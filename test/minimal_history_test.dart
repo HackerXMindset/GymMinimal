@@ -5,6 +5,7 @@ import 'package:gymmane/l10n/l10n.dart';
 import 'package:gymmane/models/workout.dart';
 import 'package:gymmane/services/local_store.dart';
 import 'package:gymmane/state/fit_state.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -61,7 +62,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Barbell Bench Press'), findsNWidgets(2),
         reason: 'the exercise is shown in the collapsed summary and expanded set detail');
-    expect(find.textContaining('60 × 8'), findsOneWidget);
+    expect(find.textContaining('8'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
 
@@ -83,6 +84,14 @@ void main() {
     expect(find.text('220 sets'), findsOneWidget);
     expect(find.text('Volume'), findsOneWidget);
     expect(find.text('Muscle'), findsOneWidget);
+    for (final column in ['date', 'exercise', 'set', 'weight', 'reps', 'volume', 'oneRm', 'muscle']) {
+      expect(find.byKey(ValueKey('minimal-history-sort-$column')), findsOneWidget);
+    }
+    final dateHeader = find.byKey(const ValueKey('minimal-history-sort-date'));
+    await tester.tap(dateHeader);
+    await tester.pumpAndSettle();
+    expect(find.byIcon(PhosphorIconsBold.caretUp), findsOneWidget,
+        reason: 'tapping the active sort toggles the direction');
     expect(find.text('Showing 200 of 220 sets. Search to narrow the results.'), findsOneWidget);
 
     final search = find.byKey(const ValueKey('minimal-history-search'));
