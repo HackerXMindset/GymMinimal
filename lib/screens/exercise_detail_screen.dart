@@ -647,7 +647,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     final rows = history.where((h) => !h.date.isAfter(end) && !h.date.isBefore(start)).toList()
       ..sort((a, b) => a.date.compareTo(b.date));
     final trend = [for (final h in rows) if (h.ex.bestOneRm > 0) h.ex.bestOneRm];
-    final maxVolume = rows.fold<double>(1, (m, h) => math.max(m, h.ex.volume));
+    final maxVolume = rows.fold<double>(1, (m, h) => math.max(m, h.ex.volume).toDouble());
     final prs = <({DateTime date, double value})>[];
     var record = 0.0;
     for (final h in [...history]..sort((a, b) => a.date.compareTo(b.date))) {
@@ -670,7 +670,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         for (final h in rows) Expanded(child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2),
           child: Tooltip(message: _fmtDate(h.date) + ' · ' + fit.volumeLabel(h.ex.volume),
-            child: Container(height: math.max(2, 64 * h.ex.volume / maxVolume),
+            child: Container(height: math.max(2, 64 * h.ex.volume / maxVolume).toDouble(),
               decoration: BoxDecoration(color: gc.ember.withValues(alpha: 0.75),
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(3)))),
           ),
