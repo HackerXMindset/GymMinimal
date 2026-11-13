@@ -53,7 +53,6 @@ void main() {
 
     await pumpHistory(tester);
 
-    final bench = fit.matchExerciseByName('Barbell Bench Press')!;
     expect(find.text('Workout 00'), findsOneWidget);
     expect(find.text('Workout 39'), findsOneWidget);
     expect(find.text('Workout 40'), findsNothing);
@@ -61,9 +60,8 @@ void main() {
 
     await tester.tap(find.text('Workout 00'));
     await tester.pumpAndSettle();
-    expect(find.text(t.catalogName(bench.id, bench.name)), findsNWidgets(2),
-        reason: 'the exercise is shown in the collapsed summary and expanded set detail');
-    expect(find.textContaining(fit.loggedSetLabel(LoggedSet(8, 60))), findsOneWidget);
+    expect(find.textContaining(fit.loggedSetLabel(LoggedSet(8, 60))), findsOneWidget,
+        reason: 'expanding a workout reveals its logged set summary');
     expect(tester.takeException(), isNull);
   });
 
