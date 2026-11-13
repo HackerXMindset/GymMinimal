@@ -22,7 +22,7 @@ env:
 
 jobs:
   build:
-    name: Build split APKs
+    name: Build ARM64 APK
     runs-on: ubuntu-latest
 
     steps:
@@ -55,20 +55,18 @@ jobs:
         run: flutter test
 
       - name: Build split APKs
-        run: flutter build apk --release --split-per-abi
+        run: flutter build apk --release --target-platform android-arm64
 
       - name: Rename APKs
         run: |
           cd build/app/outputs/flutter-apk
-          mv app-arm64-v8a-release.apk     GymMane-arm64-v8a.apk
-          mv app-armeabi-v7a-release.apk   GymMane-armeabi-v7a.apk
-          mv app-x86_64-release.apk        GymMane-x86_64.apk
+          mv app-release.apk GymMane-arm64-v8a.apk
 
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: gymmane-apks
-          path: build/app/outputs/flutter-apk/GymMane-*.apk
+          name: gymmane-apk-arm64
+          path: build/app/outputs/flutter-apk/GymMane-arm64-v8a.apk
           if-no-files-found: error
 
   release:
