@@ -1618,9 +1618,9 @@ class SessionScreen extends StatelessWidget {
   Future<void> _confirmDiscard(BuildContext context) async {
     final ok = await askConfirm(
       context,
-      title: 'Discard workout?',
-      body: 'Your active workout will be discarded and will not be saved to history.',
-      confirmLabel: 'Discard',
+      title: t.discardTitle,
+      body: t.discardBody,
+      confirmLabel: t.discard,
     );
     if (ok && fit.session != null) fit.discardSession();
   }
