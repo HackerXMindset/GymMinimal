@@ -84,7 +84,7 @@ class HistoryScreen extends StatelessWidget {
                               const SizedBox(height: 10),
                               CardFlow(minColumn: 300, maxColumns: 2, gap: 12, children: [
                                 for (var i = 0; i < list.length; i++)
-                                  Rise(index: i + 1, child: WorkoutHistoryCard(session: list[i], records: records[list[i]] ?? 0)),
+                                  Rise(index: i + 1, child: WorkoutHistoryCard(session: list[i], records: records[list[i]] ?? 0, minimal: false)),
                               ]),
                             ]),
                     ),
@@ -100,7 +100,7 @@ class HistoryScreen extends StatelessWidget {
                   style: AppTheme.f(10.5, weight: FontWeight.w700, color: gc.textTertiary, letterSpacing: 1.4)),
               const SizedBox(height: 10),
               for (var i = 0; i < list.length; i++) ...[
-                Rise(index: i + 1, child: WorkoutHistoryCard(session: list[i], records: records[list[i]] ?? 0)),
+                Rise(index: i + 1, child: WorkoutHistoryCard(session: list[i], records: records[list[i]] ?? 0, minimal: false)),
                 const SizedBox(height: 10),
               ],
             ],
@@ -356,7 +356,7 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
                 ),
                 const SizedBox(height: 1),
                 Text(
-                  '${duration} min, $setCount sets',
+                  '$duration min, $setCount sets',
                   style: AppTheme.f(11.5, weight: FontWeight.w500, color: gc.textSecondary),
                 ),
                 if (exerciseNames.isNotEmpty) ...[
