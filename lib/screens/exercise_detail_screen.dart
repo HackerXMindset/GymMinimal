@@ -663,11 +663,11 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       Row(children: [Expanded(child: _section(gc, 'Estimated 1RM')), _minimalRangePicker(gc)]),
       const SizedBox(height: 8),
       if (trend.length > 1) TrendChart(values: trend.map(fit.toDisplayWeight).toList(), height: 82, scale: fmt)
-      else Text('Not enough sessions for a trend', style: AppTheme.f(11, color: gc.textSecondary)),
+      else Text(t.minimalExerciseTrendEmpty, style: AppTheme.f(11, color: gc.textSecondary)),
       const SizedBox(height: 14),
       _section(gc, 'Volume per session'),
       const SizedBox(height: 8),
-      if (rows.isEmpty) Text('No volume data in this range', style: AppTheme.f(11, color: gc.textSecondary))
+      if (rows.isEmpty) Text(t.minimalExerciseVolumeEmpty, style: AppTheme.f(11, color: gc.textSecondary))
       else SizedBox(height: 88, child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
         for (final h in rows) Expanded(child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -681,7 +681,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       const SizedBox(height: 14),
       _section(gc, 'PR history'),
       const SizedBox(height: 6),
-      if (prs.isEmpty) Text('No personal records yet', style: AppTheme.f(11, color: gc.textSecondary))
+      if (prs.isEmpty) Text(t.minimalExerciseRecordsEmpty, style: AppTheme.f(11, color: gc.textSecondary))
       else for (final p in prs.reversed) Padding(
         padding: const EdgeInsets.symmetric(vertical: 5),
         child: Row(children: [
