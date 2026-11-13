@@ -216,7 +216,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       if (minimal) ...[
         if (history.isNotEmpty) ...[
           const SizedBox(height: 10),
-          _minimalOverview(gc, history, pr),
+          _minimalOverview(gc, history),
         ],
         _minimalHistorySections(gc, history),
       ],
@@ -600,7 +600,6 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   Widget _minimalOverview(
     GymColors gc,
     List<({DateTime date, LoggedExercise ex})> history,
-    PersonalRecord? pr,
   ) {
     final sets = [for (final item in history) ...item.ex.workingSets];
     final last = history.isEmpty ? null : history.first;
@@ -609,6 +608,15 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     final volume = sets.fold<double>(0, (sum, set) => sum + set.volume);
     final heavy = sets.isEmpty ? null : sets.reduce((a, b) => a.weight > b.weight || (a.weight == b.weight && a.reps > b.reps) ? a : b);
     final best = sets.isEmpty ? null : sets.reduce((a, b) => a.oneRm > b.oneRm ? a : b);
+    var bestSoFar = 0.0;
+    var lastPrLabel = '–';
+    for (final item in [...history]..sort((a, b) => a.date.compareTo(b.date))) {
+      final value = item.ex.bestOneRm;
+      if (value > bestSoFar + 0.01) {
+        bestSoFar = value;
+        lastPrLabel = _fmtDate(item.date) + ' · ' + fit.weightLabel(value);
+      }
+    }
     final metrics = <(String, String)>[
       ('Last done', last == null ? 'Not logged' : _fmtDate(last.date)),
       ('Last sets', last == null ? '–' : fit.setsSummary(last.ex.sets)),
@@ -619,7 +627,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       ('Total volume', fit.volumeLabel(volume)),
       ('Heaviest set', heavy == null ? '–' : fit.weightLabel(heavy.weight) + ' × ' + heavy.reps.toString()),
       ('Best 1RM', best == null ? '–' : fit.weightLabel(best.oneRm)),
-      ('Last PR', pr == null ? '–' : fit.recordLabel(pr)),
+      ('Last PR', lastPrLabel),
     ];
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 4),
