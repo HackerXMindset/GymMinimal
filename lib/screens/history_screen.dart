@@ -301,7 +301,7 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
       final groupKey = '${exercise.id}|${exercise.primary}';
       final group = grouped.putIfAbsent(
         groupKey,
-        () => _MinimalHistoryExerciseGroup(exercise.id, exercise.name, exercise.primary),
+        () => _MinimalHistoryExerciseGroup(exercise.id, exercise.name),
       );
       group.sets.addAll(exercise.sets);
     }
@@ -541,30 +541,35 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
               scrollDirection: Axis.horizontal,
               child: SizedBox(
                 width: 611,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 31,
-                        decoration: BoxDecoration(
-                          color: gc.bgRaised,
-                          border: Border(bottom: BorderSide(color: gc.border)),
-                        ),
-                        child: Row(children: [
-                          _sortHeader(_MinimalHistorySort.date, 'Date', 80, gc),
-                          _sortHeader(_MinimalHistorySort.exercise, 'Exercise', 178, gc),
-                          _sortHeader(_MinimalHistorySort.set, 'Set', 38, gc, right: true),
-                          _sortHeader(_MinimalHistorySort.weight, 'Kg', 54, gc, right: true),
-                          _sortHeader(_MinimalHistorySort.reps, 'Reps', 47, gc, right: true),
-                          _sortHeader(_MinimalHistorySort.volume, 'Volume', 65, gc, right: true),
-                          _sortHeader(_MinimalHistorySort.oneRm, '1RM', 65, gc, right: true),
-                          _sortHeader(_MinimalHistorySort.muscle, 'Muscle', 84, gc),
-                        ]),
+                child: Column(
+                  children: [
+                    Container(
+                      height: 31,
+                      decoration: BoxDecoration(
+                        color: gc.bgRaised,
+                        border: Border(bottom: BorderSide(color: gc.border)),
                       ),
-                      for (final row in visible) _historyTableRow(row, gc),
-                    ],
-                  ),
+                      child: Row(children: [
+                        _sortHeader(_MinimalHistorySort.date, 'Date', 80, gc),
+                        _sortHeader(_MinimalHistorySort.exercise, 'Exercise', 178, gc),
+                        _sortHeader(_MinimalHistorySort.set, 'Set', 38, gc, right: true),
+                        _sortHeader(_MinimalHistorySort.weight, 'Kg', 54, gc, right: true),
+                        _sortHeader(_MinimalHistorySort.reps, 'Reps', 47, gc, right: true),
+                        _sortHeader(_MinimalHistorySort.volume, 'Volume', 65, gc, right: true),
+                        _sortHeader(_MinimalHistorySort.oneRm, '1RM', 65, gc, right: true),
+                        _sortHeader(_MinimalHistorySort.muscle, 'Muscle', 84, gc),
+                      ]),
+                    ),
+                    SizedBox(
+                      height: tableHeight - 31,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Column(
+                          children: [for (final row in visible) _historyTableRow(row, gc)],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -674,11 +679,10 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
 }
 
 class _MinimalHistoryExerciseGroup {
-  _MinimalHistoryExerciseGroup(this.id, this.name, this.muscle);
+  _MinimalHistoryExerciseGroup(this.id, this.name);
 
   final String id;
   final String name;
-  final String muscle;
   final List<LoggedSet> sets = [];
 }
 
