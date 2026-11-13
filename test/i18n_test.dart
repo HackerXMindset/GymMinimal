@@ -91,6 +91,18 @@ void main() {
     expect(t.startWorkout, 'START WORKOUT');
   });
 
+  test('Minimal exercise detail empty states follow the active language', () {
+    setAppLanguage('en');
+    expect(t.minimalExerciseTrendEmpty, 'Not enough sessions for a trend');
+    expect(t.minimalExerciseVolumeEmpty, 'No volume data in this range');
+    expect(t.minimalExerciseRecordsEmpty, 'No personal records yet');
+
+    setAppLanguage('es');
+    expect(t.minimalExerciseTrendEmpty, 'No hay suficientes sesiones para mostrar una tendencia');
+    expect(t.minimalExerciseVolumeEmpty, 'No hay datos de volumen en este periodo');
+    expect(t.minimalExerciseRecordsEmpty, 'Todavía no hay récords personales');
+  });
+
   test('every key says something different in each language', () {
 
     final same = <String>[];
