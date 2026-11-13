@@ -473,6 +473,7 @@ extension MinimalHistoryL10n on AppLocalizations {
     final language = locale.startsWith('zh_hant') ? 'zh_Hant' : locale.split('_').first;
     return labels[language]?[index] ?? english[index];
   }
+}
 
 /// Empty-state copy for Minimal exercise-detail statistics.
 extension MinimalExerciseDetailL10n on AppLocalizations {
@@ -513,6 +514,4 @@ extension MinimalExerciseDetailL10n on AppLocalizations {
     final language = locale.startsWith('zh_hant') ? 'zh_Hant' : locale.split('_').first;
     return labels[language]?[index] ?? english[index];
   }
-}
-
 }
