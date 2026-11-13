@@ -701,10 +701,9 @@ class _MinimalHistorySetRow {
 }
 
 class _MonthCard extends StatelessWidget {
-  const _MonthCard({super.key, required this.month, this.minimal = false});
+  const _MonthCard({super.key, required this.month});
 
   final DateTime month;
-  final bool minimal;
 
   @override
   Widget build(BuildContext context) {
@@ -715,28 +714,28 @@ class _MonthCard extends StatelessWidget {
     final hours = now.seconds ~/ 3600;
     final minutes = (now.seconds % 3600) ~/ 60;
     return Container(
-      padding: EdgeInsets.fromLTRB(minimal ? 10 : 16, minimal ? 9 : 14, minimal ? 10 : 16, minimal ? 10 : 16),
-      decoration: BoxDecoration(color: gc.bgRaised, borderRadius: BorderRadius.circular(minimal ? 10 : 22)),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+      decoration: BoxDecoration(color: gc.bgRaised, borderRadius: BorderRadius.circular(22)),
       child: Column(children: [
         Row(children: [
           _arrow(gc, PhosphorIconsBold.caretLeft, t.notePrevMonth, () => fit.shiftHistoryMonth(-1)),
           Expanded(
             child: Text(t.monthYear(month),
-                textAlign: TextAlign.center, style: AppTheme.f(minimal ? 13.5 : 16, weight: FontWeight.w800, color: gc.text)),
+                textAlign: TextAlign.center, style: AppTheme.f(16, weight: FontWeight.w800, color: gc.text)),
           ),
           _arrow(gc, PhosphorIconsBold.caretRight, t.noteNextMonth,
               fit.historyAtLatest ? null : () => fit.shiftHistoryMonth(1)),
         ]),
-        SizedBox(height: minimal ? 9 : 16),
+        const SizedBox(height: 16),
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          _stat(gc, '${now.workouts}', t.statWorkouts.toUpperCase(), now.workouts - before.workouts, minimal: minimal),
-          _stat(gc, hours > 0 ? '${hours}h ${minutes.toString().padLeft(2, '0')}' : '${minutes}m', t.timeCaps, null, minimal: minimal),
-          _stat(gc, '${now.sets}', t.setsCaps, null, minimal: minimal),
-          _stat(gc, fit.volumeLabel(now.volume), t.volume, null, minimal: minimal),
+          _stat(gc, '${now.workouts}', t.statWorkouts.toUpperCase(), now.workouts - before.workouts),
+          _stat(gc, hours > 0 ? '${hours}h ${minutes.toString().padLeft(2, '0')}' : '${minutes}m', t.timeCaps, null),
+          _stat(gc, '${now.sets}', t.setsCaps, null),
+          _stat(gc, fit.volumeLabel(now.volume), t.volume, null),
         ]),
-        SizedBox(height: minimal ? 9 : 16),
+        const SizedBox(height: 16),
         Container(height: 1, color: gc.border),
-        SizedBox(height: minimal ? 8 : 12),
+        const SizedBox(height: 12),
         _calendar(context, gc, trained),
       ]),
     );
@@ -757,8 +756,8 @@ class _MonthCard extends StatelessWidget {
           child: Opacity(
             opacity: onTap == null ? 0.3 : 1,
             child: Container(
-              width: minimal ? 28 : 34,
-              height: minimal ? 28 : 34,
+              width: 34,
+              height: 34,
               decoration: BoxDecoration(color: gc.bgRaised2, shape: BoxShape.circle),
               child: Icon(icon, size: 13, color: gc.text),
             ),
@@ -766,15 +765,15 @@ class _MonthCard extends StatelessWidget {
         ),
       );
 
-  Widget _stat(GymColors gc, String value, String label, int? delta, {bool minimal = false}) => Expanded(
+  Widget _stat(GymColors gc, String value, String label, int? delta) => Expanded(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
-            child: RollIn(value, style: AppTheme.f(minimal ? 16 : 21, weight: FontWeight.w800, color: gc.text, height: 1.1)),
+            child: RollIn(value, style: AppTheme.f(21, weight: FontWeight.w800, color: gc.text, height: 1.1)),
           ),
           const SizedBox(height: 3),
-          FitText(label, style: AppTheme.f(minimal ? 8 : 9, weight: FontWeight.w700, color: gc.textTertiary, letterSpacing: 1)),
+          FitText(label, style: AppTheme.f(9, weight: FontWeight.w700, color: gc.textTertiary, letterSpacing: 1)),
           if (delta != null && delta != 0) ...[
             const SizedBox(height: 3),
             Row(mainAxisSize: MainAxisSize.min, children: [
@@ -782,7 +781,7 @@ class _MonthCard extends StatelessWidget {
                   size: 10, color: delta > 0 ? gc.sage : gc.textTertiary),
               const SizedBox(width: 2),
               Text('${delta.abs()}',
-                  style: AppTheme.f(minimal ? 9 : 10.5, weight: FontWeight.w700, color: delta > 0 ? gc.sage : gc.textTertiary)),
+                  style: AppTheme.f(10.5, weight: FontWeight.w700, color: delta > 0 ? gc.sage : gc.textTertiary)),
             ]),
           ],
         ]),
@@ -799,16 +798,16 @@ class _MonthCard extends StatelessWidget {
           Expanded(
             child: Text(t.weekdayInitial(fit.weekdayAt(i)).toUpperCase(),
                 textAlign: TextAlign.center,
-                style: AppTheme.f(minimal ? 8.5 : 10, weight: FontWeight.w700, color: gc.textTertiary, letterSpacing: 1)),
+                style: AppTheme.f(10, weight: FontWeight.w700, color: gc.textTertiary, letterSpacing: 1)),
           ),
       ]),
-      SizedBox(height: minimal ? 4 : 6),
+      const SizedBox(height: 6),
       for (var row = 0; row * 7 < lead + days; row++)
         Row(children: [
           for (var col = 0; col < 7; col++)
             Expanded(child: () {
               final n = row * 7 + col - lead + 1;
-              if (n < 1 || n > days) return SizedBox(height: minimal ? 30 : 40);
+              if (n < 1 || n > days) return const SizedBox(height: 40);
               final day = DateTime(month.year, month.month, n);
               final on = trained.contains(n);
               final isToday = DateUtils.isSameDay(day, today);
@@ -820,11 +819,11 @@ class _MonthCard extends StatelessWidget {
                   behavior: HitTestBehavior.opaque,
                   onTap: future ? null : () => showDaySheet(context, day),
                   child: SizedBox(
-                    height: minimal ? 30 : 40,
+                    height: 40,
                     child: Center(
                       child: Container(
-                        width: minimal ? 24 : 32,
-                        height: minimal ? 24 : 32,
+                        width: 32,
+                        height: 32,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           color: on ? gc.accent : Colors.transparent,
@@ -832,7 +831,7 @@ class _MonthCard extends StatelessWidget {
                           border: isToday && !on ? Border.all(color: gc.ember, width: 1.4) : null,
                         ),
                         child: Text('$n',
-                            style: AppTheme.f(minimal ? 11 : 13,
+                            style: AppTheme.f(13,
                                 weight: on || isToday ? FontWeight.w800 : FontWeight.w500,
                                 color: on
                                     ? gc.onEmber
