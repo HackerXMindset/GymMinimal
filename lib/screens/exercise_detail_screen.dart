@@ -213,9 +213,11 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           _meta(gc, t.equipmentLabel, t.equipment(ex.equipment)),
         ],
       ),
-      if (minimal && history.isNotEmpty) ...[
-        const SizedBox(height: 10),
-        _minimalOverview(gc, history, pr),
+      if (minimal) ...[
+        if (history.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          _minimalOverview(gc, history, pr),
+        ],
         _minimalHistorySections(gc, history),
       ],
       SizedBox(height: minimal ? 10 : 18),
