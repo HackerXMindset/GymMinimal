@@ -247,10 +247,11 @@ class _MonthCard extends StatelessWidget {
 }
 
 class WorkoutHistoryCard extends StatelessWidget {
-  const WorkoutHistoryCard({super.key, required this.session, this.records = 0});
+  const WorkoutHistoryCard({super.key, required this.session, this.records = 0, this.minimal = false});
 
   final LoggedSession session;
   final int records;
+  final bool minimal;
 
   @override
   Widget build(BuildContext context) {
@@ -265,6 +266,73 @@ class WorkoutHistoryCard extends StatelessWidget {
       if (s.hrAvg != null) '\u2665 ${s.hrAvg} · ${t.hrMaxShort(s.hrMax ?? s.hrAvg!)}',
     ].join(' · ');
     final shown = s.exercises.take(4).toList();
+
+    if (minimal) {
+      return Pressable(
+        scale: 0.98,
+        onTap: () => showDaySheet(context, s.day),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 2),
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: gc.border)),
+          ),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 38,
+                child: Column(
+                  children: [
+                    Text(t.weekdayShort(s.day.weekday).toUpperCase(),
+                        style: AppTheme.f(8.5, weight: FontWeight.w800, color: gc.accent, letterSpacing: 0.5)),
+                    Text('${s.day.day}',
+                        style: AppTheme.f(17, weight: FontWeight.w800, color: gc.text, height: 1.15)),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(fit.sessionHeading(s),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTheme.f(13, weight: FontWeight.w800, color: gc.text)),
+                        ),
+                        if (records > 0) ...[
+                          const SizedBox(width: 6),
+                          Icon(PhosphorIconsFill.trophy, size: 11, color: gc.accent),
+                          const SizedBox(width: 3),
+                          Text('$records',
+                              style: AppTheme.f(10.5, weight: FontWeight.w800, color: gc.accent)),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 3),
+                    Text(meta,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTheme.f(10.5, weight: FontWeight.w600, color: gc.textSecondary)),
+                    const SizedBox(height: 2),
+                    Text(
+                      [t.exerciseCount(s.exercises.length), t.setCount(s.setCount), if (s.volume > 0) fit.volumeLabel(s.volume)]
+                          .join(' · '),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTheme.f(10, weight: FontWeight.w600, color: gc.textTertiary),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Pressable(
       scale: 0.98,
       onTap: () => showDaySheet(context, s.day),
