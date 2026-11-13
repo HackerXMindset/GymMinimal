@@ -613,7 +613,7 @@ class SessionScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            child: Text('Discard',
+            child: Text(t.discard,
                 style: AppTheme.f(11.5, weight: FontWeight.w600,
                     color: locked ? gc.textTertiary : gc.textSecondary)),
           ),
