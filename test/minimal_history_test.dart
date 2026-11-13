@@ -53,6 +53,7 @@ void main() {
 
     await pumpHistory(tester);
 
+    final bench = fit.matchExerciseByName('Barbell Bench Press')!;
     expect(find.text('Workout 00'), findsOneWidget);
     expect(find.text('Workout 39'), findsOneWidget);
     expect(find.text('Workout 40'), findsNothing);
@@ -60,9 +61,9 @@ void main() {
 
     await tester.tap(find.text('Workout 00'));
     await tester.pumpAndSettle();
-    expect(find.text('Barbell Bench Press'), findsNWidgets(2),
+    expect(find.text(t.catalogName(bench.id, bench.name)), findsNWidgets(2),
         reason: 'the exercise is shown in the collapsed summary and expanded set detail');
-    expect(find.textContaining('8'), findsWidgets);
+    expect(find.textContaining(fit.loggedSetLabel(LoggedSet(8, 60))), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -106,6 +107,9 @@ void main() {
     await tester.enterText(search, date);
     await tester.pumpAndSettle();
     expect(find.text('20 sets'), findsOneWidget);
+    await tester.enterText(search, 'no-such-exercise');
+    await tester.pumpAndSettle();
+    expect(find.text('No sets match that search.'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
