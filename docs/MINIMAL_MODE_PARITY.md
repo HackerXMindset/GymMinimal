@@ -12,7 +12,7 @@
 
 - [x] Stage 0 — Reference specification and baseline
 - [x] Stage 1 — Minimal shell and navigation
-- [ ] Stage 2 — Today screen
+- [x] Stage 2 — Today screen
 - [ ] Stage 3 — Live workout
 - [ ] Stage 4 — Exercise library
 - [ ] Stage 5 — Exercise details and per-exercise statistics
