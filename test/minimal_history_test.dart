@@ -112,7 +112,7 @@ void main() {
   testWidgets('Minimal History shows a clear empty state', (tester) async {
     await pumpHistory(tester);
     expect(find.text(t.historyEmpty), findsOneWidget);
-    expect(find.text('Export Excel'), findsOneWidget);
+    expect(find.text(t.minimalHistoryExportExcel), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }
