@@ -47,7 +47,8 @@ void main() {
     expect(find.text('Last workout'), findsOneWidget);
 
     fit.sessions.clear();
-    await tester.pump();
+    await tester.pumpWidget(const GymManeApp());
+    await tester.pump(const Duration(milliseconds: 500));
     expect(tester.takeException(), isNull);
     expect(find.byKey(const PageStorageKey('home-minimal')), findsOneWidget);
     expect(find.text(t.noHistory), findsOneWidget);
