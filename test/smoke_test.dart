@@ -42,7 +42,13 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.byKey(const PageStorageKey('home-minimal')), findsOneWidget);
-    expect(find.text(t.today), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byKey(const PageStorageKey('home-minimal')),
+        matching: find.text(t.today),
+      ),
+      findsOneWidget,
+    );
     expect(find.text('Start empty workout'), findsOneWidget);
     expect(find.text('Last workout'), findsOneWidget);
 
