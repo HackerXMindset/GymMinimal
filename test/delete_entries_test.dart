@@ -18,7 +18,7 @@ void main() {
 
   LoggedSession log(String name, double kg, {int daysAgo = 0}) {
     final s = LoggedSession(
-      DateTime.now().subtract(Duration(days: daysAgo)),
+      DateTime.now().subtract(Duration(days: daysAgo)).add(const Duration(seconds: 600)),
       600,
       [LoggedExercise('e-$name', name, 'chest', [LoggedSet(5, kg)])],
     );
