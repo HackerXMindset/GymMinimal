@@ -65,7 +65,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Minimal Table searches all 8 columns and caps rendered rows at 200',
+  testWidgets('Minimal Table fits the phone, switches its last column, searches all columns and caps rendered rows at 200',
       (tester) async {
     final now = DateTime.now();
     for (var daysAgo = 0; daysAgo < 11; daysAgo++) {
@@ -81,11 +81,22 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('220 sets'), findsOneWidget);
-    expect(find.text('Volume'), findsOneWidget);
-    expect(find.text('Muscle'), findsOneWidget);
-    for (final column in ['date', 'exercise', 'set', 'weight', 'reps', 'volume', 'oneRm', 'muscle']) {
+    // Volume is both the selected last-column chip and its header.
+    expect(find.text('Volume'), findsNWidgets(2));
+    for (final column in ['date', 'exercise', 'set', 'weight', 'reps', 'volume']) {
       expect(find.byKey(ValueKey('minimal-history-sort-$column')), findsOneWidget);
     }
+    expect(find.byKey(const ValueKey('minimal-history-sort-oneRm')), findsNothing);
+    expect(find.byKey(const ValueKey('minimal-history-sort-muscle')), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('minimal-history-last-muscle')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('minimal-history-sort-muscle')), findsOneWidget);
+    expect(find.byKey(const ValueKey('minimal-history-sort-volume')), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('minimal-history-last-oneRm')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('minimal-history-sort-oneRm')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('minimal-history-last-volume')));
+    await tester.pumpAndSettle();
     final dateHeader = find.byKey(const ValueKey('minimal-history-sort-date'));
     await tester.tap(dateHeader);
     await tester.pumpAndSettle();

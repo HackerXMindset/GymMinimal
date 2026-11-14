@@ -148,6 +148,20 @@ enum _MinimalHistoryView { list, table }
 
 enum _MinimalHistorySort { date, exercise, set, weight, reps, volume, oneRm, muscle }
 
+/// The one switchable column at the end of the Minimal table. Date, Exercise,
+/// Set, Kg and Reps are always shown so the table fits a phone without
+/// sideways scrolling.
+enum _MinimalHistoryLast {
+  volume('Volume', _MinimalHistorySort.volume, 56),
+  oneRm('1RM', _MinimalHistorySort.oneRm, 48),
+  muscle('Muscle', _MinimalHistorySort.muscle, 70);
+
+  const _MinimalHistoryLast(this.label, this.sort, this.width);
+  final String label;
+  final _MinimalHistorySort sort;
+  final double width;
+}
+
 class _MinimalHistoryContent extends StatefulWidget {
   const _MinimalHistoryContent({required this.allSessions});
 
@@ -164,6 +178,7 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
   final Set<int> _expandedSessions = {};
   _MinimalHistoryView _view = _MinimalHistoryView.list;
   _MinimalHistorySort _sort = _MinimalHistorySort.date;
+  _MinimalHistoryLast _last = _MinimalHistoryLast.volume;
   bool _descending = true;
 
   @override
@@ -473,7 +488,8 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
   Widget _tableView(GymColors gc) {
     final rows = _filteredRows();
     final visible = rows.take(_visibleSetLimit).toList(growable: false);
-    final tableHeight = (31 + visible.length * 34).clamp(31, 430).toDouble();
+    final maxTable = (MediaQuery.sizeOf(context).height * 0.6).clamp(300.0, 560.0).toDouble();
+    final tableHeight = (31 + visible.length * 34).clamp(31.0, maxTable).toDouble();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -525,6 +541,15 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
               style: AppTheme.f(9.5, weight: FontWeight.w500, color: gc.textTertiary)),
         ]),
         const SizedBox(height: 5),
+        Row(children: [
+          Text('Last column', style: AppTheme.f(9.5, weight: FontWeight.w500, color: gc.textTertiary)),
+          const Spacer(),
+          for (final option in _MinimalHistoryLast.values) ...[
+            const SizedBox(width: 5),
+            _lastChip(option, gc),
+          ],
+        ]),
+        const SizedBox(height: 6),
         if (visible.isEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 26),
@@ -537,41 +562,31 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
         else
           SizedBox(
             height: tableHeight,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                width: 611,
-                child: Column(
-                  children: [
-                    Container(
-                      height: 31,
-                      decoration: BoxDecoration(
-                        color: gc.bgRaised,
-                        border: Border(bottom: BorderSide(color: gc.border)),
-                      ),
-                      child: Row(children: [
-                        _sortHeader(_MinimalHistorySort.date, 'Date', 80, gc),
-                        _sortHeader(_MinimalHistorySort.exercise, 'Exercise', 178, gc),
-                        _sortHeader(_MinimalHistorySort.set, 'Set', 38, gc, right: true),
-                        _sortHeader(_MinimalHistorySort.weight, 'Kg', 54, gc, right: true),
-                        _sortHeader(_MinimalHistorySort.reps, 'Reps', 47, gc, right: true),
-                        _sortHeader(_MinimalHistorySort.volume, 'Volume', 65, gc, right: true),
-                        _sortHeader(_MinimalHistorySort.oneRm, '1RM', 65, gc, right: true),
-                        _sortHeader(_MinimalHistorySort.muscle, 'Muscle', 84, gc),
-                      ]),
-                    ),
-                    SizedBox(
-                      height: tableHeight - 31,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: Column(
-                          children: [for (final row in visible) _historyTableRow(row, gc)],
-                        ),
-                      ),
-                    ),
-                  ],
+            child: Column(
+              children: [
+                Container(
+                  height: 31,
+                  decoration: BoxDecoration(
+                    color: gc.bgRaised,
+                    border: Border(bottom: BorderSide(color: gc.border)),
+                  ),
+                  child: Row(children: [
+                    _sortHeader(_MinimalHistorySort.date, 'Date', 52, gc),
+                    _sortHeader(_MinimalHistorySort.exercise, 'Exercise', null, gc),
+                    _sortHeader(_MinimalHistorySort.set, 'Set', 30, gc, right: true),
+                    _sortHeader(_MinimalHistorySort.weight, 'Kg', 40, gc, right: true),
+                    _sortHeader(_MinimalHistorySort.reps, 'Reps', 36, gc, right: true),
+                    _sortHeader(_last.sort, _last.label, _last.width, gc, right: _last != _MinimalHistoryLast.muscle),
+                  ]),
                 ),
-              ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [for (final row in visible) _historyTableRow(row, gc)],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         if (rows.length > visible.length)
@@ -586,9 +601,35 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
     );
   }
 
-  Widget _sortHeader(_MinimalHistorySort column, String label, double width, GymColors gc, {bool right = false}) {
+  Widget _lastChip(_MinimalHistoryLast option, GymColors gc) {
+    final selected = _last == option;
+    return GestureDetector(
+      key: ValueKey('minimal-history-last-${option.name}'),
+      behavior: HitTestBehavior.opaque,
+      onTap: () => setState(() {
+        _last = option;
+        if (_sort == _MinimalHistorySort.volume ||
+            _sort == _MinimalHistorySort.oneRm ||
+            _sort == _MinimalHistorySort.muscle) {
+          _sort = option.sort;
+        }
+      }),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: selected ? gc.accentSoft : Colors.transparent,
+          border: Border.all(color: selected ? gc.accent : gc.border),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Text(option.label,
+            style: AppTheme.f(9.5, weight: FontWeight.w700, color: selected ? gc.accent : gc.textSecondary)),
+      ),
+    );
+  }
+
+  Widget _sortHeader(_MinimalHistorySort column, String label, double? width, GymColors gc, {bool right = false}) {
     final active = _sort == column;
-    return InkWell(
+    final header = InkWell(
       key: ValueKey('minimal-history-sort-${column.name}'),
       onTap: () => setState(() {
         if (_sort == column) {
@@ -602,7 +643,7 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
         width: width,
         height: 31,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 3),
           child: Row(
             mainAxisAlignment: right ? MainAxisAlignment.end : MainAxisAlignment.start,
             children: [
@@ -623,6 +664,7 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
         ),
       ),
     );
+    return width == null ? Expanded(child: header) : header;
   }
 
   Widget _historyTableRow(_MinimalHistorySetRow row, GymColors gc) {
@@ -643,23 +685,25 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
       height: 34,
       decoration: BoxDecoration(border: Border(bottom: BorderSide(color: gc.border.withValues(alpha: 0.65)))),
       child: Row(children: [
-        _tableCell(date, 80, gc),
-        _tableCell(t.catalogName(row.exercise.id, row.exercise.name), 178, gc),
-        _tableCell('${row.setNumber}$type', 38, gc, right: true),
-        _tableCell(weight, 54, gc, right: true, muted: weight == '—'),
-        _tableCell(reps, 47, gc, right: true, muted: reps == '—'),
-        _tableCell(volume, 65, gc, right: true, muted: volume == '—'),
-        _tableCell(oneRm, 65, gc, right: true, muted: oneRm == '—'),
-        _tableCell(sentenceCase(row.exercise.primary), 84, gc, muted: true),
+        _tableCell(date, 52, gc),
+        _tableCell(t.catalogName(row.exercise.id, row.exercise.name), null, gc),
+        _tableCell('${row.setNumber}$type', 30, gc, right: true),
+        _tableCell(weight, 40, gc, right: true, muted: weight == '—'),
+        _tableCell(reps, 36, gc, right: true, muted: reps == '—'),
+        switch (_last) {
+          _MinimalHistoryLast.volume => _tableCell(volume, _last.width, gc, right: true, muted: volume == '—'),
+          _MinimalHistoryLast.oneRm => _tableCell(oneRm, _last.width, gc, right: true, muted: oneRm == '—'),
+          _MinimalHistoryLast.muscle => _tableCell(t.muscle(row.exercise.primary), _last.width, gc, muted: true),
+        },
       ]),
     );
   }
 
-  Widget _tableCell(String value, double width, GymColors gc, {bool right = false, bool muted = false}) {
-    return SizedBox(
+  Widget _tableCell(String value, double? width, GymColors gc, {bool right = false, bool muted = false}) {
+    final cell = SizedBox(
       width: width,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 3),
         child: Align(
           alignment: right ? Alignment.centerRight : Alignment.centerLeft,
           child: Text(
@@ -672,6 +716,7 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
         ),
       ),
     );
+    return width == null ? Expanded(child: cell) : cell;
   }
 
   String _metric(double value) =>
