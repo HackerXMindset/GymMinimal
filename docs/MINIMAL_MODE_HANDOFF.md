@@ -6,10 +6,10 @@
 
 **Snapshot date:** 2026-11-14  
 **Repository:** `HackerXMindset/GymMinimal`  
-**Latest merged baseline:** PR #11 Stage 3 merge commit `7b9a8e3ea4492b56d3391f640c708062991c6297`.  
-**Latest merged UI stage:** Stage 3 — Live Workout (PR #11, merged).  
-**Current UI stage:** Stage 4 — Exercise Library (in progress; PR #12).  
-**Progress at this snapshot:** Stages 0–3 are implemented and merged; 7 of 11 total stages remain.  
+**Latest merged baseline:** PR #15 Stage 6 merge commit `b97e1aa2512c84ec9e1037d5911dcd467a648683`.  
+**Latest merged UI stage:** Stage 6 — History (PR #15, merged).  
+**Current UI stage:** Stage 7 — Stats Dashboard (in progress; PR #17).  
+**Progress at this snapshot:** Stages 0–6 are implemented and merged; Stage 7 is in PR #17.  
 **Verified Stage 3 CI:** Actions run #43515792250 passed analysis, full tests, one-APK build and artifact upload.  
 **Verified release:** main run #43508196293 succeeded; the rolling preview release contains exactly one `GymMinimal.apk`.
 

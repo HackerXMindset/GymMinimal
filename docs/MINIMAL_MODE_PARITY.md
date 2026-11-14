@@ -6,7 +6,7 @@
 
 **Working method:** One focused stage per branch and pull request. Reuse real Flutter state/models/services; do not copy the HTML prototype's sample data or browser implementation. Run Flutter analysis, relevant tests and the one-APK build on every PR. Only mark a stage complete after its UI and interactions have been checked against the HTML reference. A successful merge to `main` should publish the same tested `GymMinimal.apk` artifact to the rolling GitHub preview release.
 
-**Snapshot:** 2026-11-14. PR #10 merged the conflict-resolved handoff and roadmap as `7fbc49522965e638a110e9988c4fe53b29a11301`. Stage 3 Live Workout merged in PR #11 as `7b9a8e3ea4492b56d3391f640c708062991c6297`; Actions run #43515792250 passed analysis, full tests and one-APK build. Stage 4 Exercise Library is in progress in PR #12 on `feature/sample-html-parity-stage-4-exercise-library`. The post-merge main run #43518506146 passed analysis/tests and was building the release APK at this snapshot.
+**Snapshot:** 2026-11-14. Stage 6 History merged in PR #15 as `b97e1aa2512c84ec9e1037d5911dcd467a648683`; the post-merge main workflow #43534728710 passed analysis, 1,117 tests (3 skipped), one-APK build and preview publishing. Stage 7 Stats Dashboard is being implemented on `feat/minimal-stage-07-stats-dashboard`.
 
 ## Overall progress
 
@@ -14,15 +14,15 @@
 - [x] Stage 1 — Minimal shell and navigation
 - [x] Stage 2 — Today screen
 - [x] Stage 3 — Live workout
-- [ ] Stage 4 — Exercise library
-- [ ] Stage 5 — Exercise details and per-exercise statistics (in progress, PR #14)
-- [ ] Stage 6 — History
-- [ ] Stage 7 — Stats dashboard
+- [x] Stage 4 — Exercise library
+- [x] Stage 5 — Exercise details and per-exercise statistics
+- [x] Stage 6 — History (PR #15 merged)
+- [ ] Stage 7 — Stats dashboard (in progress, `feat/minimal-stage-07-stats-dashboard`)
 - [ ] Stage 8 — Settings
 - [ ] Stage 9 — Behaviour, persistence and export parity
 - [ ] Stage 10 — Visual and functional QA
 
-**Progress: 3 of 11 stages implemented and merged (27%).** Eight stages remain. Final cross-screen visual verification is consolidated in Stage 10.
+**Progress: 6 of 11 stages implemented and merged (55%).** Five stages remain. Final cross-screen visual verification is consolidated in Stage 10.
 
 ## Stage details
 
@@ -101,29 +101,29 @@
 
 **PR #14 is open. Do not mark Stage 5 complete until CI and visual/interaction review pass.**
 
-### Stage 6 — History
+### Stage 6 — History — COMPLETE (PR #15 merged)
 
 **Primary source:** `lib/screens/history_screen.dart`; export service `lib/services/workout_history_xlsx.dart`.  
 **Reference:** `Sample.html` → `history()`, `tableBody()`, `flat()`.
 
-- [ ] Match List / Table switch and Excel export.
-- [ ] Match latest-40 expandable workout list, newest first.
-- [ ] Match eight-column table: Date / Exercise / Set / Kg / Reps / Volume / 1RM / Muscle.
-- [ ] Add search by exercise, muscle or date; sortable columns and active sort direction.
-- [ ] Bound rendered rows to 200 and report the real result count.
-- [ ] Verify exports, no-history and no-match states; keep Standard history unchanged.
+- [x] Match List / Table switch and Excel export.
+- [x] Match latest-40 expandable workout list, newest first.
+- [x] Match eight-column table: Date / Exercise / Set / Kg / Reps / Volume / 1RM / Muscle.
+- [x] Add search by exercise, muscle or date; sortable columns and active sort direction.
+- [x] Bound rendered rows to 200 and report the real result count.
+- [x] Verify exports, no-history and no-match states; keep Standard history unchanged. PR #15 merged; main CI passed.
 
 ### Stage 7 — Stats dashboard
 
 **Primary source:** `lib/screens/progress_screen.dart`, `lib/state/stats_state.dart`, `lib/widgets/charts.dart`.  
 **Reference:** `Sample.html` → `stats()`, `volChart()`, `lineChart()`, `prBars()`, `heat()`, `muscleBars()`.
 
-- [ ] Match weekly volume chart and date-range navigation.
-- [ ] Match selected-exercise estimated 1RM trend and best / last PR / sessions context.
-- [ ] Add days-since-last-PR chart.
-- [ ] Match 16-week training heatmap.
-- [ ] Match sets per muscle over the last 30 days.
-- [ ] Verify real-data calculations, range changes and empty/sparse data states.
+- [x] Add weekly volume chart with 4W / 8W / 12W / All range selection.
+- [x] Keep selected-exercise estimated 1RM trend and show Best / Last PR / Sessions context.
+- [x] Add days-since-last-PR chart for exercises with a recorded PR.
+- [x] Reuse the existing 16-week training heatmap.
+- [x] Reuse the real-data 30-day sets-per-muscle breakdown.
+- [ ] Verify real-data calculations, range changes and empty/sparse data states in CI and phone review.
 
 ### Stage 8 — Settings
 
