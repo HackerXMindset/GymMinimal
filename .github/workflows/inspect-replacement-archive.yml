@@ -1,0 +1,47 @@
+name: Inspect replacement archive
+
+on:
+  push:
+    branches:
+      - feat/minimal-stage-08-settings-home-fix
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch archive from latest main and inspect it
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin main
+          archive="$RUNNER_TEMP/GymMinimal-v3-full.zip"
+          git show origin/main:GymMinimal-v3-full.zip > "$archive"
+          python3 - "$archive" <<'PY'
+          import sys, zipfile
+          from pathlib import PurePosixPath
+
+          path = sys.argv[1]
+          print("Archive bytes:", __import__("os").path.getsize(path))
+          with zipfile.ZipFile(path) as z:
+              infos = [i for i in z.infolist() if not i.is_dir()]
+              print("File entries:", len(infos))
+              print("Top-level roots:", sorted({PurePosixPath(i.filename).parts[0] for i in infos if PurePosixPath(i.filename).parts}))
+              print("Project manifests:")
+              for i in infos:
+                  name = i.filename
+                  if name.endswith(("pubspec.yaml", "pubspec.lock", "Sample.html", ".metadata")):
+                      print(" ", name, i.file_size, "bytes")
+              print("First 250 paths:")
+              for i in z.infolist()[:250]:
+                  print(i.filename)
+              bad = z.testzip()
+              if bad:
+                  raise SystemExit("CRC failure at " + bad)
+              print("ZIP integrity: OK")
+          PY
