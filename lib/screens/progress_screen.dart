@@ -3399,6 +3399,78 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
     );
   }
 
+  Widget _weeklyVolumeChart(GymColors gc, List<LoggedSession> sessions) {
+    final now = DateUtils.dateOnly(DateTime.now());
+    final oldest = sessions.isEmpty ? now : sessions
+        .map((session) => DateUtils.dateOnly(session.day))
+        .reduce((a, b) => a.isBefore(b) ? a : b);
+    final availableWeeks = math.max(1, (now.difference(oldest).inDays ~/ 7) + 1);
+    final count = _rangeWeeks == 0 ? math.min(availableWeeks, 52) : _rangeWeeks;
+    final start = now.subtract(Duration(days: count * 7 - 1));
+    final values = List<double>.filled(count, 0);
+    for (final session in sessions) {
+      final day = DateUtils.dateOnly(session.day);
+      if (day.isBefore(start) || day.isAfter(now)) continue;
+      final index = day.difference(start).inDays ~/ 7;
+      if (index >= 0 && index < count) values[index] += session.volume;
+    }
+    final maxValue = values.fold<double>(0, math.max);
+    if (maxValue <= 0) return Text(t.noHistory, style: AppTheme.f(11.5, color: gc.textTertiary));
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        for (final value in values)
+          Expanded(child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 1.5),
+            child: Container(
+              height: math.max(2.0, 54 * value / maxValue),
+              decoration: BoxDecoration(
+                color: gc.accent.withValues(alpha: value == 0 ? 0.12 : 0.82),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(2)),
+              ),
+            ),
+          )),
+      ]),
+      const SizedBox(height: 5),
+      Row(children: [
+        Text('${start.month.toString().padLeft(2, '0')}/${start.day.toString().padLeft(2, '0')}', style: AppTheme.f(9, color: gc.textTertiary)),
+        const Spacer(),
+        Text('${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')}', style: AppTheme.f(9, color: gc.textTertiary)),
+      ]),
+      const SizedBox(height: 4),
+      Text('Weekly total · ${fit.volumeUnit}', style: AppTheme.f(9, color: gc.textTertiary)),
+    ]);
+  }
+
+  Widget _daysSincePrChart(GymColors gc, List<PersonalRecord> records) {
+    final entries = records.map((record) {
+      final date = _lastRecordDate(record);
+      final days = date == null ? null : DateUtils.dateOnly(DateTime.now())
+          .difference(DateUtils.dateOnly(date)).inDays;
+      return (record: record, days: days);
+    }).where((entry) => entry.days != null).toList()
+      ..sort((a, b) => b.days!.compareTo(a.days!));
+    if (entries.isEmpty) return Text(t.noHistory, style: AppTheme.f(11.5, color: gc.textTertiary));
+    final maxDays = math.max(1, entries.first.days!);
+    return Column(children: [
+      for (final entry in entries.take(8))
+        Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Row(children: [
+          SizedBox(width: 86, child: Text(t.catalogName(entry.record.id, entry.record.name),
+              maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: AppTheme.f(10, weight: FontWeight.w600, color: gc.textSecondary))),
+          Expanded(child: ClipRRect(
+            borderRadius: BorderRadius.circular(2),
+            child: LinearProgressIndicator(
+              value: (entry.days! / maxDays).clamp(0.0, 1.0),
+              minHeight: 5, backgroundColor: gc.bgRaised2, color: gc.accent,
+            ),
+          )),
+          const SizedBox(width: 8),
+          SizedBox(width: 32, child: Text('${entry.days}d', textAlign: TextAlign.end,
+              style: AppTheme.f(10, weight: FontWeight.w700, color: gc.text))),
+        ])),
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
     final gc = _minimalProgressColors(context.gc);
@@ -3483,16 +3555,15 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
                 _metric(gc, '30d change', volumeChange == null ? '—' : '${volumeChange > 0 ? '+' : ''}${volumeChange}%',
                     note: t.tileVolume30),
               ]),
-              _flatSection(gc, 'Weekly volume · 30 days', [
-                if (fit.volumeChartPoints.length > 1)
-                  Sparkline(
-                    values: [for (final v in fit.volumeChartPoints) fit.toDisplayWeight(v) / 1000],
-                    height: 58,
-                    color: gc.accent,
-                    scale: fmt,
-                  )
-                else
-                  Text(t.noHistory, style: AppTheme.f(11.5, color: gc.textTertiary)),
+              _flatSection(gc, 'Weekly volume · kg', [
+                Row(children: [
+                  for (final weeks in [4, 8, 12, 0]) ...[
+                    if (weeks != 4) const SizedBox(width: 5),
+                    _rangeChip(gc, weeks),
+                  ],
+                ]),
+                const SizedBox(height: 10),
+                _weeklyVolumeChart(gc, sessions),
               ]),
               _flatSection(
                 gc,
@@ -3528,6 +3599,9 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
                       }),
                 ],
               ),
+              _flatSection(gc, 'Days since last PR', [
+                _daysSincePrChart(gc, records),
+              ]),
               _flatSection(
                 gc,
                 'Estimated strength trend',
@@ -3581,9 +3655,15 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
                     else
                       Text(t.noHistory, style: AppTheme.f(11.5, color: gc.textTertiary)),
                     if (trend.isNotEmpty) ...[
-                      const SizedBox(height: 5),
-                      Text('${trend.length} sessions',
-                          style: AppTheme.f(9.5, weight: FontWeight.w600, color: gc.textTertiary)),
+                      const SizedBox(height: 8),
+                      Row(children: [
+                        _metric(gc, 'Best', fit.weightLabel(trend.map((point) => point.value).reduce(math.max))),
+                        _metric(gc, 'Last PR', _ageLabel(id == null ? null : records
+                            .where((record) => record.id == id).map(_lastRecordDate)
+                            .whereType<DateTime>().fold<DateTime?>(null, (best, date) =>
+                                best == null || date.isAfter(best) ? date : best))),
+                        _metric(gc, 'Sessions', '${trend.length}'),
+                      ]),
                     ],
                   ],
                 ],
