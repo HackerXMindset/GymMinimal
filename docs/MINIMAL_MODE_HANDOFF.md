@@ -6,12 +6,13 @@
 
 **Snapshot date:** 2026-11-14  
 **Repository:** `HackerXMindset/GymMinimal`  
-**Latest merged baseline:** PR #15 Stage 6 merge commit `b97e1aa2512c84ec9e1037d5911dcd467a648683`.  
-**Latest merged UI stage:** Stage 6 — History (PR #15, merged).  
-**Current UI stage:** Stage 7 — Stats Dashboard (in progress; PR #17).  
-**Progress at this snapshot:** Stages 0–6 are implemented and merged; Stage 7 is in PR #17.  
-**Verified Stage 3 CI:** Actions run #43515792250 passed analysis, full tests, one-APK build and artifact upload.  
-**Verified release:** main run #43508196293 succeeded; the rolling preview release contains exactly one `GymMinimal.apk`.
+**Latest merged baseline:** PR #17 Stage 7 merge commit `a83e7660b7fb49585fe5189306e80b1c148287b4`.  
+**Latest merged UI stage:** Stage 7 — Stats Dashboard (PR #17, merged).  
+**Current implementation:** Stage 9 — Behaviour/persistence (PR #19, branch `feat/minimal-stage-09-behaviour-persistence`).  
+**Parallel work:** Stage 8 Settings is being built separately; Stage 9 avoids its settings UI files.  
+**Progress at this snapshot:** Stages 0–7 are implemented and merged; Stage 8 is parallel work; Stage 9 is in progress; Stage 10 remains.  
+**Verified Stage 7 CI:** Actions run #43537910571 passed.  
+**Stage 9 CI:** Actions run #43540572455 is running; test/build result is not yet verified.
 
 ---
 
@@ -362,7 +363,7 @@ The Stage 3 implementation and CI gate are complete. The final physical-device v
 - [ ] Standard workout UI and completion flow are unchanged.
 - [ ] Tests, analysis and one-APK CI build pass; screenshot/manual review recorded.
 
-### Stage 4 — Exercise library (IN PROGRESS — PR #12)
+### Stage 4 — Exercise library — COMPLETE (PR #12 and localized follow-up PR #13 merged)
 
 **Primary file:** `lib/screens/exercises_screen.dart`.
 
@@ -372,8 +373,8 @@ The Stage 3 implementation and CI gate are complete. The final physical-device v
 - [x] 1RM values use `fit.bestLift` and existing display-unit conversion; no-history values show an em dash.
 - [x] Existing search, custom exercise creation and exercise-detail navigation are preserved.
 - [x] Added a 360×800 widget test and a real-history 1RM assertion.
-- [ ] PR #12 analysis, full tests and one-APK build must pass.
-- [ ] Standard library regression and final visual parity review remain to be checked.
+- [x] PR #12 merged; localized label-casing follow-up PR #13 merged.
+- [ ] Final phone screenshot/manual parity and interaction review is consolidated in Stage 10.
 
 **Implementation outline**
 1. Trace existing search, selected muscle, custom exercise creation and exercise-detail navigation.
@@ -389,7 +390,7 @@ The Stage 3 implementation and CI gate are complete. The final physical-device v
 - [ ] No fake values and no regression to Standard library.
 - [ ] Tests, analysis, one-APK build and screenshot/manual review pass.
 
-### Stage 5 — Exercise detail and per-exercise statistics — IN PROGRESS (PR #14)
+### Stage 5 — Exercise detail and per-exercise statistics — COMPLETE (PR #14 merged)
 
 **Primary file:** `lib/screens/exercise_detail_screen.dart`.
 
@@ -402,17 +403,12 @@ The Stage 3 implementation and CI gate are complete. The final physical-device v
 4. Progressive PR history and a per-session table with date, sets, volume and 1RM.
 5. Existing exercise history, set calculations, weight formatting and chart components reused.
 
-**Still required before completion**
-- [ ] Run dart format, Flutter analysis and the full test suite.
-- [ ] Add or confirm focused tests for metrics, sparse data and range navigation.
-- [ ] Verify the 360px phone layout and every range control.
-- [ ] Confirm Standard detail rendering is unchanged.
-- [ ] Confirm PR CI builds and uploads exactly one `GymMinimal.apk`.
-- [ ] Complete screenshot/manual comparison against `Sample.html`.
+**Completion record**
+- [x] PR #14 merged; implementation is part of current `main`.
+- [ ] Final 360px phone layout, sparse-data and range-control visual review remains in Stage 10.
+- [ ] Standard detail visual regression is included in the consolidated Stage 10 audit.
 
-**PR:** [#14](https://github.com/HackerXMindset/GymMinimal/pull/14).  
-**Branch:** `feat/minimal-stage-05-exercise-details`.  
-**Base:** latest `main`; Stage 4 follow-up PR #13 is intentionally not included.
+**PR:** [#14](https://github.com/HackerXMindset/GymMinimal/pull/14) — merged.
 
 ### Stage 6 — History
 
@@ -658,17 +654,17 @@ Update this record at the end of every stage PR:
 
 | Field | Current value |
 |---|---|
-| Current stage | Stage 5 — Exercise details (PR #14 in progress) |
-| Stage state | In progress — PR #14 open; ten metrics, range charts, PR history and session table added; CI pending |
-| Last known base | `main` commit `7b9a8e3ea4492b56d3391f640c708062991c6297` (PR #11 merge) |
-| Current prerequisite | Stage 3 PR #11 merged; Actions run #43515792250 passed analysis, full tests and one-APK build |
-| Last completed UI stage | Stage 3 — Live Workout (PR #11 merged) |
-| Current owner | Unassigned / whoever takes the next stage |
-| Current branch | `feat/minimal-stage-05-exercise-details` |
-| Current PR | [PR #14](https://github.com/HackerXMindset/GymMinimal/pull/14) |
-| Last verified test commit | Stage 3 PR #11 head `ceba4b53b8d2484bdb4c599fd63dddc8216bc1b4`; Actions run #43515792250 passed |
-| Known blocker | PR #12 CI is pending; physical-device screenshot/manual review is not available yet. |
-| Next concrete action | Verify PR #14 formatting, analysis, full tests, single-APK build and phone-width interactions; fix all failures before marking Stage 5 complete |
+| Current stage | Stage 9 — Behaviour, persistence and export parity (PR #19 open) |
+| Stage state | Integration test added; run #43540572455 is in progress; acceptance is not yet complete |
+| Last known base | `main` commit `a83e7660b7fb49585fe5189306e80b1c148287b4` (PR #17 merge) |
+| Current prerequisite | Stages 0–7 merged; Stage 7 Actions run #43537910571 passed |
+| Last completed UI stage | Stage 7 — Stats Dashboard (PR #17 merged) |
+| Parallel owner/work | Stage 8 Settings is being implemented separately; avoid its settings UI files |
+| Current branch | `feat/minimal-stage-09-behaviour-persistence` |
+| Current PR | [PR #19](https://github.com/HackerXMindset/GymMinimal/pull/19) |
+| Last verified commit | Stage 7 merge `a83e7660b7fb49585fe5189306e80b1c148287b4`; Actions run #43537910571 passed |
+| Known blocker | Awaiting Stage 9 CI; real-device screenshot/manual review belongs to Stage 10. |
+| Next concrete action | Resolve any integration test/analysis/build failures, then complete broader end-to-end parity and reconcile with Stage 8 before Stage 10 |
 
 For each future handoff, replace these values with the real current stage and live commit/PR/test state. Keep completed stages' PR references in the roadmap changelog. If a stage is partially done, state exactly which acceptance boxes passed, which failed, and the next unfinished item. Do not simply write "mostly done".
 

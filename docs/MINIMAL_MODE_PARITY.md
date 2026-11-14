@@ -95,11 +95,11 @@
 - [x] Add 4W / 8W / 12W / All controls and earlier/later navigation.
 - [x] Add range-filtered estimated 1RM and per-session volume charts.
 - [x] Add progressive PR history and a per-session table.
-- [ ] Verify empty/sparse history, range navigation, narrow phone layout and Standard detail regression in CI/manual review.
-- [ ] Confirm focused tests, formatting, analysis, full tests and one-APK CI build.
+- [x] PR #14 implementation and CI are merged.
+- [ ] Verify empty/sparse history, range navigation, narrow phone layout and Standard detail regression during Stage 10.
 - [ ] Complete phone screenshot/manual parity review in Stage 10.
 
-**PR #14 is open. Do not mark Stage 5 complete until CI and visual/interaction review pass.**
+**PR #14 is merged. Final narrow-phone visual and interaction review is consolidated in Stage 10.**
 
 ### Stage 6 — History — COMPLETE (PR #15 merged)
 
