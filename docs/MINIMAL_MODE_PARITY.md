@@ -6,7 +6,7 @@
 
 **Working method:** One focused stage per branch and pull request. Reuse real Flutter state/models/services; do not copy the HTML prototype's sample data or browser implementation. Run Flutter analysis, relevant tests and the one-APK build on every PR. Only mark a stage complete after its UI and interactions have been checked against the HTML reference. A successful merge to `main` should publish the same tested `GymMinimal.apk` artifact to the rolling GitHub preview release.
 
-**Snapshot:** 2026-11-14. Stage 6 History merged in PR #15 as `b97e1aa2512c84ec9e1037d5911dcd467a648683`; the post-merge main workflow #43534728710 passed analysis, 1,117 tests (3 skipped), one-APK build and preview publishing. Stage 7 Stats Dashboard is being implemented on `feat/minimal-stage-07-stats-dashboard`.
+**Snapshot:** 2026-11-14. Stage 7 Stats Dashboard merged in PR #17 as `a83e7660b7fb49585fe5189306e80b1c148287b4`; Actions run #43537910571 succeeded. Stage 8 Settings is being built separately. Stage 9 integration work is underway on `feat/minimal-stage-09-behaviour-persistence`.
 
 ## Overall progress
 
@@ -17,12 +17,12 @@
 - [x] Stage 4 — Exercise library
 - [x] Stage 5 — Exercise details and per-exercise statistics
 - [x] Stage 6 — History (PR #15 merged)
-- [ ] Stage 7 — Stats dashboard (in progress, `feat/minimal-stage-07-stats-dashboard`)
-- [ ] Stage 8 — Settings
-- [ ] Stage 9 — Behaviour, persistence and export parity
+- [x] Stage 7 — Stats dashboard (PR #17 merged)
+- [ ] Stage 8 — Settings (parallel contributor work in progress)
+- [ ] Stage 9 — Behaviour, persistence and export parity (in progress, `feat/minimal-stage-09-behaviour-persistence`)
 - [ ] Stage 10 — Visual and functional QA
 
-**Progress: 6 of 11 stages implemented and merged (55%).** Five stages remain. Final cross-screen visual verification is consolidated in Stage 10.
+**Progress: 8 of 11 stages implemented and merged (73%).** Three stages remain: Stage 8, Stage 9 and final Stage 10 QA.
 
 ## Stage details
 
@@ -74,7 +74,7 @@
 - [x] Add discard regression coverage; CI run #43515792250 passed analysis, full tests and the single-APK build.
 - [ ] Final phone screenshot/manual parity and Standard-mode regression are consolidated in Stage 10.
 
-### Stage 4 — Exercise library — IN PROGRESS (PR #12)
+### Stage 4 — Exercise library — COMPLETE (PR #12 and localized follow-up PR #13 merged)
 
 **Primary source:** `lib/screens/exercises_screen.dart`.  
 **Reference:** `Sample.html` → `exercises()`, `exList()`.
@@ -86,7 +86,7 @@
 - [ ] Verify the 360px phone-width widget test, search/filter interactions and Standard library regression in CI.
 - [ ] Complete phone screenshot/manual parity review in Stage 10.
 
-### Stage 5 — Exercise details and per-exercise statistics — IN PROGRESS (PR #14)
+### Stage 5 — Exercise details and per-exercise statistics — COMPLETE (PR #14 merged)
 
 **Primary source:** `lib/screens/exercise_detail_screen.dart`.  
 **Reference:** `Sample.html` → `exercise()`, `rangeBar()`, `exSessions()`, `lineChart()`, `barsSvg()`.
@@ -95,11 +95,11 @@
 - [x] Add 4W / 8W / 12W / All controls and earlier/later navigation.
 - [x] Add range-filtered estimated 1RM and per-session volume charts.
 - [x] Add progressive PR history and a per-session table.
-- [ ] Verify empty/sparse history, range navigation, narrow phone layout and Standard detail regression in CI/manual review.
-- [ ] Confirm focused tests, formatting, analysis, full tests and one-APK CI build.
+- [x] PR #14 implementation and CI are merged.
+- [ ] Verify empty/sparse history, range navigation, narrow phone layout and Standard detail regression during Stage 10.
 - [ ] Complete phone screenshot/manual parity review in Stage 10.
 
-**PR #14 is open. Do not mark Stage 5 complete until CI and visual/interaction review pass.**
+**PR #14 is merged. Final narrow-phone visual and interaction review is consolidated in Stage 10.**
 
 ### Stage 6 — History — COMPLETE (PR #15 merged)
 
@@ -113,7 +113,7 @@
 - [x] Bound rendered rows to 200 and report the real result count.
 - [x] Verify exports, no-history and no-match states; keep Standard history unchanged. PR #15 merged; main CI passed.
 
-### Stage 7 — Stats dashboard
+### Stage 7 — Stats dashboard — COMPLETE (PR #17 merged; Actions run #43537910571 succeeded)
 
 **Primary source:** `lib/screens/progress_screen.dart`, `lib/state/stats_state.dart`, `lib/widgets/charts.dart`.  
 **Reference:** `Sample.html` → `stats()`, `volChart()`, `lineChart()`, `prBars()`, `heat()`, `muscleBars()`.
@@ -125,7 +125,7 @@
 - [x] Reuse the real-data 30-day sets-per-muscle breakdown.
 - [ ] Verify real-data calculations, range changes and empty/sparse data states in CI and phone review.
 
-### Stage 8 — Settings
+### Stage 8 — Settings — IN PROGRESS (parallel contributor)
 
 **Primary source:** `lib/screens/settings_screen.dart`, `lib/state/settings_state.dart`.  
 **Reference:** `Sample.html` → `settings()`.
@@ -137,7 +137,9 @@
 - [ ] Reuse existing persisted Minimal settings fields; do not introduce duplicate prototype/localStorage settings.
 - [ ] Verify persistence and Standard preference regression.
 
-### Stage 9 — Behaviour, persistence and export parity
+### Stage 9 — Behaviour, persistence and export parity — IN PROGRESS (feat/minimal-stage-09-behaviour-persistence)
+
+Stage 9 is being implemented separately from the parallel Stage 8 Settings work. The new integration test is test/minimal_stage_09_integration_test.dart; it covers session restoration, rest/pause resume, completion, calculation parity, XLSX content and JSON restore. Awaiting CI validation.
 
 - [ ] Verify full workout journey: start → edit/complete sets → rest → pause/resume → finish → history → exercise detail → stats.
 - [ ] Verify active workout restoration after app restart.
@@ -209,27 +211,18 @@ The authoritative workflow is the version already merged to `main` by PR #9: `.g
 
 ## Current PR / branch snapshot
 
-| Item | Value |
-|---|---|
-| PR #8 | Merged — Minimal shell/navigation |
-| PR #9 | Merged — Stage 2 Today screen and single-APK workflow |
-| PR #10 | Merged — conflict-resolved project handoff/roadmap documentation |
-| PR #11 | Merged — Stage 3 Live Workout; Actions run #43515792250 passed |
-| PR #10 merge commit | `7fbc49522965e638a110e9988c4fe53b29a11301` |
-| PR #10 Actions | Run #43510832870 passed; the newer single-job APK workflow was preserved |
-| Current UI stage | Stage 5 — Exercise details (PR #14 in progress); Stage 4 follow-up PR #13 remains open |
-| Stage 3 PR | [PR #11](https://github.com/HackerXMindset/GymMinimal/pull/11) — merged |
-| Stage 3 merge commit | `7b9a8e3ea4492b56d3391f640c708062991c6297` |
-| Stage 3 CI | Actions run #43515792250 passed analysis, full tests and one-APK build |
-| Stage 4 branch | `feature/sample-html-parity-stage-4-exercise-library` |
-| Stage 4 PR | [PR #12](https://github.com/HackerXMindset/GymMinimal/pull/12) |
-| Stage 4 base | `main` at Stage 3 merge commit `7b9a8e3ea4492b56d3391f640c708062991c6297` |
-| Stage 4 CI | Pending; verify latest PR run before merge |
-| Remaining proof | Phone-sized screenshot/manual interaction review and Standard library regression review |
-| Stage 5 PR | [PR #14](https://github.com/HackerXMindset/GymMinimal/pull/14) — open; CI pending |
-| Stage 5 branch | `feat/minimal-stage-05-exercise-details` |
-| Next action | Review PR #14 CI and phone-width layout; resolve failures before merging Stage 5 |
+| Stage | Status | Reference |
+|---|---|---|
+| 0–3 | Complete | PRs #8, #9 and #11 merged |
+| 4 | Complete | PR #12 and localized follow-up PR #13 merged |
+| 5 | Complete | PR #14 merged |
+| 6 | Complete | PR #15 merged |
+| 7 | Complete | PR #17 merged; Actions run #43537910571 succeeded |
+| 8 | In progress, separate contributor | Settings, rest timer, Excel/JSON export controls |
+| 9 | In progress on this branch | feat/minimal-stage-09-behaviour-persistence; integration test added, CI pending |
+| 10 | Planned | Final phone comparison, interaction audit, Standard regression and release install |
 
+PR #16 also merged the CI signing/release workflow update. Stage 9 intentionally avoids Stage 8 settings UI files so the work can proceed in parallel.
 ## Change log
 
 | Date | Change |
@@ -246,6 +239,6 @@ The authoritative workflow is the version already merged to `main` by PR #9: `.g
 ## How to continue
 
 1. Read [Complete Project Handoff](MINIMAL_MODE_HANDOFF.md).
-2. PR #10 is merged and conflict-free; PR #11 Stage 3 is also merged with CI run #43515792250 passing.
-3. Stage 4 follow-up PR #13 remains open. Stage 5 implementation is in [PR #14](https://github.com/HackerXMindset/GymMinimal/pull/14) on its own branch from `main`.
-4. Review Stage 5 CI and phone-width interactions; do not mark the stage complete until every acceptance check passes.
+2. Stages 0–7 are merged, with Stage 7 CI run #43537910571 succeeding.
+3. Stage 8 is being built in parallel by another contributor; Stage 9 is isolated on feat/minimal-stage-09-behaviour-persistence.
+4. Review the Stage 9 CI results, fix any integration failures, and then reconcile with Stage 8 before final Stage 10 QA.
