@@ -20,7 +20,7 @@ Rebuild the reference's compact phone experience in the existing Flutter app usi
 
 ## Progress
 
-**4 of 11 stages implemented and merged (36%).** Seven stages remain. Stage 4 follow-up PR #13 and Stage 7 PR #17 are open concurrently. Stage 5 is in progress on its own branch from the latest `main`; final cross-screen visual verification is consolidated in Stage 10.
+**8 of 11 stages implemented and merged (73%).** Three stages remain. Stage 8 is being built separately; Stage 9 integration testing is underway on `feat/minimal-stage-09-behaviour-persistence`. Final cross-screen visual verification remains Stage 10.
 
 | Stage | Area | Status | Last change / next step |
 |---|---|---|---|
@@ -31,19 +31,20 @@ Rebuild the reference's compact phone experience in the existing Flutter app usi
 | 4 | Exercise library | Complete | PR #13 follow-up merged; library parity complete |
 | 5 | Exercise details | Complete | PR #14 merged; ten metrics, range-filtered charts, PR history and session table |
 | 6 | History | Complete | PR #15 merged; latest-40 list, List/Table, eight-column table, search/sort and Excel |
-| 7 | Stats dashboard | In progress (PR #17) | Weekly volume range chart, exercise 1RM trend/context, days-since-PR, 16-week heatmap, muscle sets |
-| 8 | Settings | Planned | Minimal display options, rest timer, Excel/JSON export |
-| 9 | Behaviour and persistence | Planned | End-to-end flows, persistence and export parity |
+| 7 | Stats dashboard | Complete | PR #17 merged; Actions run #43537910571 succeeded |
+| 8 | Settings | In progress (parallel contributor) | Minimal display options, rest timer, Excel/JSON export |
+| 9 | Behaviour and persistence | In progress | Active-session restore, end-to-end workout, stats and export integration tests |
 | 10 | Visual and functional QA | Planned | Phone screenshots, interaction audit, Standard regression and final install |
 
 ## Current state and next action
 
-- **Latest merged UI work:** PR #11, Stage 3 Live Workout, merge commit `7b9a8e3ea4492b56d3391f640c708062991c6297`.
-- **Latest merged repository baseline:** PR #11 Stage 3 merge commit `7b9a8e3ea4492b56d3391f640c708062991c6297`.
-- **Stage 4 follow-up:** PR #13 is open; it is not included in the Stage 5 branch.
-- **Current implementation:** Stage 7 — Stats Dashboard, PR #17, branch `feat/minimal-stage-07-stats-dashboard`.
-- **Stage 3 gate passed:** PR #11 Actions run #43515792250 passed analysis, full tests and the single-APK build; PR #11 is merged.
-- **Stage 7 implementation:** weekly volume range chart, selected-exercise strength trend with Best / Last PR / Sessions context, days-since-PR chart; reuses existing 16-week heatmap and 30-day muscle-set breakdown. PR #17 CI is running.
+- **Latest merged UI work:** PR #17, Stage 7 Stats Dashboard, merge commit `a83e7660b7fb49585fe5189306e80b1c148287b4`.
+- **Latest merged repository baseline:** PR #17 merge commit `a83e7660b7fb49585fe5189306e80b1c148287b4`.
+- **Stage 4 follow-up:** PR #13 localized label-casing fix is merged; Stage 4 is complete.
+- **Current parallel work:** Stage 8 Settings is being built separately by another contributor.
+- **Current implementation:** Stage 9 — Behaviour and persistence, branch `feat/minimal-stage-09-behaviour-persistence`, based on the latest `main`.
+- **Stage 7 gate passed:** PR #17 is merged; Actions run #43537910571 succeeded.
+- **Stage 9 coverage added:** one integration test exercises Minimal preference persistence, active workout restore, pause/rest resume, workout completion, cross-screen calculation agreement, XLSX contents and JSON restore.
 - **Do not restart Stage 2.** Reopen it only for a confirmed regression or mismatch. Its final screenshot/manual parity check belongs in Stage 10.
 
 ## Build and release
@@ -56,7 +57,7 @@ The current workflow (merged in PR #9) runs analysis, tests, a single APK build 
 - Main push run #43508196293: completed successfully, including the Release publish steps.
 - Verified the [rolling release](https://github.com/HackerXMindset/GymMinimal/releases/tag/minimal-mode-preview) now contains exactly one APK asset named `GymMinimal.apk`.
 - PR #11 Stage 3 run #43515792250 passed analysis, full tests and the single-APK build. Post-merge main run #43518506146: analysis and tests passed; APK build/release steps were still running at this snapshot.
-- A persistent release keystore has not been confirmed. Do not assume seamless in-place upgrades between separately built APKs until stable signing is configured and tested.
+- PR #16 established the repository-keystore signing configuration and CI verification. Install-over-update behaviour still needs an installed-device verification.
 
 ## Documents and source map
 
