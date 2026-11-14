@@ -3404,8 +3404,8 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
     final oldest = sessions.isEmpty ? now : sessions
         .map((session) => DateUtils.dateOnly(session.day))
         .reduce((a, b) => a.isBefore(b) ? a : b);
-    final availableWeeks = math.max(1, (now.difference(oldest).inDays ~/ 7) + 1);
-    final count = _rangeWeeks == 0 ? math.min(availableWeeks, 52) : _rangeWeeks;
+    final availableWeeks = math.max(1, (now.difference(oldest).inDays ~/ 7) + 1).toInt();
+    final count = _rangeWeeks == 0 ? math.min(availableWeeks, 52).toInt() : _rangeWeeks;
     final start = now.subtract(Duration(days: count * 7 - 1));
     final values = List<double>.filled(count, 0);
     for (final session in sessions) {
@@ -3422,7 +3422,7 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
           Expanded(child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 1.5),
             child: Container(
-              height: math.max(2.0, 54 * value / maxValue),
+              height: math.max(2.0, 54 * value / maxValue).toDouble(),
               decoration: BoxDecoration(
                 color: gc.accent.withValues(alpha: value == 0 ? 0.12 : 0.82),
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(2)),
