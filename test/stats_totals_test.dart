@@ -176,7 +176,7 @@ void main() {
     });
 
     test('the heatmap lights the days that were trained and nothing else', () {
-      fit.sessions.add(LoggedSession(DateTime.now(), 1800, [
+      fit.sessions.add(LoggedSession(DateTime.now().add(const Duration(seconds: 1800)), 1800, [
         LoggedExercise('a', 'A', 'chest', [LoggedSet(10, 50)]),
       ]));
 
