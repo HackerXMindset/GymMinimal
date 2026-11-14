@@ -541,14 +541,14 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
               style: AppTheme.f(9.5, weight: FontWeight.w500, color: gc.textTertiary)),
         ]),
         const SizedBox(height: 5),
-        Row(children: [
-          Text('Last column', style: AppTheme.f(9.5, weight: FontWeight.w500, color: gc.textTertiary)),
-          const Spacer(),
-          for (final option in _MinimalHistoryLast.values) ...[
-            const SizedBox(width: 5),
-            _lastChip(option, gc),
-          ],
-        ]),
+        Align(
+          alignment: AlignmentDirectional.centerEnd,
+          child: Wrap(
+            spacing: 5,
+            runSpacing: 4,
+            children: [for (final option in _MinimalHistoryLast.values) _lastChip(option, gc)],
+          ),
+        ),
         const SizedBox(height: 6),
         if (visible.isEmpty)
           Padding(
