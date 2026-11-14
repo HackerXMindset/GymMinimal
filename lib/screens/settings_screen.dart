@@ -76,6 +76,10 @@ class SettingsScreen extends StatelessWidget {
     final gc = context.gc;
     final id = section;
     WidgetShowcase.warm(context);
+    if (id == null && fit.minimalMode) {
+      _deskOn = false;
+      return _minimalSettings(context, gc);
+    }
     if (id == null && DesktopScope.of(context)) {
       _deskOn = true;
       return Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -125,6 +129,247 @@ class SettingsScreen extends StatelessWidget {
         eyebrow: t.settings,
         onBack: fit.popRoute,
         children: riseAll(_sectionBody(context, gc, id)),
+      ),
+    );
+  }
+
+  Widget _minimalSettings(BuildContext context, GymColors gc) {
+    Widget section(List<Widget> rows) => Container(
+          decoration: BoxDecoration(
+            color: gc.bgRaised,
+            border: Border.all(color: gc.border),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Column(mainAxisSize: MainAxisSize.min, children: rows),
+        );
+
+    Widget row(
+      String label,
+      Widget trailing, {
+      String? key,
+      String? hint,
+      VoidCallback? onTap,
+      bool divider = true,
+    }) {
+      final content = Container(
+        constraints: BoxConstraints(minHeight: hint == null ? 38 : 54),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+        decoration: BoxDecoration(
+          border: divider
+              ? Border(bottom: BorderSide(color: gc.border.withValues(alpha: 0.65)))
+              : null,
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label, style: AppTheme.f(12.5, weight: FontWeight.w600, color: gc.text)),
+                  if (hint != null) ...[
+                    const SizedBox(height: 2),
+                    Text(hint,
+                        style: AppTheme.f(10.5, weight: FontWeight.w500, color: gc.textSecondary, height: 1.25)),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            trailing,
+          ],
+        ),
+      );
+      if (onTap == null) return content;
+      return InkWell(key: key == null ? null : ValueKey(key), onTap: onTap, child: content);
+    }
+
+    Widget picker(
+      String label,
+      String selected,
+      List<(String, String)> options,
+      ValueChanged<String> onSelected,
+      String keyPrefix,
+    ) =>
+        Container(
+          constraints: const BoxConstraints(minHeight: 42),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: gc.border.withValues(alpha: 0.65))),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(label, style: AppTheme.f(12.5, weight: FontWeight.w600, color: gc.text)),
+              ),
+              Wrap(
+                spacing: 3,
+                children: [
+                  for (final option in options)
+                    InkWell(
+                      key: ValueKey('$keyPrefix-${option.$1}'),
+                      borderRadius: BorderRadius.circular(3),
+                      onTap: () => onSelected(option.$1),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: selected == option.$1 ? gc.accentSoft : Colors.transparent,
+                          border: Border.all(color: selected == option.$1 ? gc.accent : gc.border),
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                        child: Text(
+                          option.$2,
+                          style: AppTheme.f(
+                            10.5,
+                            weight: selected == option.$1 ? FontWeight.w700 : FontWeight.w500,
+                            color: selected == option.$1 ? gc.text : gc.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        );
+
+    final buttonStyle = TextButton.styleFrom(
+      foregroundColor: gc.accent,
+      visualDensity: VisualDensity.compact,
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      minimumSize: const Size(0, 30),
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      textStyle: AppTheme.f(11.5, weight: FontWeight.w700),
+    );
+
+    return SafeArea(
+      bottom: false,
+      child: SingleChildScrollView(
+        key: const PageStorageKey('minimal-settings'),
+        padding: const EdgeInsets.fromLTRB(14, 14, 14, 64),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(t.settings, style: AppTheme.f(17, weight: FontWeight.w700, color: gc.text)),
+            const SizedBox(height: 14),
+            section([
+              row(
+                'Minimal view',
+                TinySwitch(on: fit.minimalMode),
+                key: 'minimal-mode-toggle',
+                hint: 'Shrinks text and spacing, turns the workout into one table, and hides what you switch off below.',
+                onTap: () => fit.setMinimalMode(!fit.minimalMode),
+              ),
+              if (fit.minimalMode) ...[
+                picker(
+                  'Text size',
+                  fit.minimalTextSize,
+                  const [('normal', 'Normal'), ('small', 'Small'), ('tiny', 'Tiny')],
+                  (value) => fit.updateMinimalOptions(textSize: value),
+                  'minimal-text',
+                ),
+                picker(
+                  'Row height',
+                  fit.minimalRowHeight,
+                  const [('roomy', 'Roomy'), ('compact', 'Compact'), ('tight', 'Tight')],
+                  (value) => fit.updateMinimalOptions(rowHeight: value),
+                  'minimal-row',
+                ),
+                row(
+                  'Previous column',
+                  TinySwitch(on: fit.minimalShowPrevious),
+                  key: 'minimal-toggle-previous',
+                  onTap: () => fit.updateMinimalOptions(showPrevious: !fit.minimalShowPrevious),
+                ),
+                row(
+                  'How-to button (?)',
+                  TinySwitch(on: fit.minimalShowHowTo),
+                  key: 'minimal-toggle-howto',
+                  onTap: () => fit.updateMinimalOptions(showHowTo: !fit.minimalShowHowTo),
+                ),
+                row(
+                  'Notes',
+                  TinySwitch(on: fit.minimalShowNotes),
+                  key: 'minimal-toggle-notes',
+                  onTap: () => fit.updateMinimalOptions(showNotes: !fit.minimalShowNotes),
+                ),
+                row(
+                  'Exercise icons',
+                  TinySwitch(on: fit.minimalShowExerciseIcons),
+                  key: 'minimal-toggle-icons',
+                  onTap: () => fit.updateMinimalOptions(showExerciseIcons: !fit.minimalShowExerciseIcons),
+                ),
+                row(
+                  'Totals strip',
+                  TinySwitch(on: fit.minimalShowTotals),
+                  key: 'minimal-toggle-totals',
+                  onTap: () => fit.updateMinimalOptions(showTotals: !fit.minimalShowTotals),
+                ),
+                row(
+                  'Settings button in header',
+                  TinySwitch(on: fit.minimalShowSettingsButton),
+                  key: 'minimal-toggle-header-settings',
+                  divider: false,
+                  onTap: () => fit.updateMinimalOptions(
+                    showSettingsButton: !fit.minimalShowSettingsButton,
+                  ),
+                ),
+              ],
+            ]),
+            const SizedBox(height: 14),
+            section([
+              row(
+                'Rest timer',
+                StepperControl(
+                  value: fit.restSeconds == 0 ? t.restOff : clockLabel(fit.restSeconds),
+                  minWidth: 48,
+                  btnSize: 26,
+                  gap: 8,
+                  fontSize: 12.5,
+                  onDec: () => fit.setRestSeconds(fit.restSeconds - 15),
+                  onInc: () => fit.setRestSeconds(fit.restSeconds + 15),
+                  onEdit: () async {
+                    final value = await askRuler(
+                      context,
+                      title: t.restTimer,
+                      value: fit.restSeconds.toDouble(),
+                      min: 0,
+                      max: 600,
+                      step: 5,
+                      majorEvery: 6,
+                      format: (v) => clockLabel(v.round()),
+                      tickLabel: (v) => clockLabel(v.round()),
+                    );
+                    if (value != null) fit.setRestSeconds(value.round());
+                  },
+                ),
+              ),
+              row(
+                'Export full history',
+                TextButton(
+                  style: buttonStyle,
+                  onPressed: () => _exportXlsx(context),
+                  child: const Text('.xlsx'),
+                ),
+              ),
+              row(
+                'Backup',
+                TextButton(
+                  style: buttonStyle,
+                  onPressed: () => _exportJson(context),
+                  child: const Text('JSON'),
+                ),
+                divider: false,
+              ),
+            ]),
+            const SizedBox(height: 12),
+            Text(
+              t.fullyOfflineWhy,
+              textAlign: TextAlign.center,
+              style: AppTheme.f(10.5, weight: FontWeight.w500, color: gc.textTertiary, height: 1.35),
+            ),
+          ],
+        ),
       ),
     );
   }
