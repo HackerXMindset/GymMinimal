@@ -167,7 +167,7 @@ class HomeScreen extends StatelessWidget {
         key: const PageStorageKey('home-minimal'),
         padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Row(crossAxisAlignment: CrossAxisAlignment.baseline, children: [
+          Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
             Expanded(
               child: Text(t.today,
                   style: AppTheme.f(17, weight: FontWeight.w700, color: gc.text)),
