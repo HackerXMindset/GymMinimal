@@ -1,17 +1,9 @@
-import java.util.Properties
-import java.io.FileInputStream
 import com.android.build.gradle.internal.api.ApkVariantOutputImpl
 
 plugins {
     id("com.android.application")
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
-}
-
-val keystoreProperties = Properties()
-val keystorePropertiesFile = rootProject.file("key.properties")
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
 android {
@@ -42,24 +34,19 @@ android {
         includeInBundle = false
     }
 
-    if (keystorePropertiesFile.exists()) {
-        signingConfigs {
-            create("release") {
-                keyAlias = keystoreProperties["keyAlias"] as String
-                keyPassword = keystoreProperties["keyPassword"] as String
-                storeFile = keystoreProperties["storeFile"]?.let { file(it) }
-                storePassword = keystoreProperties["storePassword"] as String
-            }
+    signingConfigs {
+        // Match the fixed repository-keystore setup used by Life Tracker.
+        create("release") {
+            storeFile = rootProject.file("keystore/lifetracker.p12")
+            storePassword = "lifetracker"
+            keyAlias = "lifetracker"
+            keyPassword = "lifetracker"
         }
     }
 
     buildTypes {
         release {
-            signingConfig = if (keystorePropertiesFile.exists()) {
-                signingConfigs.getByName("release")
-            } else {
-                signingConfigs.getByName("debug")
-            }
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
