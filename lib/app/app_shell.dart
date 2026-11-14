@@ -43,6 +43,7 @@ import '../services/health_steps.dart';
 import '../services/incoming_share.dart';
 import '../services/nutrition_widgets.dart';
 import '../services/local_store.dart';
+import '../services/minimal_insights.dart';
 import '../services/server/server_link.dart';
 import '../services/supplement_reminder.dart';
 import '../state/fit_state.dart';
@@ -932,11 +933,11 @@ class _MinimalNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = _minimalPalette(context.gc);
     final items = <({String label, VoidCallback action})>[
-      (label: t.today, action: fit.goHome),
-      (label: t.exercises, action: fit.goExercises),
+      (label: sentenceCase(t.today), action: fit.goHome),
+      (label: sentenceCase(t.exercises), action: fit.goExercises),
       (label: sentenceCase(t.historyTitle), action: fit.goHistoryTab),
-      (label: t.progress, action: fit.goProgress),
-      (label: t.settings, action: fit.goMinimalSettingsTab),
+      (label: MinimalInsights.statsLabel(), action: fit.goProgress),
+      (label: sentenceCase(t.settings), action: fit.goMinimalSettingsTab),
     ];
 
     var selected = -1;
@@ -946,7 +947,12 @@ class _MinimalNavBar extends StatelessWidget {
     if (fit.route == 'progress') selected = 3;
     if (fit.route == 'preferences' || fit.route.startsWith('preferences/')) selected = 4;
 
-    return Container(
+    // The bar is mounted in a Stack with no Scaffold above it, so Text would
+    // fall back to the debug style (yellow double underline). Material gives
+    // it a proper DefaultTextStyle with no decoration.
+    return Material(
+      type: MaterialType.transparency,
+      child: Container(
       decoration: BoxDecoration(
         color: colors.bg,
         border: Border(top: BorderSide(color: colors.border, width: 1)),
@@ -983,7 +989,7 @@ class _MinimalNavBar extends StatelessWidget {
                           12.5,
                           weight: selected == i ? FontWeight.w600 : FontWeight.w500,
                           color: selected == i ? colors.text : colors.textTertiary,
-                        ),
+                        ).copyWith(decoration: TextDecoration.none),
                       ),
                     ),
                   ),
@@ -991,6 +997,7 @@ class _MinimalNavBar extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }
