@@ -251,10 +251,13 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                         scale: 1 - (compact ? 0.08 : 0.2) * p,
                         alignment: Alignment.topLeft,
                         child: compact
-                            ? Text(t.exercises,
-                                style: AppTheme.f(22, weight: FontWeight.w800, color: gc.text, letterSpacing: -0.5))
+                            ? Text(sentenceCase(t.exercises),
+                                style: AppTheme.f(17, weight: FontWeight.w700, color: gc.text))
                             : ScreenTitle(t.exercises),
                       ),
+                      // Minimal keeps the title row one line tall. The old count
+                      // line pushed the header into the search box.
+                      if (!compact)
                       Opacity(
                         opacity: (1 - p * 2).clamp(0.0, 1.0),
                         child: Padding(
