@@ -94,7 +94,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
 
-    await tester.tap(find.text(sentenceCase(t.periodAll)));
+    await tester.tap(find.byKey(const ValueKey('minimal-progress-range-0')));
     await tester.pumpAndSettle();
     expect(find.text(sentenceCase(t.periodAll)), findsOneWidget);
     expect(tester.takeException(), isNull);
