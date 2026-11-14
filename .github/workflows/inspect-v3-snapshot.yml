@@ -1,0 +1,93 @@
+name: Inspect GymMinimal v3 snapshot
+
+on:
+  push:
+    branches:
+      - import/gymminimal-v3-corrected-snapshot
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract and compare archive without changing the checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin main
+          archive="$RUNNER_TEMP/GymMinimal-v3-full.zip"
+          git show origin/main:GymMinimal-v3-full.zip > "$archive"
+          python3 - "$archive" <<'PY'
+          import hashlib, os, re, stat, subprocess, sys, zipfile
+          from collections import Counter
+          from pathlib import Path, PurePosixPath
+
+          archive = sys.argv[1]
+          with zipfile.ZipFile(archive) as z:
+              infos = [i for i in z.infolist() if not i.is_dir()]
+              names = []
+              for info in infos:
+                  p = PurePosixPath(info.filename)
+                  if p.is_absolute() or ".." in p.parts:
+                      raise SystemExit("Unsafe ZIP path rejected")
+                  mode = (info.external_attr >> 16) & 0xFFFF
+                  if stat.S_ISLNK(mode):
+                      raise SystemExit("Symlink entry rejected")
+                  parts = p.parts
+                  if not parts or parts[0] != "gymminimal":
+                      raise SystemExit("Unexpected archive root")
+                  rel = str(PurePosixPath(*parts[1:]))
+                  if not rel or rel == ".":
+                      continue
+                  names.append(rel)
+              bad = z.testzip()
+              if bad:
+                  raise SystemExit("ZIP CRC failed")
+              data = {str(PurePosixPath(*PurePosixPath(i.filename).parts[1:])): z.read(i) for i in infos
+                      if not i.is_dir() and len(PurePosixPath(i.filename).parts) > 1}
+
+          print("ARCHIVE")
+          print("bytes:", os.path.getsize(archive))
+          print("files:", len(infos))
+          print("CRC: OK")
+          print("top-level file counts:", dict(sorted(Counter(p.split("/")[0] for p in names).items())))
+          print("first 90 project paths:")
+          for p in names[:90]:
+              print(" ", p)
+
+          protected = re.compile(r"(^|/)(\.github|keystore|key\.properties|local\.properties|google-services\.json|\.env)(/|$)|\.(jks|keystore|p12|pfx|pem|p8)$", re.I)
+          protected_paths = [p for p in data if protected.search(p)]
+          print("protected/signing/config file entries in archive:", len(protected_paths))
+          print("protected entries present (names only):", [p for p in protected_paths if "keystore" in p.lower() or p.lower().endswith((".jks", ".keystore", ".p12", ".pfx"))])
+
+          tracked = subprocess.check_output(["git", "ls-files", "-z"]).decode().split("\0")
+          tracked = [p for p in tracked if p and p != "GymMinimal-v3-full.zip"]
+          archive_paths = set(data)
+          tracked_set = set(tracked)
+          same, different, new = [], [], []
+          for p, content in data.items():
+              target = Path(p)
+              if not target.is_file():
+                  new.append(p)
+              elif hashlib.sha256(target.read_bytes()).digest() == hashlib.sha256(content).digest():
+                  same.append(p)
+              else:
+                  different.append(p)
+          missing = sorted(tracked_set - archive_paths)
+          print("COMPARISON")
+          print("tracked files in checkout (archive excluded):", len(tracked))
+          print("same bytes:", len(same))
+          print("different bytes:", len(different))
+          print("new in archive:", len(new))
+          print("tracked but absent from archive:", len(missing))
+          print("different examples:", different[:45])
+          print("new examples:", new[:45])
+          print("archive-omitted top-level counts:", dict(sorted(Counter(p.split("/")[0] for p in missing).items())))
+          print("archive paths by app-critical scope:", {
+              scope: sum(1 for p in data if p == scope or p.startswith(scope + "/"))
+              for scope in ["lib", "test", "integration_test", "android", "ios", "assets", "web", "server", "packages", "docs", "fastlane"]
+          })
+          PY
