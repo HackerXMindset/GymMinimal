@@ -18,7 +18,6 @@ permissions:
 
 env:
   FLUTTER_VERSION: '3.41.9'
-  RELEASE_TAG: ${{ github.event.inputs.tag || 'minimal-mode-preview' }}
 
 jobs:
   build:
@@ -29,16 +28,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
+      - name: Set up Java and cache Gradle
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
           cache: gradle
           cache-dependency-path: |
-            android/*.gradle
-            android/**/*.gradle
-            android/gradle/wrapper/gradle-wrapper.properties
+            android/**/*.gradle*
+            android/**/gradle-wrapper.properties
             android/gradle.properties
 
       - name: Set up Flutter
@@ -56,42 +54,125 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pub-
 
-
       - name: Show versions
         run: flutter --version
 
       - name: Install dependencies
+        id: dependencies
         run: flutter pub get
 
       - name: Analyze
+        id: analyze
         run: flutter analyze --no-fatal-infos
 
       - name: Test
+        id: tests
         run: flutter test
 
+      - name: Configure persistent Android signing
+        id: signing
+        if: always() && steps.dependencies.outcome == 'success'
+        shell: bash
+        env:
+          ANDROID_SIGNING_CONFIG_JSON: ${{ secrets.ANDROID_SIGNING_CONFIG_JSON }}
+        run: |
+          if [[ -z "${ANDROID_SIGNING_CONFIG_JSON:-}" ]]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::ANDROID_SIGNING_CONFIG_JSON is not configured. APK will be signed with the temporary runner debug key and will not be published as an updateable Release."
+            exit 0
+          fi
+
+          STORE_PASSWORD="$(jq -r '.storePassword // empty' <<< "$ANDROID_SIGNING_CONFIG_JSON")"
+          KEY_ALIAS="$(jq -r '.keyAlias // empty' <<< "$ANDROID_SIGNING_CONFIG_JSON")"
+          KEY_PASSWORD="$(jq -r '.keyPassword // empty' <<< "$ANDROID_SIGNING_CONFIG_JSON")"
+          KEYSTORE_BASE64="$(jq -r '.keystoreBase64 // empty' <<< "$ANDROID_SIGNING_CONFIG_JSON")"
+
+          if [[ -z "$STORE_PASSWORD" || -z "$KEY_ALIAS" || -z "$KEY_PASSWORD" || -z "$KEYSTORE_BASE64" ]]; then
+            echo "::error::ANDROID_SIGNING_CONFIG_JSON is malformed or missing required fields."
+            exit 1
+          fi
+
+          mkdir -p android/app
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > android/app/gymminimal-release-key.jks
+          keytool -list -keystore android/app/gymminimal-release-key.jks -storepass "$STORE_PASSWORD" -alias "$KEY_ALIAS" >/dev/null
+
+          cat > android/key.properties <<EOF
+          storeFile=gymminimal-release-key.jks
+          storePassword=$STORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEY_PASSWORD
+          EOF
+
+          echo "configured=true" >> "$GITHUB_OUTPUT"
+
+      - name: Allocate a higher Android version code for every CI build
+        id: android-build-number
+        if: always() && steps.dependencies.outcome == 'success'
+        shell: bash
+        run: |
+          BUILD_NUMBER=$((GITHUB_RUN_NUMBER * 100 + GITHUB_RUN_ATTEMPT))
+          echo "value=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "Using Android version code: $BUILD_NUMBER"
+
       - name: Build one installable APK
-        run: flutter build apk --release
+        id: build-apk
+        if: always() && steps.dependencies.outcome == 'success'
+        run: flutter build apk --release --target-platform android-arm64 --build-number "${{ steps.android-build-number.outputs.value }}"
 
       - name: Rename APK
+        id: rename-apk
+        if: always() && steps.build-apk.outcome == 'success'
         run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/GymMinimal.apk
 
       - name: Upload single APK artifact
+        if: always() && steps.rename-apk.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: gymminimal-apk
           path: build/app/outputs/flutter-apk/GymMinimal.apk
           if-no-files-found: error
 
-      - name: Point preview tag at this build
-        if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+      - name: Select release destination
+        id: release
+        if: always()
+        shell: bash
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_SOURCE_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          DISPATCH_TAG: ${{ github.event.inputs.tag }}
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+            TAG="pr-${PR_NUMBER}-preview"
+            NAME="GymMinimal — PR #${PR_NUMBER}"
+            if [[ "$PR_SOURCE_REPO" == "$GITHUB_REPOSITORY" ]]; then
+              PUBLISH=true
+            else
+              PUBLISH=false
+              echo "::notice::Fork PRs build an Actions artifact only; GitHub does not grant them write access to repository Releases."
+            fi
+          else
+            TAG="${DISPATCH_TAG:-minimal-mode-preview}"
+            NAME="GymMinimal — Minimal Mode"
+            PUBLISH=true
+          fi
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "publish=$PUBLISH" >> "$GITHUB_OUTPUT"
+
+      - name: Point this preview tag at the built commit
+        if: always() && steps.build-apk.outcome == 'success' && steps.release.outputs.publish == 'true' && steps.signing.outputs.configured == 'true'
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
         run: |
           git tag -f "$RELEASE_TAG" "$GITHUB_SHA"
           git push origin "refs/tags/$RELEASE_TAG" --force
 
-      - name: Remove previous APK assets from the preview release
-        if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+      - name: Remove previous APK assets from this preview release
+        if: always() && steps.build-apk.outcome == 'success' && steps.release.outputs.publish == 'true' && steps.signing.outputs.configured == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
         run: |
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             mapfile -t old_apks < <(gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name | select(endswith(".apk"))')
@@ -100,16 +181,29 @@ jobs:
             done
           fi
 
-      - name: Publish single APK to GitHub Release
-        if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+      - name: Publish the built APK to GitHub Releases
+        if: always() && steps.build-apk.outcome == 'success' && steps.release.outputs.publish == 'true' && steps.signing.outputs.configured == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.RELEASE_TAG }}
-          name: GymMinimal — Minimal Mode
+          tag_name: ${{ steps.release.outputs.tag }}
+          name: ${{ steps.release.outputs.name }}
           body: |
-            Rolling preview build of the native Minimal Mode implementation.
+            Automatically updated, signed GymMinimal preview build.
 
-            Download the single installable APK: GymMinimal.apk
+            Source commit: ${{ github.sha }}
+            Trigger: ${{ github.event_name }}
+            Analysis result: ${{ steps.analyze.outcome }}
+            Test result: ${{ steps.tests.outcome }}
+            Pull request: ${{ github.event.pull_request.html_url || 'not applicable' }}
+
+            Download GymMinimal.apk and install it over the previous preview build.
           prerelease: true
+          make_latest: false
           overwrite_files: true
           files: build/app/outputs/flutter-apk/GymMinimal.apk
+
+      - name: Explain why the APK was not published as a Release
+        if: always() && steps.build-apk.outcome == 'success' && (steps.signing.outputs.configured != 'true' || steps.release.outputs.publish != 'true')
+        run: |
+          echo "The APK remains available in this run's Actions artifacts."
+          echo "A Release requires the persistent signing secret and a same-repository PR or main/manual run."
