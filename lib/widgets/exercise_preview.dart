@@ -10,6 +10,7 @@ import '../services/media_store.dart';
 import '../state/fit_state.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
+import '../theme/minimal_palette.dart';
 import 'exercise_media.dart';
 import 'glass.dart';
 import 'shimmer.dart';
@@ -84,18 +85,22 @@ class _ExercisePreviewState extends State<_ExercisePreview> {
 
   @override
   Widget build(BuildContext context) {
-    final gc = context.gc;
+    final minimal = fit.minimalMode;
+    final gc = minimal ? minimalColors(context.gc) : context.gc;
     final pad = MediaQuery.viewPaddingOf(context);
     final steps = fit.activeExerciseSteps(ex);
+    final animate = !minimal || fit.minimalAnimateDemo;
     final video = _video;
-    return Center(
+    return Theme(
+      data: Theme.of(context).copyWith(extensions: [gc]),
+      child: Center(
       child: Padding(
       padding: EdgeInsets.fromLTRB(16, pad.top + 24, 16, pad.bottom + 24),
       child: Material(
         color: gc.bgRaised,
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(minimal ? 16 : 28),
           side: BorderSide(color: gc.border),
         ),
         child: AnimatedBuilder(
@@ -112,7 +117,7 @@ class _ExercisePreviewState extends State<_ExercisePreview> {
                     children: [
                       Stack(children: [
                         video == null
-                            ? ExerciseMedia(ex: ex, height: 250, radius: 20, live: true, bordered: false)
+                            ? ExerciseMedia(ex: ex, height: minimal ? 210 : 250, radius: minimal ? 12 : 20, live: animate, bordered: false)
                             : _VideoStage(controller: video),
                         Positioned(
                           top: 14,
@@ -144,7 +149,7 @@ class _ExercisePreviewState extends State<_ExercisePreview> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(exerciseName(ex),
-                                style: AppTheme.f(24, weight: FontWeight.w800, color: gc.text, height: 1.1)),
+                                style: AppTheme.f(minimal ? 17 : 24, weight: minimal ? FontWeight.w700 : FontWeight.w800, color: gc.text, height: 1.15)),
                             const SizedBox(height: 16),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,6 +188,7 @@ class _ExercisePreviewState extends State<_ExercisePreview> {
             ],
           ),
         ),
+      ),
       ),
       ),
     );

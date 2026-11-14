@@ -249,6 +249,11 @@ class FitState extends FitCore
     minimalShowExerciseIcons = data['minimalShowExerciseIcons'] as bool? ?? false;
     minimalShowTotals = data['minimalShowTotals'] as bool? ?? true;
     minimalShowSettingsButton = data['minimalShowSettingsButton'] as bool? ?? true;
+    minimalExpandExercises = data['minimalExpandExercises'] as bool? ?? false;
+    minimalShowRecent = data['minimalShowRecent'] as bool? ?? true;
+    minimalAnimateDemo = data['minimalAnimateDemo'] as bool? ?? true;
+    minimalRepRecords = data['minimalRepRecords'] as bool? ?? true;
+    minimalDefaultApplied = data['minimalDefaultV4'] == true;
     heatmapRange = data['heatRange'] == 'year' ? 'year' : 'weeks';
     alarmStyle = data['alarmStyle'] as String? ?? 'quiet';
     RestAlarm.instance.style = alarmStyle;
@@ -623,6 +628,11 @@ class FitState extends FitCore
         'minimalShowExerciseIcons': minimalShowExerciseIcons,
         'minimalShowTotals': minimalShowTotals,
         'minimalShowSettingsButton': minimalShowSettingsButton,
+        'minimalExpandExercises': minimalExpandExercises,
+        'minimalShowRecent': minimalShowRecent,
+        'minimalAnimateDemo': minimalAnimateDemo,
+        'minimalRepRecords': minimalRepRecords,
+        'minimalDefaultV4': minimalDefaultApplied,
         'heatRange': heatmapRange,
         'alarmStyle': alarmStyle,
         'noSuggest': noSuggest.toList(),
@@ -815,6 +825,10 @@ class FitState extends FitCore
     minimalShowExerciseIcons = false;
     minimalShowTotals = true;
     minimalShowSettingsButton = true;
+    minimalExpandExercises = false;
+    minimalShowRecent = true;
+    minimalAnimateDemo = true;
+    minimalRepRecords = true;
     heatmapRange = 'weeks';
     MediaStore.clearAll();
     favorites.clear();

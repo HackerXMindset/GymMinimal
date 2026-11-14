@@ -31,6 +31,11 @@ mixin SettingsState on FitCore, ToolsState, LibraryState {
   bool minimalShowExerciseIcons = false;
   bool minimalShowTotals = true;
   bool minimalShowSettingsButton = true;
+  bool minimalExpandExercises = false;
+  bool minimalShowRecent = true;
+  bool minimalAnimateDemo = true;
+  bool minimalRepRecords = true;
+  bool minimalDefaultApplied = false;
   String heatmapRange = 'weeks';
   String alarmStyle = 'quiet';
   int restSeconds = 90;
@@ -177,9 +182,24 @@ mixin SettingsState on FitCore, ToolsState, LibraryState {
       ? const ['home', 'progress', 'exercises', 'exercise-detail', 'history', 'preferences'].contains(route)
       : const ['home', 'progress', 'exercises', 'settings'].contains(route);
 
+  @override
+  bool get recentViewAllowed => minimalMode && minimalShowRecent;
+
+  /// One-time switch that makes Minimal the default view. It runs from main()
+  /// after the saved data is loaded, so tests and backup restores never hit
+  /// it. After it has run the toggle in Settings is fully the user's choice.
+  void applyMinimalDefaultOnce() {
+    if (minimalDefaultApplied) return;
+    minimalDefaultApplied = true;
+    minimalMode = true;
+    _persist();
+    notifyListeners();
+  }
+
   void setMinimalMode(bool enabled) {
     if (minimalMode == enabled) return;
     minimalMode = enabled;
+    exRecentOn = true;
     _persist();
     notifyListeners();
   }
@@ -193,6 +213,10 @@ mixin SettingsState on FitCore, ToolsState, LibraryState {
     bool? showExerciseIcons,
     bool? showTotals,
     bool? showSettingsButton,
+    bool? expandExercises,
+    bool? showRecent,
+    bool? animateDemo,
+    bool? repRecords,
   }) {
     if (textSize != null && const ['normal', 'small', 'tiny'].contains(textSize)) {
       minimalTextSize = textSize;
@@ -206,6 +230,10 @@ mixin SettingsState on FitCore, ToolsState, LibraryState {
     if (showExerciseIcons != null) minimalShowExerciseIcons = showExerciseIcons;
     if (showTotals != null) minimalShowTotals = showTotals;
     if (showSettingsButton != null) minimalShowSettingsButton = showSettingsButton;
+    if (expandExercises != null) minimalExpandExercises = expandExercises;
+    if (showRecent != null) minimalShowRecent = showRecent;
+    if (animateDemo != null) minimalAnimateDemo = animateDemo;
+    if (repRecords != null) minimalRepRecords = repRecords;
     _persist();
     notifyListeners();
   }

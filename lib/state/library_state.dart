@@ -54,6 +54,49 @@ mixin LibraryState on FitCore {
 
   bool exArchivedOnly = false;
 
+  /// Minimal "Recent" chip: the exercises you did lately, newest first.
+  /// It is the default view of the minimal Exercises list and switches off as
+  /// soon as the person searches, filters or taps another chip.
+  bool exRecentOn = true;
+
+  /// Overridden by SettingsState: only the minimal view with the Recent option on.
+  bool get recentViewAllowed => false;
+
+  List<String> recentExerciseIds({int limit = 20}) {
+    final byDate = [...sessions]..sort((a, b) => b.date.compareTo(a.date));
+    final seen = <String>{};
+    for (final s in byDate) {
+      for (final e in s.exercises) {
+        if (seen.length >= limit) break;
+        if (e.workingSets.isEmpty) continue;
+        if (!isArchived(e.id) && exerciseById(e.id) != null) seen.add(e.id);
+      }
+      if (seen.length >= limit) break;
+    }
+    return seen.toList();
+  }
+
+  bool get _plainList =>
+      exSearch.trim().isEmpty &&
+      exMuscleFilter == null &&
+      exZoneFilter == null &&
+      exDifficultyFilter == null &&
+      exEquipmentFilter == null &&
+      exKindFilter == null &&
+      !exFavouritesOnly &&
+      !exArchivedOnly;
+
+  /// True while the Recent list is what the person sees.
+  bool get exRecentActive =>
+      recentViewAllowed && exRecentOn && _plainList && recentExerciseIds(limit: 1).isNotEmpty;
+
+  void showRecentExercises() {
+    exMuscleFilter = null;
+    exZoneFilter = null;
+    exRecentOn = true;
+    notifyListeners();
+  }
+
   bool isArchived(String id) => archived.contains(id);
 
   void toggleArchived(String id) {
@@ -120,18 +163,29 @@ mixin LibraryState on FitCore {
     exKindFilter = null;
     exFavouritesOnly = false;
     exArchivedOnly = false;
+    exRecentOn = true;
     notifyListeners();
   }
 
   void setMuscleFilter(String id) {
     exMuscleFilter = exMuscleFilter == id ? null : id;
     exZoneFilter = null;
+    exRecentOn = false;
+    notifyListeners();
+  }
+
+  /// "All" chip: leave Recent and every muscle filter.
+  void showAllExercises() {
+    exMuscleFilter = null;
+    exZoneFilter = null;
+    exRecentOn = false;
     notifyListeners();
   }
 
   void setZoneFilter(String? zone) {
     exZoneFilter = zone;
     exMuscleFilter = null;
+    exRecentOn = false;
     notifyListeners();
   }
 
@@ -174,6 +228,10 @@ mixin LibraryState on FitCore {
   List<Exercise> get exercisesFiltered => exercisesMatching(exSearch);
 
   List<Exercise> exercisesMatching(String query) {
+    if (query == exSearch && exRecentActive) {
+      final ids = recentExerciseIds();
+      return [for (final id in ids) exerciseById(id)!];
+    }
     final matchesSearch = exerciseSearch(query);
     final list = allExercises.where((ex) {
       if (isArchived(ex.id) != exArchivedOnly) return false;

@@ -9,9 +9,11 @@ import '../l10n/l10n.dart';
 import '../models/exercise.dart';
 import '../models/workout.dart';
 import '../services/exercise_match.dart';
+import '../services/minimal_insights.dart';
 import '../state/fit_state.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
+import '../theme/minimal_palette.dart';
 import '../widgets/charts.dart';
 import '../widgets/dialogs.dart';
 import '../widgets/entrance.dart';
@@ -37,9 +39,8 @@ class ExerciseDetailScreen extends StatefulWidget {
 
 class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   int _rangeDays = 84;
-  int _rangeOffset = 0;
-  bool _showHowTo = false;
-  bool _showSettings = false;
+  String _metric = '';
+  bool _allHistory = false;
 
   String get _exId => fit.activeExercise.id;
 
@@ -57,30 +58,8 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   Widget build(BuildContext context) {
     final base = context.gc;
     final minimal = fit.minimalMode;
-    final gc = minimal
-        ? base.copyWith(
-            pageBg: const Color(0xFF0E0E0D),
-            bg: const Color(0xFF141413),
-            bgRaised: const Color(0xFF1B1B1A),
-            bgRaised2: const Color(0xFF222221),
-            border: const Color(0xFF2C2C2A),
-            navBg: const Color(0xEE141413),
-            text: const Color(0xFFE9E7E2),
-            textSecondary: const Color(0xFF8D8A84),
-            textTertiary: const Color(0xFF5F5D58),
-            ember: const Color(0xFFC8A45F),
-            emberDeep: const Color(0xFFA88647),
-            onEmber: const Color(0xFF141413),
-            emberSoft: const Color(0x35C8A45F),
-            accent: const Color(0xFFC8A45F),
-            accentSoft: const Color(0x35C8A45F),
-            brass: const Color(0xFFC8A45F),
-            sage: const Color(0xFFC8A45F),
-            sageSoft: const Color(0x35C8A45F),
-            mutedFill: const Color(0xFF222221),
-            heatEmpty: const Color(0xFF222221),
-          )
-        : base;
+    final gc = minimal ? minimalColors(base) : base;
+    if (minimal) return _minimalPage(context, gc);
     final ex = fit.activeExercise;
     final fav = fit.favorites[ex.id] ?? false;
     final secondary =
@@ -90,16 +69,12 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     final oneRm = fit.oneRmSeries(ex.id);
     final bestReps = fit.bestRepsSeries(ex.id);
     final history = fit.exerciseHistory(ex.id);
-    final visibleHistory = minimal ? history.length : math.min(history.length, 8);
-    final trend = minimal ? fit.exerciseTrend(ex.id, days: _rangeDays) : <({DateTime date, double value})>[];
+    final visibleHistory = math.min(history.length, 8);
     final hasMedia = fit.hasCustomMedia(ex.id);
-    final repsOnly = fit.isRepsOnly(ex.id);
     final mode = fit.modeOf(ex.id);
     final custom = fit.isCustom(ex.id);
     final archived = fit.isArchived(ex.id);
-    final bar = minimal
-        ? _minimalBar(context, gc, ex, custom, archived, fav, history, steps)
-        : Padding(
+    final bar = Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -213,13 +188,6 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           _meta(gc, t.equipmentLabel, t.equipment(ex.equipment)),
         ],
       ),
-      if (minimal) ...[
-        if (history.isNotEmpty) ...[
-          const SizedBox(height: 10),
-          _minimalOverview(gc, history),
-        ],
-        _minimalHistorySections(gc, history),
-      ],
       SizedBox(height: minimal ? 10 : 18),
       _addToRoutineRow(context, gc, ex),
       SizedBox(height: minimal ? 12 : 20),
@@ -268,36 +236,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                 ],
               ),
               if (history.length > 1) _bests(gc, ex.id, pr.kind),
-              if (minimal && (pr.kind == PrKind.weight || pr.kind == PrKind.reps)) ...[
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(child: _cardLabel(gc, pr.kind == PrKind.reps ? t.repsTitle : t.estOneRm)),
-                    _minimalRangePicker(gc),
-                  ],
-                ),
-                if (trend.length > 1) ...[
-                  const SizedBox(height: 8),
-                  TrendChart(
-                    values: [for (final point in trend) pr.kind == PrKind.weight ? fit.toDisplayWeight(point.value) : point.value],
-                    height: 72,
-                    scale: pr.kind == PrKind.reps ? (v) => '${v.round()}' : fmt,
-                  ),
-                  const SizedBox(height: 2),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(_fmtDate(trend.first.date),
-                          style: AppTheme.f(9.5, weight: FontWeight.w500, color: gc.textTertiary)),
-                      Text(_fmtDate(trend.last.date),
-                          style: AppTheme.f(9.5, weight: FontWeight.w500, color: gc.textTertiary)),
-                    ],
-                  ),
-                ],
-              ] else if (!minimal && pr.kind == PrKind.weight && oneRm.length > 2) ...[
+              if (pr.kind == PrKind.weight && oneRm.length > 2) ...[
                 const SizedBox(height: 16),
                 TrendChart(values: [for (final v in oneRm) fit.toDisplayWeight(v)], height: 84, scale: fmt),
-              ] else if (!minimal && pr.kind == PrKind.reps && bestReps.length > 2) ...[
+              ] else if (pr.kind == PrKind.reps && bestReps.length > 2) ...[
                 const SizedBox(height: 16),
                 TrendChart(values: bestReps, height: 84, scale: (v) => '${v.round()}'),
               ],
@@ -327,8 +269,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       SizedBox(height: minimal ? 14 : 24),
     ];
     final partB = <Widget>[
-      if ((steps.isNotEmpty || custom) &&
-          (!minimal || (fit.minimalShowHowTo && _showHowTo))) ...[
+      if (steps.isNotEmpty || custom) ...[
         Row(children: [
           Expanded(child: _section(gc, t.howTo)),
           if (custom && steps.isNotEmpty)
@@ -365,65 +306,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           if (i < steps.length - 1) const SizedBox(height: 14),
         ],
       ],
-      if (!minimal || _showSettings) ...[
-        SizedBox(height: minimal ? 14 : 28),
-        _section(gc, t.exerciseSettings),
-        SizedBox(height: minimal ? 8 : 12),
-        _group(gc, [
-        _modeRow(context, gc, ex.id, mode),
-        if (mode != 'cardio') _repsOnlyRow(gc, ex.id, repsOnly),
-        if (mode == 'time') ...[
-          _switchRow(
-            gc,
-            PhosphorIconsRegular.arrowsLeftRight,
-            t.eachSide,
-            t.eachSideHint,
-            fit.isEachSide(ex.id),
-            () => fit.toggleEachSide(ex.id),
-          ),
-          _holdProgressRow(gc, ex.id),
-        ] else if (mode.isEmpty)
-          _switchRow(
-            gc,
-            PhosphorIconsRegular.arrowsLeftRight,
-            t.eachSide,
-            t.eachSideRepsHint,
-            fit.isSidedReps(ex.id),
-            () => fit.toggleSidedReps(ex.id),
-          ),
-        _restRow(gc, ex.id),
-        if (ex.equipment == 'Barbell' || ex.equipment == 'Machine') _barRow(gc, ex),
-        if ((ex.equipment == 'Machine' || ex.equipment == 'Cable') && mode.isEmpty && !repsOnly)
-          _stackRow(context, gc, ex.id),
-        _switchRow(
-          gc,
-          PhosphorIconsRegular.sparkle,
-          t.suggestInWorkouts,
-          t.suggestInWorkoutsHint,
-          fit.suggests(ex.id),
-          () => fit.toggleSuggest(ex.id),
-        ),
-        if (!repsOnly && mode.isEmpty) ...[
-          _switchRow(
-            gc,
-            PhosphorIconsRegular.arrowFatLinesDown,
-            t.assistedSetting,
-            t.assistedSettingHint,
-            fit.isAssisted(ex.id),
-            () => fit.toggleAssisted(ex.id),
-          ),
-          _progressRow(context, gc, ex.id),
-          _switchRow(
-            gc,
-            PhosphorIconsRegular.fire,
-            t.autoWarmup,
-            t.autoWarmupHint,
-            fit.warmsUp(ex.id),
-            () => fit.toggleAutoWarmup(ex.id),
-          ),
-        ],
-        ]),
-      ],
+      SizedBox(height: minimal ? 14 : 28),
+      _section(gc, t.exerciseSettings),
+      SizedBox(height: minimal ? 8 : 12),
+      _group(gc, _settingRows(context, gc, ex)),
       if (fit.runsClock(ex.id)) ...[
         const SizedBox(height: 24),
         _section(gc, t.stopwatch),
@@ -433,12 +319,6 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       if (fit.alternativesHere(ex, 3).isNotEmpty) ...[
         const SizedBox(height: 24),
         _notHere(gc, ex),
-      ],
-      if (fit.similarExercises(ex, 4).isNotEmpty) ...[
-        const SizedBox(height: 24),
-        _section(gc, t.similar),
-        const SizedBox(height: 10),
-        for (final s in fit.similarExercises(ex, 4)) _similarRow(gc, s),
       ],
     ];
     if (DesktopScope.of(context) && !minimal) {
@@ -505,246 +385,592 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     );
   }
 
-  Widget _minimalBar(
-    BuildContext context,
-    GymColors gc,
-    Exercise ex,
-    bool custom,
-    bool archived,
-    bool fav,
-    List<({DateTime date, LoggedExercise ex})> history,
-    List<String> steps,
-  ) {
-    final actions = <Widget>[];
-    if (custom) {
-      actions.add(RoundAction(
-        size: 30,
-        label: t.delete,
-        onTap: () => _confirmDelete(context, ex),
-        child: Icon(PhosphorIconsRegular.trash, size: 13, color: gc.textSecondary),
-      ));
-      actions.add(RoundAction(
-        size: 30,
-        label: t.editExercise,
-        onTap: () => showCreateExerciseSheet(context, editing: ex),
-        child: Icon(PhosphorIconsRegular.pencilSimple, size: 13, color: gc.textSecondary),
-      ));
-      if (history.isNotEmpty) {
-        actions.add(RoundAction(
-          size: 30,
-          label: t.mergeExercise,
-          onTap: () => _merge(context, ex),
-          child: Icon(PhosphorIconsRegular.gitMerge, size: 13, color: gc.textSecondary),
-        ));
-      }
-    }
-    actions.add(RoundAction(
-      size: 30,
-      label: t.duplicateExercise,
-      onTap: () => showCreateExerciseSheet(context, copyOf: ex),
-      child: Icon(PhosphorIconsRegular.copy, size: 13, color: gc.textSecondary),
-    ));
-    actions.add(RoundAction(
-      size: 30,
-      label: archived ? t.restoreExercise : t.archiveExercise,
-      onTap: () => _toggleArchived(context, ex),
-      child: Icon(archived ? PhosphorIconsFill.archive : PhosphorIconsRegular.archive,
-          size: 13, color: archived ? gc.accent : gc.textSecondary),
-    ));
-    actions.add(RoundAction(
-      size: 30,
-      label: t.favouritesOnly,
-      onTap: () => fit.toggleFavorite(ex.id),
-      child: _star(gc, fav),
-    ));
-    if (fit.minimalShowHowTo && (steps.isNotEmpty || custom)) {
-      actions.add(RoundAction(
-        size: 30,
-        label: t.howTo,
-        onTap: () => setState(() => _showHowTo = !_showHowTo),
-        child: Icon(Icons.help_outline_rounded, size: 16, color: _showHowTo ? gc.ember : gc.textSecondary),
-      ));
-    }
-    actions.add(RoundAction(
-      size: 30,
-      label: t.exerciseSettings,
-      onTap: () => setState(() => _showSettings = !_showSettings),
-      child: Icon(Icons.settings_outlined, size: 15, color: _showSettings ? gc.ember : gc.textSecondary),
-    ));
+  List<Widget> _settingRows(BuildContext context, GymColors gc, Exercise ex) {
+    final repsOnly = fit.isRepsOnly(ex.id);
+    final mode = fit.modeOf(ex.id);
+    return [
+    _modeRow(context, gc, ex.id, mode),
+    if (mode != 'cardio') _repsOnlyRow(gc, ex.id, repsOnly),
+    if (mode == 'time') ...[
+      _switchRow(
+        gc,
+        PhosphorIconsRegular.arrowsLeftRight,
+        t.eachSide,
+        t.eachSideHint,
+        fit.isEachSide(ex.id),
+        () => fit.toggleEachSide(ex.id),
+      ),
+      _holdProgressRow(gc, ex.id),
+    ] else if (mode.isEmpty)
+      _switchRow(
+        gc,
+        PhosphorIconsRegular.arrowsLeftRight,
+        t.eachSide,
+        t.eachSideRepsHint,
+        fit.isSidedReps(ex.id),
+        () => fit.toggleSidedReps(ex.id),
+      ),
+    _restRow(gc, ex.id),
+    if (ex.equipment == 'Barbell' || ex.equipment == 'Machine') _barRow(gc, ex),
+    if ((ex.equipment == 'Machine' || ex.equipment == 'Cable') && mode.isEmpty && !repsOnly)
+      _stackRow(context, gc, ex.id),
+    _switchRow(
+      gc,
+      PhosphorIconsRegular.sparkle,
+      t.suggestInWorkouts,
+      t.suggestInWorkoutsHint,
+      fit.suggests(ex.id),
+      () => fit.toggleSuggest(ex.id),
+    ),
+    if (!repsOnly && mode.isEmpty) ...[
+      _switchRow(
+        gc,
+        PhosphorIconsRegular.arrowFatLinesDown,
+        t.assistedSetting,
+        t.assistedSettingHint,
+        fit.isAssisted(ex.id),
+        () => fit.toggleAssisted(ex.id),
+      ),
+      _progressRow(context, gc, ex.id),
+      _switchRow(
+        gc,
+        PhosphorIconsRegular.fire,
+        t.autoWarmup,
+        t.autoWarmupHint,
+        fit.warmsUp(ex.id),
+        () => fit.toggleAutoWarmup(ex.id),
+      ),
+    ],
+    ];
+  }
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
-      child: Row(
-        children: [
-          RoundBtn(icon: Ic.chevronLeft, onTap: fit.closeExerciseDetail),
-          const Spacer(),
-          Flexible(
+  // ---------------------------------------------------------------------------
+  // Minimal exercise page
+  // ---------------------------------------------------------------------------
+
+  Widget _minimalPage(BuildContext context, GymColors gc) {
+    final ex = fit.activeExercise;
+    final history = fit.exerciseHistory(ex.id);
+    final archived = fit.isArchived(ex.id);
+    final mode = fit.modeOf(ex.id);
+    final pr = fit.exerciseRecord(ex.id);
+    final secondary = ex.secondary.map(muscleLabel).join(', ');
+    final shown = _allHistory ? history.length : math.min(history.length, 8);
+    return Theme(
+      data: Theme.of(context).copyWith(extensions: [gc]),
+      child: RiseScope(
+        key: ValueKey(ex.id),
+        id: 'exercise',
+        once: false,
+        child: ColoredBox(
+          color: gc.bg,
+          child: SafeArea(
+            bottom: false,
             child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  for (int i = 0; i < actions.length; i++) ...[
-                    if (i > 0) const SizedBox(width: 5),
-                    actions[i],
-                  ],
-                ],
+              clipBehavior: Clip.none,
+              padding: const EdgeInsets.only(top: 4, bottom: 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: riseAll([
+                  _miniBar(context, gc, ex),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 4, 14, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (archived) ...[
+                          _archivedBanner(gc, ex),
+                          const SizedBox(height: 12),
+                        ],
+                        Text(exerciseName(ex),
+                            style: AppTheme.f(17, weight: FontWeight.w700, color: gc.text, height: 1.2)),
+                        const SizedBox(height: 3),
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () => _editSecondary(context, ex.id),
+                          child: Text(
+                            [
+                              muscleLabel(ex.primary),
+                              if (secondary.isNotEmpty) secondary,
+                              t.equipment(ex.equipment),
+                            ].join('  ·  '),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTheme.f(11.5, weight: FontWeight.w500, color: gc.textSecondary, height: 1.35),
+                          ),
+                        ),
+                        if (history.isEmpty) ...[
+                          const SizedBox(height: 18),
+                          Text(t.noHistory,
+                              style: AppTheme.f(12.5, weight: FontWeight.w500, color: gc.textSecondary)),
+                        ] else ...[
+                          const SizedBox(height: 14),
+                          _miniStats(gc, ex, history, pr),
+                          _miniNext(gc, ex),
+                          if (pr != null) _miniRecords(gc, ex, history, pr),
+                          if (fit.minimalRepRecords) _miniRepRecords(gc, ex),
+                          if (pr != null) _miniChart(gc, ex, history, pr),
+                        ],
+                        if (fit.goalFits(ex.id) && fit.exerciseGoals[ex.id] != null) ...[
+                          const SizedBox(height: 14),
+                          _goalCard(context, gc, ex.id),
+                        ],
+                        if (history.isNotEmpty) ...[
+                          const SizedBox(height: 18),
+                          _section(gc, t.history),
+                          const SizedBox(height: 2),
+                          for (var i = 0; i < shown; i++) _historyRow(gc, history[i], i < shown - 1, mode),
+                          if (history.length > shown)
+                            GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () => setState(() => _allHistory = true),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                child: Text('Show all ${history.length}',
+                                    style: AppTheme.f(11.5, weight: FontWeight.w600, color: gc.ember)),
+                              ),
+                            ),
+                        ],
+                        const SizedBox(height: 14),
+                        _addToRoutineRow(context, gc, ex),
+                        if (fit.minimalShowNotes) _notesRow(gc, ex.id),
+                        if (fit.runsClock(ex.id)) ...[
+                          const SizedBox(height: 18),
+                          _section(gc, t.stopwatch),
+                          const SizedBox(height: 8),
+                          const StopwatchCard(),
+                        ],
+                        if (fit.alternativesHere(ex, 3).isNotEmpty) ...[
+                          const SizedBox(height: 18),
+                          _notHere(gc, ex),
+                        ],
+                      ],
+                    ),
+                  ),
+                ]),
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _minimalOverview(
-    GymColors gc,
-    List<({DateTime date, LoggedExercise ex})> history,
-  ) {
-    final sets = [for (final item in history) ...item.ex.workingSets];
-    final last = history.isEmpty ? null : history.first;
-    final first = history.isEmpty ? null : history.last;
-    final reps = sets.fold<int>(0, (sum, set) => sum + set.reps);
-    final volume = sets.fold<double>(0, (sum, set) => sum + set.volume);
-    final heavy = sets.isEmpty ? null : sets.reduce((a, b) => a.weight > b.weight || (a.weight == b.weight && a.reps > b.reps) ? a : b);
-    final best = sets.isEmpty ? null : sets.reduce((a, b) => a.oneRm > b.oneRm ? a : b);
-    var bestSoFar = 0.0;
-    var lastPrLabel = '–';
-    for (final item in [...history]..sort((a, b) => a.date.compareTo(b.date))) {
-      final value = item.ex.bestOneRm;
-      if (value > bestSoFar + 0.01) {
-        bestSoFar = value;
-        lastPrLabel = _fmtDate(item.date) + ' · ' + fit.weightLabel(value);
-      }
-    }
-    final metrics = <(String, String)>[
-      ('Last done', last == null ? 'Not logged' : _fmtDate(last.date)),
-      ('Last sets', last == null ? '–' : fit.setsSummary(last.ex.sets)),
-      ('First done', first == null ? '–' : _fmtDate(first.date)),
-      ('Sessions', history.length.toString()),
-      ('Total sets', sets.length.toString()),
-      ('Total reps', reps.toString()),
-      ('Total volume', fit.volumeLabel(volume)),
-      ('Heaviest set', heavy == null ? '–' : fit.weightLabel(heavy.weight) + ' × ' + heavy.reps.toString()),
-      ('Best 1RM', best == null ? '–' : fit.weightLabel(best.oneRm)),
-      ('Last PR', lastPrLabel),
-    ];
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      decoration: BoxDecoration(border: Border.symmetric(horizontal: BorderSide(color: gc.border))),
-      child: LayoutBuilder(builder: (context, box) {
-        final width = (box.maxWidth - 12) / 2;
-        return Wrap(spacing: 12, children: [
-          for (final metric in metrics)
-            SizedBox(width: width, child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 7),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(metric.$1.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: AppTheme.f(9.5, weight: FontWeight.w700, color: gc.textTertiary)),
-                const SizedBox(height: 3),
-                Text(metric.$2, maxLines: 2, overflow: TextOverflow.ellipsis,
-                  style: AppTheme.f(12.5, weight: FontWeight.w700, color: gc.text)),
-              ]),
-            )),
-        ]);
-      }),
-    );
-  }
-
-  Widget _minimalHistorySections(GymColors gc, List<({DateTime date, LoggedExercise ex})> history) {
-    final end = DateTime.now().subtract(Duration(days: _rangeOffset));
-    final start = _rangeDays == 0 ? DateTime(2000) : end.subtract(Duration(days: _rangeDays - 1));
-    final rows = history.where((h) => !h.date.isAfter(end) && !h.date.isBefore(start)).toList()
-      ..sort((a, b) => a.date.compareTo(b.date));
-    final trend = [for (final h in rows) if (h.ex.bestOneRm > 0) h.ex.bestOneRm];
-    final maxVolume = rows.fold<double>(1, (m, h) => math.max(m, h.ex.volume).toDouble());
-    final prs = <({DateTime date, double value})>[];
-    var record = 0.0;
-    for (final h in [...history]..sort((a, b) => a.date.compareTo(b.date))) {
-      if (h.ex.bestOneRm > record + 0.01) {
-        record = h.ex.bestOneRm;
-        prs.add((date: h.date, value: record));
-      }
-    }
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      const SizedBox(height: 12),
-      Row(children: [Expanded(child: _section(gc, 'Estimated 1RM')), _minimalRangePicker(gc)]),
-      const SizedBox(height: 8),
-      if (trend.length > 1) TrendChart(values: trend.map(fit.toDisplayWeight).toList(), height: 82, scale: fmt)
-      else Text(t.minimalExerciseTrendEmpty, style: AppTheme.f(11, color: gc.textSecondary)),
-      const SizedBox(height: 14),
-      _section(gc, 'Volume per session'),
-      const SizedBox(height: 8),
-      if (rows.isEmpty) Text(t.minimalExerciseVolumeEmpty, style: AppTheme.f(11, color: gc.textSecondary))
-      else SizedBox(height: 88, child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-        for (final h in rows) Expanded(child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 2),
-          child: Tooltip(message: _fmtDate(h.date) + ' · ' + fit.volumeLabel(h.ex.volume),
-            child: Container(height: math.max(2, 64 * h.ex.volume / maxVolume).toDouble(),
-              decoration: BoxDecoration(color: gc.ember.withValues(alpha: 0.75),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(3)))),
+  Widget _miniBar(BuildContext context, GymColors gc, Exercise ex) {
+    final fav = fit.favorites[ex.id] ?? false;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
+      child: Row(children: [
+        RoundBtn(icon: Ic.chevronLeft, onTap: fit.closeExerciseDetail),
+        const Spacer(),
+        RoundAction(
+          size: 30,
+          label: t.favouritesOnly,
+          onTap: () => fit.toggleFavorite(ex.id),
+          child: _star(gc, fav),
+        ),
+        if (fit.minimalShowHowTo) ...[
+          const SizedBox(width: 6),
+          RoundAction(
+            size: 30,
+            label: t.howTo,
+            onTap: () => showExercisePreview(context, ex),
+            child: Icon(Icons.help_outline_rounded, size: 16, color: gc.textSecondary),
           ),
-        )),
-      ])),
-      const SizedBox(height: 14),
-      _section(gc, 'PR history'),
-      const SizedBox(height: 6),
-      if (prs.isEmpty) Text(t.minimalExerciseRecordsEmpty, style: AppTheme.f(11, color: gc.textSecondary))
-      else for (final p in prs.reversed) Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5),
-        child: Row(children: [
-          Expanded(child: Text(_fmtDate(p.date), style: AppTheme.f(11, color: gc.textSecondary))),
-          Text(fit.weightLabel(p.value), style: AppTheme.f(12, weight: FontWeight.w700, color: gc.text)),
-        ]),
-      ),
-      const SizedBox(height: 14),
-      _section(gc, 'Every session'),
-      const SizedBox(height: 6),
-      for (final h in history) Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: gc.border))),
-        child: Row(children: [
-          SizedBox(width: 62, child: Text(_fmtDate(h.date), style: AppTheme.f(9.5, color: gc.textSecondary))),
-          Expanded(child: Text(h.ex.sets.map((x) => fit.weightLabel(x.weight) + '×' + x.reps.toString()).join('  '),
-            maxLines: 2, overflow: TextOverflow.ellipsis, style: AppTheme.f(10, color: gc.text))),
-          Text(fit.volumeLabel(h.ex.volume), style: AppTheme.f(9.5, color: gc.textSecondary)),
-          const SizedBox(width: 8),
-          Text(h.ex.bestOneRm > 0 ? fit.weightLabel(h.ex.bestOneRm) : '–', style: AppTheme.f(9.5, color: gc.textSecondary)),
-        ]),
-      ),
-    ]);
+        ],
+        const SizedBox(width: 6),
+        RoundAction(
+          size: 30,
+          label: t.exerciseSettings,
+          onTap: () => _showSettingsPopup(context, ex),
+          child: Icon(Icons.settings_outlined, size: 15, color: gc.textSecondary),
+        ),
+        const SizedBox(width: 6),
+        RoundAction(
+          size: 30,
+          label: t.moreOptions,
+          onTap: () => _showMore(context, gc, ex),
+          child: Icon(PhosphorIconsBold.dotsThree, size: 16, color: gc.textSecondary),
+        ),
+      ]),
+    );
   }
 
-  Widget _minimalRangePicker(GymColors gc) {
-    const ranges = [(28, '4W'), (56, '8W'), (84, '12W'), (0, 'ALL')];
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (_rangeDays != 0) GestureDetector(onTap: () => setState(() => _rangeOffset += _rangeDays), child: Icon(PhosphorIconsRegular.caretLeft, size: 14, color: gc.textSecondary)),
-        for (final range in ranges)
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () => setState(() { _rangeDays = range.$1; _rangeOffset = 0; }),
-            child: Container(
-              margin: const EdgeInsets.only(left: 4),
-              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-              decoration: BoxDecoration(
-                color: _rangeDays == range.$1 ? gc.emberSoft : Colors.transparent,
-                border: Border.all(color: _rangeDays == range.$1 ? gc.ember : gc.border),
-                borderRadius: BorderRadius.circular(4),
+  Future<void> _showMore(BuildContext context, GymColors gc, Exercise ex) {
+    final custom = fit.isCustom(ex.id);
+    final archived = fit.isArchived(ex.id);
+    final hasMedia = fit.hasCustomMedia(ex.id);
+    final hasHistory = fit.exerciseHistory(ex.id).isNotEmpty;
+    return showAppDialog<void>(
+      context: context,
+      builder: (dctx) {
+        Widget item(String label, VoidCallback onTap, {bool danger = false}) => GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                Navigator.of(dctx).pop();
+                onTap();
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+                child: Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(label,
+                      style: AppTheme.f(13.5,
+                          weight: FontWeight.w600, color: danger ? gc.danger : gc.text)),
+                ),
               ),
-              child: Text(
-                range.$2,
-                style: AppTheme.f(
-                  9.5,
-                  weight: FontWeight.w700,
-                  color: _rangeDays == range.$1 ? gc.ember : gc.textTertiary,
+            );
+        final items = <Widget>[
+          if (custom) item(t.editExercise, () => showCreateExerciseSheet(context, editing: ex)),
+          item(t.duplicateExercise, () => showCreateExerciseSheet(context, copyOf: ex)),
+          item(hasMedia ? t.changeMedia : t.addMedia, _pickMedia),
+          if (hasMedia) item(t.useDefaultArt, () => fit.clearExerciseMedia(ex.id)),
+          if (custom && hasHistory) item(t.mergeExercise, () => _merge(context, ex)),
+          item(archived ? t.restoreExercise : t.archiveExercise, () => _toggleArchived(context, ex)),
+          if (custom) item(t.delete, () => _confirmDelete(context, ex), danger: true),
+        ];
+        return Theme(
+          data: Theme.of(dctx).copyWith(extensions: [gc]),
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Material(
+                color: gc.bgRaised,
+                clipBehavior: Clip.antiAlias,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  side: BorderSide(color: gc.border),
+                ),
+                child: SingleChildScrollView(
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    for (var i = 0; i < items.length; i++) ...[
+                      items[i],
+                      if (i < items.length - 1) Divider(height: 1, thickness: 0.7, color: gc.border),
+                    ],
+                  ]),
                 ),
               ),
             ),
           ),
-        if (_rangeDays != 0) GestureDetector(onTap: _rangeOffset > 0 ? () => setState(() => _rangeOffset = math.max(0, _rangeOffset - _rangeDays)) : null, child: Icon(PhosphorIconsRegular.caretRight, size: 14, color: gc.textSecondary)),
-      ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showSettingsPopup(BuildContext context, Exercise ex) {
+    return showAppDialog<void>(
+      context: context,
+      builder: (dctx) {
+        final pad = MediaQuery.viewPaddingOf(dctx);
+        return AnimatedBuilder(
+          animation: fit,
+          builder: (_, _) {
+            final gc = minimalColors(dctx.gc);
+            return Theme(
+              data: Theme.of(dctx).copyWith(extensions: [gc]),
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(14, pad.top + 24, 14, pad.bottom + 24),
+                  child: Material(
+                    color: gc.bgRaised,
+                    clipBehavior: Clip.antiAlias,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: BorderSide(color: gc.border),
+                    ),
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 8, 4),
+                        child: Row(children: [
+                          Expanded(
+                            child: Text(t.exerciseSettings,
+                                style: AppTheme.f(14, weight: FontWeight.w700, color: gc.text)),
+                          ),
+                          IconButton(
+                            visualDensity: VisualDensity.compact,
+                            onPressed: () => Navigator.of(dctx).pop(),
+                            icon: Icon(PhosphorIconsBold.x, size: 14, color: gc.textSecondary),
+                          ),
+                        ]),
+                      ),
+                      Flexible(
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.fromLTRB(12, 0, 12, 14),
+                          child: _group(gc, _settingRows(dctx, gc, ex)),
+                        ),
+                      ),
+                    ]),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _miniLabel(GymColors gc, String label) => Text(label.toUpperCase(),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: AppTheme.f(9.5, weight: FontWeight.w700, color: gc.textTertiary, letterSpacing: 0.8));
+
+  String _ago(DateTime date) {
+    final days = MinimalInsights.daysSince(date);
+    return days <= 0 ? 'Today' : days == 1 ? 'Yesterday' : '${days}d ago';
+  }
+
+  Widget _miniStats(GymColors gc, Exercise ex, List<({DateTime date, LoggedExercise ex})> history, PersonalRecord? pr) {
+    final sets = history.fold<int>(0, (n, h) => n + h.ex.workingSets.length);
+    Widget cell(String label, String value, String sub) => Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            _miniLabel(gc, label),
+            const SizedBox(height: 4),
+            FitText(value, style: AppTheme.f(19, weight: FontWeight.w800, color: gc.text, height: 1.1)),
+            const SizedBox(height: 3),
+            Text(sub,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTheme.f(10, weight: FontWeight.w500, color: gc.textTertiary)),
+          ]),
+        );
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(border: Border.symmetric(horizontal: BorderSide(color: gc.border))),
+      child: Row(children: [
+        cell('Best', pr == null ? '–' : fit.recordLabel(pr),
+            pr == null || pr.kind != PrKind.weight || fit.isAssisted(ex.id) ? '' : 'est. 1RM ${fit.weightLabel(pr.oneRm)}'),
+        cell('Last done', _ago(history.first.date), _fmtDate(history.first.date)),
+        cell('Sessions', '${history.length}', '$sets sets'),
+      ]),
+    );
+  }
+
+  Widget _miniNext(GymColors gc, Exercise ex) {
+    final next = fit.nextTargetLabel(ex.id);
+    if (next == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Row(children: [
+        SvgPathIcon(Ic.trendUp, size: 13, color: gc.ember),
+        const SizedBox(width: 7),
+        Text('Next  ', style: AppTheme.f(11.5, weight: FontWeight.w500, color: gc.textSecondary)),
+        Flexible(
+          child: Text(next,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTheme.f(12, weight: FontWeight.w700, color: gc.text)),
+        ),
+      ]),
+    );
+  }
+
+  Widget _miniRecords(
+      GymColors gc, Exercise ex, List<({DateTime date, LoggedExercise ex})> history, PersonalRecord pr) {
+    final cells = <(String, String, DateTime?)>[];
+    final oldestFirst = history.reversed.toList();
+    if (pr.kind == PrKind.weight && !fit.isAssisted(ex.id)) {
+      var oneRm = 0.0, setVol = 0.0;
+      DateTime? oneRmDate, setVolDate;
+      ({LoggedSet set, DateTime date})? heavy;
+      for (final h in oldestFirst) {
+        for (final st in h.ex.workingSets) {
+          if (st.reps <= 0) continue;
+          if (st.oneRm > oneRm + 0.001) {
+            oneRm = st.oneRm;
+            oneRmDate = h.date;
+          }
+          final v = st.weight * st.reps;
+          if (v > setVol + 0.001) {
+            setVol = v;
+            setVolDate = h.date;
+          }
+          if (heavy == null || st.weight > heavy.set.weight) heavy = (set: st, date: h.date);
+        }
+      }
+      final session = fit.bestWorkout(ex.id, PrKind.weight);
+      if (heavy != null) {
+        cells.add(('Heaviest set', ltr('${fit.weightLabel(heavy.set.weight)} × ${heavy.set.reps}'), heavy.date));
+      }
+      if (oneRm > 0) cells.add(('Est. 1RM', fit.weightLabel(oneRm), oneRmDate));
+      if (setVol > 0) cells.add(('Best set volume', fit.weightLabel(setVol), setVolDate));
+      if (session != null) {
+        cells.add(('Best session volume', fit.bestWorkoutLabel(session.score, PrKind.weight), session.date));
+      }
+    } else {
+      DateTime? bestDate;
+      for (final h in oldestFirst) {
+        if (h.ex.workingSets.any((st) => pr.kind.score(st) >= pr.best - 0.001)) {
+          bestDate = h.date;
+          break;
+        }
+      }
+      cells.add(('Best', fit.recordLabel(pr), bestDate));
+      final session = fit.bestWorkout(ex.id, PrKind.reps);
+      if (pr.kind == PrKind.reps && session != null) {
+        cells.add(('Best session reps', fit.bestWorkoutLabel(session.score, PrKind.reps), session.date));
+      }
+    }
+    if (cells.length < 2 && pr.kind != PrKind.weight) return const SizedBox.shrink();
+    Widget cell((String, String, DateTime?) c) => Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              _miniLabel(gc, c.$1),
+              const SizedBox(height: 3),
+              FitText(c.$2, style: AppTheme.f(13.5, weight: FontWeight.w700, color: gc.text)),
+              if (c.$3 != null) ...[
+                const SizedBox(height: 2),
+                Text(_fmtDate(c.$3!), style: AppTheme.f(10, weight: FontWeight.w500, color: gc.textTertiary)),
+              ],
+            ]),
+          ),
+        );
+    final rows = <Widget>[];
+    for (var i = 0; i < cells.length; i += 2) {
+      rows.add(Row(children: [
+        cell(cells[i]),
+        const SizedBox(width: 12),
+        i + 1 < cells.length ? cell(cells[i + 1]) : const Expanded(child: SizedBox.shrink()),
+      ]));
+    }
+    return Padding(
+      padding: const EdgeInsets.only(top: 14),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        _section(gc, 'Records'),
+        const SizedBox(height: 2),
+        ...rows,
+      ]),
+    );
+  }
+
+  Widget _miniRepRecords(GymColors gc, Exercise ex) {
+    final records = fit.repRecords(ex.id);
+    if (records.length < 2) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        _miniLabel(gc, 'Best weight by reps'),
+        const SizedBox(height: 6),
+        Row(children: [
+          for (final r in records)
+            Expanded(
+              child: Container(
+                margin: const EdgeInsets.only(right: 6),
+                padding: const EdgeInsets.symmetric(vertical: 7),
+                decoration: BoxDecoration(
+                  border: Border.all(color: gc.border),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Column(children: [
+                  Text('${r.reps} rep${r.reps == 1 ? '' : 's'}',
+                      style: AppTheme.f(9.5, weight: FontWeight.w600, color: gc.textTertiary)),
+                  const SizedBox(height: 2),
+                  FitText(fit.weightValue(r.kg),
+                      style: AppTheme.f(12.5, weight: FontWeight.w700, color: gc.text)),
+                ]),
+              ),
+            ),
+        ]),
+      ]),
+    );
+  }
+
+  Widget _miniChart(
+      GymColors gc, Exercise ex, List<({DateTime date, LoggedExercise ex})> history, PersonalRecord pr) {
+    final assisted = fit.isAssisted(ex.id);
+    final options = <(String, String)>[
+      if (pr.kind == PrKind.weight && !assisted) ...const [('1rm', '1RM'), ('weight', 'Weight'), ('volume', 'Volume')],
+      if (pr.kind == PrKind.weight && assisted) ...const [('weight', 'Assist')],
+      if (pr.kind == PrKind.reps) ...const [('reps', 'Best reps'), ('total', 'Total reps')],
+      if (pr.kind == PrKind.time) ...const [('time', 'Best time')],
+      if (pr.kind == PrKind.distance) ...const [('distance', 'Distance')],
+    ];
+    if (options.isEmpty) return const SizedBox.shrink();
+    final metric = options.any((o) => o.$1 == _metric) ? _metric : options.first.$1;
+    double value(LoggedExercise e) {
+      final w = e.workingSets;
+      return switch (metric) {
+        '1rm' => fit.toDisplayWeight(e.bestOneRm),
+        'weight' => fit.toDisplayWeight(fit.headlineWeight(e)),
+        'volume' => fit.toDisplayWeight(e.volume),
+        'reps' => w.fold<int>(0, (m, s) => math.max(m, s.reps)).toDouble(),
+        'total' => w.fold<int>(0, (n, s) => n + s.reps).toDouble(),
+        'time' => w.fold<int>(0, (m, s) => math.max(m, s.sec ?? 0)).toDouble(),
+        _ => w.fold<double>(0, (n, s) => n + (s.km ?? 0)),
+      };
+    }
+
+    String label(double v) => switch (metric) {
+          '1rm' || 'weight' || 'volume' => '${fmt(v.roundToDouble() == v ? v : (v * 10).round() / 10)} ${fit.units}',
+          'time' => durationLabel(v.round()),
+          'distance' => fit.distanceLabel(v),
+          _ => '${v.round()}',
+        };
+
+    final end = DateTime.now();
+    final start = _rangeDays == 0 ? DateTime(2000) : end.subtract(Duration(days: _rangeDays));
+    final points = [
+      for (final h in history.reversed)
+        if (!h.date.isBefore(start) && value(h.ex) > 0) (date: h.date, v: value(h.ex)),
+    ];
+    final delta = points.length > 1 ? points.last.v - points.first.v : 0.0;
+    final sign = delta >= 0 ? '+' : '−';
+
+    Widget chip(String text, bool on, VoidCallback onTap) => GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          child: Container(
+            margin: const EdgeInsets.only(right: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: on ? gc.emberSoft : Colors.transparent,
+              border: Border.all(color: on ? gc.ember : gc.border),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Text(text,
+                style: AppTheme.f(9.5, weight: FontWeight.w700, color: on ? gc.ember : gc.textTertiary)),
+          ),
+        );
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 14),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Row(children: [
+          Expanded(
+            child: options.length > 1
+                ? SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(children: [
+                      for (final o in options) chip(o.$2, o.$1 == metric, () => setState(() => _metric = o.$1)),
+                    ]),
+                  )
+                : _section(gc, options.first.$2),
+          ),
+          for (final r in const [(28, '4W'), (84, '12W'), (365, '1Y'), (0, 'All')])
+            chip(r.$2, _rangeDays == r.$1, () => setState(() => _rangeDays = r.$1)),
+        ]),
+        const SizedBox(height: 10),
+        if (points.length < 2)
+          Text(t.minimalExerciseTrendEmpty, style: AppTheme.f(11, color: gc.textSecondary))
+        else ...[
+          Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
+            Text(label(points.last.v), style: AppTheme.f(15, weight: FontWeight.w800, color: gc.text)),
+            const SizedBox(width: 8),
+            Text('$sign${label(delta.abs())} in range',
+                style: AppTheme.f(10.5, weight: FontWeight.w500, color: gc.textSecondary)),
+          ]),
+          const SizedBox(height: 8),
+          TrendChart(values: [for (final p in points) p.v], height: 84, scale: fmt),
+          const SizedBox(height: 3),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Text(_fmtDate(points.first.date),
+                style: AppTheme.f(9.5, weight: FontWeight.w500, color: gc.textTertiary)),
+            Text(_fmtDate(points.last.date),
+                style: AppTheme.f(9.5, weight: FontWeight.w500, color: gc.textTertiary)),
+          ]),
+        ],
+      ]),
     );
   }
 
