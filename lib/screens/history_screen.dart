@@ -50,8 +50,8 @@ class HistoryScreen extends StatelessWidget {
     final gc = compact ? _minimalHistoryColors(base) : base;
     final month = fit.historyMonth;
     final list = fit.sessionsInMonth(month);
+    if (compact) return _minimalHistory(context, gc, fit.sessions);
     final records = fit.recordsBySession();
-    if (compact) return _minimalHistory(context, gc, month, list, records, fit.sessions);
     return RiseScope(
       id: 'history',
       once: false,
@@ -113,9 +113,6 @@ class HistoryScreen extends StatelessWidget {
   Widget _minimalHistory(
     BuildContext context,
     GymColors gc,
-    DateTime month,
-    List<LoggedSession> list,
-    Map<LoggedSession, int> records,
     List<LoggedSession> allSessions,
   ) {
     final theme = Theme.of(context).copyWith(extensions: [gc]);
@@ -125,12 +122,7 @@ class HistoryScreen extends StatelessWidget {
         color: gc.bg,
         child: SafeArea(
           bottom: false,
-          child: _MinimalHistoryContent(
-            month: month,
-            monthSessions: list,
-            allSessions: allSessions,
-            records: records,
-          ),
+          child: _MinimalHistoryContent(allSessions: allSessions),
         ),
       ),
     );
@@ -157,24 +149,19 @@ enum _MinimalHistoryView { list, table }
 enum _MinimalHistorySort { date, exercise, set, weight, reps, volume, oneRm, muscle }
 
 class _MinimalHistoryContent extends StatefulWidget {
-  const _MinimalHistoryContent({
-    required this.month,
-    required this.monthSessions,
-    required this.allSessions,
-    required this.records,
-  });
+  const _MinimalHistoryContent({required this.allSessions});
 
-  final DateTime month;
-  final List<LoggedSession> monthSessions;
   final List<LoggedSession> allSessions;
-  final Map<LoggedSession, int> records;
 
   @override
   State<_MinimalHistoryContent> createState() => _MinimalHistoryContentState();
 }
 
 class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
+  static const _latestSessionLimit = 40;
+  static const _visibleSetLimit = 200;
   final _searchController = TextEditingController();
+  final Set<int> _expandedSessions = {};
   _MinimalHistoryView _view = _MinimalHistoryView.list;
   _MinimalHistorySort _sort = _MinimalHistorySort.date;
   bool _descending = true;
@@ -183,6 +170,15 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  List<LoggedSession> get _recentSessions {
+    final sessions = [...widget.allSessions]
+      ..sort((a, b) {
+        final day = b.day.compareTo(a.day);
+        return day != 0 ? day : b.date.compareTo(a.date);
+      });
+    return sessions.take(_latestSessionLimit).toList(growable: false);
   }
 
   Future<void> _exportHistory() async {
@@ -207,23 +203,16 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
   Widget build(BuildContext context) {
     final gc = context.gc;
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(14, 8, 14, 104),
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 104),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              IconButton(
-                tooltip: t.back,
-                visualDensity: VisualDensity.compact,
-                onPressed: fit.popRoute,
-                icon: Icon(PhosphorIconsRegular.arrowLeft, size: 18, color: gc.textSecondary),
-              ),
-              const SizedBox(width: 4),
               Expanded(
                 child: Text(
                   sentenceCase(t.historyTitle),
-                  style: AppTheme.f(20, weight: FontWeight.w800, color: gc.text),
+                  style: AppTheme.f(16.5, weight: FontWeight.w800, color: gc.text),
                 ),
               ),
               TextButton(
@@ -239,10 +228,8 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
             ],
           ),
           const SizedBox(height: 8),
-          _MonthCard(key: ValueKey(widget.month), month: widget.month, minimal: true),
-          const SizedBox(height: 12),
           _viewSwitcher(gc),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           if (_view == _MinimalHistoryView.list) _listView(gc) else _tableView(gc),
         ],
       ),
@@ -253,80 +240,179 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
     Widget option(String label, _MinimalHistoryView value) {
       final selected = _view == value;
       return InkWell(
+        key: ValueKey('minimal-history-view-${value.name}'),
         onTap: () => setState(() => _view = value),
-        borderRadius: BorderRadius.circular(5),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-          decoration: BoxDecoration(
-            color: selected ? gc.bgRaised2 : Colors.transparent,
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: Text(
-            label,
-            style: AppTheme.f(11, weight: selected ? FontWeight.w800 : FontWeight.w600,
-                color: selected ? gc.text : gc.textTertiary),
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(
+                color: selected ? gc.accent : Colors.transparent,
+                width: 1.5,
+              )),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Text(
+                label,
+                style: AppTheme.f(12, weight: selected ? FontWeight.w700 : FontWeight.w500,
+                    color: selected ? gc.text : gc.textTertiary),
+              ),
+            ),
           ),
         ),
       );
     }
 
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          padding: const EdgeInsets.all(2),
-          decoration: BoxDecoration(
-            border: Border.all(color: gc.border),
-            borderRadius: BorderRadius.circular(7),
-          ),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            option('List', _MinimalHistoryView.list),
-            option('Table', _MinimalHistoryView.table),
-          ]),
-        ),
-        const Spacer(),
-        if (_view == _MinimalHistoryView.list)
-          Text(
-            t.historyWorkouts(widget.monthSessions.length),
-            style: AppTheme.f(10.5, weight: FontWeight.w600, color: gc.textTertiary),
-          )
-        else
-          Text(
-            '${widget.allSessions.length} workouts',
-            style: AppTheme.f(10.5, weight: FontWeight.w600, color: gc.textTertiary),
-          ),
+        option('List', _MinimalHistoryView.list),
+        const SizedBox(width: 16),
+        option('Table', _MinimalHistoryView.table),
       ],
     );
   }
 
   Widget _listView(GymColors gc) {
-    if (widget.monthSessions.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 18),
-        decoration: BoxDecoration(
-          color: gc.bgRaised,
-          borderRadius: BorderRadius.circular(9),
+    final sessions = _recentSessions;
+    if (sessions.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+        child: Text(
+          t.historyEmpty,
+          textAlign: TextAlign.start,
+          style: AppTheme.f(11.5, weight: FontWeight.w500, color: gc.textSecondary),
         ),
-        child: Column(children: [
-          Icon(PhosphorIconsRegular.calendarBlank, size: 27, color: gc.textTertiary),
-          const SizedBox(height: 9),
-          Text(t.historyEmpty,
-              textAlign: TextAlign.center,
-              style: AppTheme.f(14, weight: FontWeight.w700, color: gc.text)),
-          const SizedBox(height: 4),
-          Text(t.historyEmptyHint,
-              textAlign: TextAlign.center,
-              style: AppTheme.f(11, weight: FontWeight.w500, color: gc.textSecondary, height: 1.35)),
-        ]),
       );
     }
     return Column(
       children: [
-        for (final session in widget.monthSessions)
-          WorkoutHistoryCard(
-            session: session,
-            records: widget.records[session] ?? 0,
-            minimal: true,
+        for (final session in sessions) _minimalWorkoutRow(session, gc),
+      ],
+    );
+  }
+
+  Widget _minimalWorkoutRow(LoggedSession session, GymColors gc) {
+    final key = session.date.microsecondsSinceEpoch;
+    final expanded = _expandedSessions.contains(key);
+    final grouped = <String, _MinimalHistoryExerciseGroup>{};
+    for (final exercise in session.exercises) {
+      final groupKey = '${exercise.id}|${exercise.primary}';
+      final group = grouped.putIfAbsent(
+        groupKey,
+        () => _MinimalHistoryExerciseGroup(exercise.id, exercise.name),
+      );
+      group.sets.addAll(exercise.sets);
+    }
+    final exercises = grouped.values.toList(growable: false);
+    final exerciseNames = exercises
+        .map((exercise) => t.catalogName(exercise.id, exercise.name))
+        .join(', ');
+    final setCount = exercises.fold<int>(0, (total, exercise) => total + exercise.sets.length);
+    final date = intl.DateFormat('EEE d MMM').format(session.day);
+    final duration = (session.durationSec / 60).round();
+
+    return Column(
+      key: ValueKey('minimal-history-session-$key'),
+      children: [
+        InkWell(
+          onTap: () => setState(() {
+            if (!_expandedSessions.add(key)) _expandedSessions.remove(key);
+          }),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 7),
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: gc.border.withValues(alpha: 0.8))),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              fit.sessionHeading(session),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTheme.f(12.5, weight: FontWeight.w800, color: gc.text),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(date, style: AppTheme.f(11.5, weight: FontWeight.w500, color: gc.textSecondary)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      fit.volumeLabel(session.volume),
+                      style: AppTheme.f(11.5, weight: FontWeight.w700, color: gc.text),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  '$duration min, $setCount sets',
+                  style: AppTheme.f(11.5, weight: FontWeight.w500, color: gc.textSecondary),
+                ),
+                if (exerciseNames.isNotEmpty) ...[
+                  const SizedBox(height: 1),
+                  Text(
+                    exerciseNames,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTheme.f(11.5, weight: FontWeight.w500, color: gc.textSecondary),
+                  ),
+                ],
+              ],
+            ),
           ),
+        ),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 160),
+          curve: Curves.easeOut,
+          alignment: Alignment.topCenter,
+          child: expanded
+              ? Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 0, 4, 8),
+                  child: Column(
+                    children: [
+                      for (final exercise in exercises)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  t.catalogName(exercise.id, exercise.name),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppTheme.f(11, weight: FontWeight.w500, color: gc.textSecondary),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Flexible(
+                                child: Text(
+                                  exercise.sets.map(fit.loggedSetLabel).join('  '),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.end,
+                                  style: AppTheme.f(11, weight: FontWeight.w600, color: gc.text),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                )
+              : const SizedBox.shrink(),
+        ),
       ],
     );
   }
@@ -349,10 +435,13 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
           }
           final date = row.session.day;
           final searchable = [
-            row.session.name ?? '',
+            fit.sessionHeading(row.session),
             row.exercise.name,
+            t.catalogName(row.exercise.id, row.exercise.name),
             row.exercise.primary,
+            sentenceCase(row.exercise.primary),
             intl.DateFormat('yyyy-MM-dd').format(date),
+            intl.DateFormat('dd MMM yy').format(date),
             intl.DateFormat('dd MMM yyyy').format(date),
             t.fullDate(date),
           ].join(' ').toLowerCase();
@@ -371,20 +460,27 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
         _MinimalHistorySort.oneRm => a.set.oneRm.compareTo(b.set.oneRm),
         _MinimalHistorySort.muscle => a.exercise.primary.toLowerCase().compareTo(b.exercise.primary.toLowerCase()),
       };
-      return _descending ? -comparison : comparison;
+      if (comparison != 0) return _descending ? -comparison : comparison;
+      final latest = b.session.day.compareTo(a.session.day);
+      if (latest != 0) return latest;
+      final exercise = a.exercise.name.toLowerCase().compareTo(b.exercise.name.toLowerCase());
+      if (exercise != 0) return exercise;
+      return a.setNumber.compareTo(b.setNumber);
     });
     return rows;
   }
 
   Widget _tableView(GymColors gc) {
     final rows = _filteredRows();
-    final visible = rows.take(200).toList();
+    final visible = rows.take(_visibleSetLimit).toList(growable: false);
+    final tableHeight = (31 + visible.length * 34).clamp(31, 430).toDouble();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         SizedBox(
           height: 38,
           child: TextField(
+            key: const ValueKey('minimal-history-search'),
             controller: _searchController,
             onChanged: (_) => setState(() {}),
             style: AppTheme.f(11.5, weight: FontWeight.w600, color: gc.text),
@@ -439,31 +535,42 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
             ),
           )
         else
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: SizedBox(
-              width: 611,
-              child: Column(
-                children: [
-                  Container(
-                    height: 31,
-                    decoration: BoxDecoration(
-                      color: gc.bgRaised,
-                      border: Border(bottom: BorderSide(color: gc.border)),
+          SizedBox(
+            height: tableHeight,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SizedBox(
+                width: 611,
+                child: Column(
+                  children: [
+                    Container(
+                      height: 31,
+                      decoration: BoxDecoration(
+                        color: gc.bgRaised,
+                        border: Border(bottom: BorderSide(color: gc.border)),
+                      ),
+                      child: Row(children: [
+                        _sortHeader(_MinimalHistorySort.date, 'Date', 80, gc),
+                        _sortHeader(_MinimalHistorySort.exercise, 'Exercise', 178, gc),
+                        _sortHeader(_MinimalHistorySort.set, 'Set', 38, gc, right: true),
+                        _sortHeader(_MinimalHistorySort.weight, 'Kg', 54, gc, right: true),
+                        _sortHeader(_MinimalHistorySort.reps, 'Reps', 47, gc, right: true),
+                        _sortHeader(_MinimalHistorySort.volume, 'Volume', 65, gc, right: true),
+                        _sortHeader(_MinimalHistorySort.oneRm, '1RM', 65, gc, right: true),
+                        _sortHeader(_MinimalHistorySort.muscle, 'Muscle', 84, gc),
+                      ]),
                     ),
-                    child: Row(children: [
-                      _sortHeader(_MinimalHistorySort.date, 'Date', 80, gc),
-                      _sortHeader(_MinimalHistorySort.exercise, 'Exercise', 178, gc),
-                      _sortHeader(_MinimalHistorySort.set, 'Set', 38, gc, right: true),
-                      _sortHeader(_MinimalHistorySort.weight, 'kg', 54, gc, right: true),
-                      _sortHeader(_MinimalHistorySort.reps, 'Reps', 47, gc, right: true),
-                      _sortHeader(_MinimalHistorySort.volume, 'Vol', 65, gc, right: true),
-                      _sortHeader(_MinimalHistorySort.oneRm, '1RM', 65, gc, right: true),
-                      _sortHeader(_MinimalHistorySort.muscle, 'Muscle', 84, gc),
-                    ]),
-                  ),
-                  for (final row in visible) _historyTableRow(row, gc),
-                ],
+                    SizedBox(
+                      height: tableHeight - 31,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Column(
+                          children: [for (final row in visible) _historyTableRow(row, gc)],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -482,6 +589,7 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
   Widget _sortHeader(_MinimalHistorySort column, String label, double width, GymColors gc, {bool right = false}) {
     final active = _sort == column;
     return InkWell(
+      key: ValueKey('minimal-history-sort-${column.name}'),
       onTap: () => setState(() {
         if (_sort == column) {
           _descending = !_descending;
@@ -518,7 +626,7 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
   }
 
   Widget _historyTableRow(_MinimalHistorySetRow row, GymColors gc) {
-    final date = intl.DateFormat('dd MMM yy').format(row.session.day);
+    final date = intl.DateFormat('d MMM').format(row.session.day);
     final type = switch (row.set.kind) {
       SetKind.normal => '',
       SetKind.warmup => 'W',
@@ -570,6 +678,14 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
       value == value.roundToDouble() ? value.toStringAsFixed(0) : value.toStringAsFixed(1);
 }
 
+class _MinimalHistoryExerciseGroup {
+  _MinimalHistoryExerciseGroup(this.id, this.name);
+
+  final String id;
+  final String name;
+  final List<LoggedSet> sets = [];
+}
+
 class _MinimalHistorySetRow {
   const _MinimalHistorySetRow({
     required this.session,
@@ -585,10 +701,9 @@ class _MinimalHistorySetRow {
 }
 
 class _MonthCard extends StatelessWidget {
-  const _MonthCard({super.key, required this.month, this.minimal = false});
+  const _MonthCard({super.key, required this.month});
 
   final DateTime month;
-  final bool minimal;
 
   @override
   Widget build(BuildContext context) {
@@ -599,28 +714,28 @@ class _MonthCard extends StatelessWidget {
     final hours = now.seconds ~/ 3600;
     final minutes = (now.seconds % 3600) ~/ 60;
     return Container(
-      padding: EdgeInsets.fromLTRB(minimal ? 10 : 16, minimal ? 9 : 14, minimal ? 10 : 16, minimal ? 10 : 16),
-      decoration: BoxDecoration(color: gc.bgRaised, borderRadius: BorderRadius.circular(minimal ? 10 : 22)),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+      decoration: BoxDecoration(color: gc.bgRaised, borderRadius: BorderRadius.circular(22)),
       child: Column(children: [
         Row(children: [
           _arrow(gc, PhosphorIconsBold.caretLeft, t.notePrevMonth, () => fit.shiftHistoryMonth(-1)),
           Expanded(
             child: Text(t.monthYear(month),
-                textAlign: TextAlign.center, style: AppTheme.f(minimal ? 13.5 : 16, weight: FontWeight.w800, color: gc.text)),
+                textAlign: TextAlign.center, style: AppTheme.f(16, weight: FontWeight.w800, color: gc.text)),
           ),
           _arrow(gc, PhosphorIconsBold.caretRight, t.noteNextMonth,
               fit.historyAtLatest ? null : () => fit.shiftHistoryMonth(1)),
         ]),
-        SizedBox(height: minimal ? 9 : 16),
+        const SizedBox(height: 16),
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          _stat(gc, '${now.workouts}', t.statWorkouts.toUpperCase(), now.workouts - before.workouts, minimal: minimal),
-          _stat(gc, hours > 0 ? '${hours}h ${minutes.toString().padLeft(2, '0')}' : '${minutes}m', t.timeCaps, null, minimal: minimal),
-          _stat(gc, '${now.sets}', t.setsCaps, null, minimal: minimal),
-          _stat(gc, fit.volumeLabel(now.volume), t.volume, null, minimal: minimal),
+          _stat(gc, '${now.workouts}', t.statWorkouts.toUpperCase(), now.workouts - before.workouts),
+          _stat(gc, hours > 0 ? '${hours}h ${minutes.toString().padLeft(2, '0')}' : '${minutes}m', t.timeCaps, null),
+          _stat(gc, '${now.sets}', t.setsCaps, null),
+          _stat(gc, fit.volumeLabel(now.volume), t.volume, null),
         ]),
-        SizedBox(height: minimal ? 9 : 16),
+        const SizedBox(height: 16),
         Container(height: 1, color: gc.border),
-        SizedBox(height: minimal ? 8 : 12),
+        const SizedBox(height: 12),
         _calendar(context, gc, trained),
       ]),
     );
@@ -641,8 +756,8 @@ class _MonthCard extends StatelessWidget {
           child: Opacity(
             opacity: onTap == null ? 0.3 : 1,
             child: Container(
-              width: minimal ? 28 : 34,
-              height: minimal ? 28 : 34,
+              width: 34,
+              height: 34,
               decoration: BoxDecoration(color: gc.bgRaised2, shape: BoxShape.circle),
               child: Icon(icon, size: 13, color: gc.text),
             ),
@@ -650,15 +765,15 @@ class _MonthCard extends StatelessWidget {
         ),
       );
 
-  Widget _stat(GymColors gc, String value, String label, int? delta, {bool minimal = false}) => Expanded(
+  Widget _stat(GymColors gc, String value, String label, int? delta) => Expanded(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
-            child: RollIn(value, style: AppTheme.f(minimal ? 16 : 21, weight: FontWeight.w800, color: gc.text, height: 1.1)),
+            child: RollIn(value, style: AppTheme.f(21, weight: FontWeight.w800, color: gc.text, height: 1.1)),
           ),
           const SizedBox(height: 3),
-          FitText(label, style: AppTheme.f(minimal ? 8 : 9, weight: FontWeight.w700, color: gc.textTertiary, letterSpacing: 1)),
+          FitText(label, style: AppTheme.f(9, weight: FontWeight.w700, color: gc.textTertiary, letterSpacing: 1)),
           if (delta != null && delta != 0) ...[
             const SizedBox(height: 3),
             Row(mainAxisSize: MainAxisSize.min, children: [
@@ -666,7 +781,7 @@ class _MonthCard extends StatelessWidget {
                   size: 10, color: delta > 0 ? gc.sage : gc.textTertiary),
               const SizedBox(width: 2),
               Text('${delta.abs()}',
-                  style: AppTheme.f(minimal ? 9 : 10.5, weight: FontWeight.w700, color: delta > 0 ? gc.sage : gc.textTertiary)),
+                  style: AppTheme.f(10.5, weight: FontWeight.w700, color: delta > 0 ? gc.sage : gc.textTertiary)),
             ]),
           ],
         ]),
@@ -683,16 +798,16 @@ class _MonthCard extends StatelessWidget {
           Expanded(
             child: Text(t.weekdayInitial(fit.weekdayAt(i)).toUpperCase(),
                 textAlign: TextAlign.center,
-                style: AppTheme.f(minimal ? 8.5 : 10, weight: FontWeight.w700, color: gc.textTertiary, letterSpacing: 1)),
+                style: AppTheme.f(10, weight: FontWeight.w700, color: gc.textTertiary, letterSpacing: 1)),
           ),
       ]),
-      SizedBox(height: minimal ? 4 : 6),
+      const SizedBox(height: 6),
       for (var row = 0; row * 7 < lead + days; row++)
         Row(children: [
           for (var col = 0; col < 7; col++)
             Expanded(child: () {
               final n = row * 7 + col - lead + 1;
-              if (n < 1 || n > days) return SizedBox(height: minimal ? 30 : 40);
+              if (n < 1 || n > days) return const SizedBox(height: 40);
               final day = DateTime(month.year, month.month, n);
               final on = trained.contains(n);
               final isToday = DateUtils.isSameDay(day, today);
@@ -704,11 +819,11 @@ class _MonthCard extends StatelessWidget {
                   behavior: HitTestBehavior.opaque,
                   onTap: future ? null : () => showDaySheet(context, day),
                   child: SizedBox(
-                    height: minimal ? 30 : 40,
+                    height: 40,
                     child: Center(
                       child: Container(
-                        width: minimal ? 24 : 32,
-                        height: minimal ? 24 : 32,
+                        width: 32,
+                        height: 32,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           color: on ? gc.accent : Colors.transparent,
@@ -716,7 +831,7 @@ class _MonthCard extends StatelessWidget {
                           border: isToday && !on ? Border.all(color: gc.ember, width: 1.4) : null,
                         ),
                         child: Text('$n',
-                            style: AppTheme.f(minimal ? 11 : 13,
+                            style: AppTheme.f(13,
                                 weight: on || isToday ? FontWeight.w800 : FontWeight.w500,
                                 color: on
                                     ? gc.onEmber
@@ -735,11 +850,10 @@ class _MonthCard extends StatelessWidget {
 }
 
 class WorkoutHistoryCard extends StatelessWidget {
-  const WorkoutHistoryCard({super.key, required this.session, this.records = 0, this.minimal = false});
+  const WorkoutHistoryCard({super.key, required this.session, this.records = 0});
 
   final LoggedSession session;
   final int records;
-  final bool minimal;
 
   @override
   Widget build(BuildContext context) {
@@ -751,47 +865,46 @@ class WorkoutHistoryCard extends StatelessWidget {
     final meta = [
       clock,
       if (s.durationSec >= 60) '${(s.durationSec / 60).round()} min',
-      if (s.hrAvg != null) '\u2665 ${s.hrAvg} · ${t.hrMaxShort(s.hrMax ?? s.hrAvg!)}',
+      if (s.hrAvg != null) '♥ ${s.hrAvg} · ${t.hrMaxShort(s.hrMax ?? s.hrAvg!)}',
     ].join(' · ');
     final shown = s.exercises.take(4).toList();
     return Pressable(
       scale: 0.98,
       onTap: () => showDaySheet(context, s.day),
       child: Container(
-        padding: EdgeInsets.fromLTRB(minimal ? 10 : 14, minimal ? 10 : 14, minimal ? 12 : 16, minimal ? 10 : 14),
+        padding: const EdgeInsets.fromLTRB(14, 14, 16, 14),
         decoration: BoxDecoration(
-          color: minimal ? gc.bg : gc.bgRaised,
-          borderRadius: BorderRadius.circular(minimal ? 0 : 20),
-          border: minimal ? Border(bottom: BorderSide(color: gc.border)) : null,
+          color: gc.bgRaised,
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Container(
-              width: minimal ? 40 : 46,
-              padding: EdgeInsets.symmetric(vertical: minimal ? 4 : 6),
-              decoration: BoxDecoration(color: gc.bgRaised2, borderRadius: BorderRadius.circular(minimal ? 9 : 12)),
+              width: 46,
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              decoration: BoxDecoration(color: gc.bgRaised2, borderRadius: BorderRadius.circular(12)),
               child: Column(children: [
                 Text(t.weekdayShort(s.day.weekday).toUpperCase(),
                     style: AppTheme.f(9, weight: FontWeight.w800, color: gc.accent, letterSpacing: 0.8)),
-                Text('${s.day.day}', style: AppTheme.f(minimal ? 17 : 19, weight: FontWeight.w800, color: gc.text, height: 1.15)),
+                Text('${s.day.day}', style: AppTheme.f(19, weight: FontWeight.w800, color: gc.text, height: 1.15)),
               ]),
             ),
-            SizedBox(width: minimal ? 9 : 12),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(fit.sessionHeading(s),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: AppTheme.f(minimal ? 14 : 16, weight: FontWeight.w800, color: gc.text)),
+                    style: AppTheme.f(16, weight: FontWeight.w800, color: gc.text)),
                 const SizedBox(height: 2),
-                Text(meta, style: AppTheme.f(minimal ? 11 : 12, weight: FontWeight.w600, color: gc.textSecondary)),
-                SizedBox(height: minimal ? 4 : 6),
+                Text(meta, style: AppTheme.f(12, weight: FontWeight.w600, color: gc.textSecondary)),
+                const SizedBox(height: 6),
                 Text(
                     [t.exerciseCount(s.exercises.length), t.setCount(s.setCount), if (s.volume > 0) fit.volumeLabel(s.volume)]
                         .join(' · '),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: AppTheme.f(minimal ? 10.5 : 11.5, weight: FontWeight.w600, color: gc.textTertiary)),
+                    style: AppTheme.f(11.5, weight: FontWeight.w600, color: gc.textTertiary)),
               ]),
             ),
             if (records > 0) ...[
@@ -807,10 +920,10 @@ class WorkoutHistoryCard extends StatelessWidget {
               ),
             ],
           ]),
-          SizedBox(height: minimal ? 8 : 12),
+          const SizedBox(height: 12),
           Container(height: 1, color: gc.border),
-          SizedBox(height: minimal ? 7 : 10),
-          for (final e in shown) _line(gc, e, compact: minimal),
+          const SizedBox(height: 10),
+          for (final e in shown) _line(gc, e),
           if (s.exercises.length > shown.length)
             Padding(
               padding: const EdgeInsets.only(top: 2),
@@ -822,21 +935,21 @@ class WorkoutHistoryCard extends StatelessWidget {
     );
   }
 
-  Widget _line(GymColors gc, LoggedExercise e, {bool compact = false}) {
+  Widget _line(GymColors gc, LoggedExercise e) {
     final top = fit.topSetOf(e);
     return Padding(
-      padding: EdgeInsets.only(bottom: compact ? 4 : 6),
+      padding: const EdgeInsets.only(bottom: 6),
       child: Row(children: [
         SizedBox(
           width: 30,
           child: Text('${e.workingSets.length}×',
-              style: AppTheme.f(compact ? 11 : 12.5, weight: FontWeight.w700, color: gc.textTertiary)),
+              style: AppTheme.f(12.5, weight: FontWeight.w700, color: gc.textTertiary)),
         ),
         Expanded(
           child: Text(t.catalogName(e.id, e.name),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: AppTheme.f(compact ? 11.5 : 13, weight: FontWeight.w600, color: gc.text)),
+              style: AppTheme.f(13, weight: FontWeight.w600, color: gc.text)),
         ),
         if (e.workingSets.any(fit.recordSets.contains)) ...[
           const SizedBox(width: 8),
@@ -844,7 +957,7 @@ class WorkoutHistoryCard extends StatelessWidget {
         ],
         if (top != null) ...[
           const SizedBox(width: 8),
-          Text(fit.loggedSetLabel(top), style: AppTheme.f(compact ? 11 : 12.5, weight: FontWeight.w700, color: gc.textSecondary)),
+          Text(fit.loggedSetLabel(top), style: AppTheme.f(12.5, weight: FontWeight.w700, color: gc.textSecondary)),
         ],
       ]),
     );

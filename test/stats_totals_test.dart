@@ -128,10 +128,10 @@ void main() {
   group('the numbers add up', () {
     test('the all-time totals match what was logged', () {
       fit.sessions
-        ..add(LoggedSession(DateTime.now(), 3600, [
+        ..add(LoggedSession(DateTime.now().add(const Duration(seconds: 3600)), 3600, [
           LoggedExercise('a', 'A', 'chest', [LoggedSet(10, 50), LoggedSet(10, 50)]),
         ]))
-        ..add(LoggedSession(shiftDays(DateTime.now(), -2), 1800, [
+        ..add(LoggedSession(shiftDays(DateTime.now(), -2).add(const Duration(seconds: 1800)), 1800, [
           LoggedExercise('b', 'B', 'back', [LoggedSet(5, 100)]),
         ]));
 
@@ -143,7 +143,7 @@ void main() {
     });
 
     test('the muscle split adds up to 100 and never counts a muscle twice', () {
-      fit.sessions.add(LoggedSession(DateTime.now(), 1800, [
+      fit.sessions.add(LoggedSession(DateTime.now().add(const Duration(seconds: 1800)), 1800, [
         LoggedExercise('a', 'A', 'chest', [LoggedSet(10, 50)]),
         LoggedExercise('b', 'B', 'quads', [LoggedSet(10, 50)]),
       ]));
@@ -156,14 +156,14 @@ void main() {
     test('the weekly goal never reads over 100%', () {
       fit.profile.weeklyGoal = 1;
       for (int i = 0; i < 6; i++) {
-        fit.sessions.add(LoggedSession(DateTime.now(), 600, const []));
+        fit.sessions.add(LoggedSession(DateTime.now().add(const Duration(seconds: 600)), 600, const []));
       }
       expect(fit.goalPct, 100);
     });
 
     test('the volume chart only ever climbs and ends at the 30-day total', () {
       for (int i = 0; i < 10; i++) {
-        fit.sessions.add(LoggedSession(shiftDays(DateTime.now(), -i * 2), 1800, [
+        fit.sessions.add(LoggedSession(shiftDays(DateTime.now(), -i * 2).add(const Duration(seconds: 1800)), 1800, [
           LoggedExercise('a', 'A', 'chest', [LoggedSet(10, 50)]),
         ]));
       }
@@ -176,7 +176,7 @@ void main() {
     });
 
     test('the heatmap lights the days that were trained and nothing else', () {
-      fit.sessions.add(LoggedSession(DateTime.now(), 1800, [
+      fit.sessions.add(LoggedSession(DateTime.now().add(const Duration(seconds: 1800)), 1800, [
         LoggedExercise('a', 'A', 'chest', [LoggedSet(10, 50)]),
       ]));
 
@@ -195,7 +195,7 @@ void main() {
     void log(int daysAgo, String muscle, double kg, {int sets = 3}) {
       final now = DateTime.now();
       final at = DateTime(now.year, now.month, now.day - daysAgo, 12);
-      fit.sessions.add(LoggedSession(at, 600, [
+      fit.sessions.add(LoggedSession(at.add(const Duration(seconds: 600)), 600, [
         LoggedExercise(idFor(muscle), muscle, muscle, [for (var i = 0; i < sets; i++) LoggedSet(5, kg)]),
       ]));
       fit.sessions.sort((a, b) => a.date.compareTo(b.date));

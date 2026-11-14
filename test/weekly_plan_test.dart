@@ -246,7 +246,7 @@ void main() {
     }
 
     LoggedSession logged(DateTime at, List<LoggedSet> sets, {String id = 'push', String primary = 'chest'}) =>
-        LoggedSession(at, 600, [LoggedExercise(id, id, primary, sets)]);
+        LoggedSession(at.add(const Duration(seconds: 600)), 600, [LoggedExercise(id, id, primary, sets)]);
 
     test('apagado, un día solo tiene una rutina', () {
       final a = routineOf(['Barbell Bench Press']);
@@ -283,7 +283,7 @@ void main() {
       final today = DateTime.now().weekday;
       fit.togglePlanDay(today, a.id);
       fit.togglePlanDay(today, b.id);
-      LoggedSession done(String id) => LoggedSession(DateTime.now(), 1800, const [], routineId: id);
+      LoggedSession done(String id) => LoggedSession(DateTime.now().add(const Duration(seconds: 1800)), 1800, const [], routineId: id);
 
       fit.sessions.add(done(a.id));
       fit.sessions.add(done(a.id));
@@ -326,7 +326,7 @@ void main() {
       final today = DateTime.now().weekday;
       fit.togglePlanDay(today, a.id);
       fit.togglePlanDay(today, b.id);
-      fit.sessions.add(LoggedSession(DateTime.now(), 1800, const [], routineId: b.id));
+      fit.sessions.add(LoggedSession(DateTime.now().add(const Duration(seconds: 1800)), 1800, const [], routineId: b.id));
       expect(fit.todayRoutine, same(a));
       expect(fit.todayPlanDone, isFalse);
     });

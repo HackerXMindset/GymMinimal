@@ -62,7 +62,7 @@ void main() {
     test('con historia de más de un año llega hasta el primer entreno', () {
       fit.setHeatmapRange('year');
       final old = DateTime.now().subtract(const Duration(days: 500));
-      fit.sessions.add(LoggedSession(old, 1800, [
+      fit.sessions.add(LoggedSession(old.add(const Duration(seconds: 1800)), 1800, [
         LoggedExercise('x', 'X', 'chest', [LoggedSet(8, 50)]),
       ]));
       final weeks = fit.heatmapShownWeeks;
@@ -103,7 +103,7 @@ void main() {
     });
 
     LoggedSession logged(DateTime at, List<LoggedSet> sets, {String id = 'push', String primary = 'chest'}) =>
-        LoggedSession(at, 600, [LoggedExercise(id, id, primary, sets)]);
+        LoggedSession(at.add(const Duration(seconds: 600)), 600, [LoggedExercise(id, id, primary, sets)]);
 
     test('un día de peso corporal se pinta', () {
       fit.sessions.add(logged(DateTime.now(), [LoggedSet(15, 0), LoggedSet(12, 0)]));
@@ -127,7 +127,7 @@ void main() {
     const bench = 'EIeI8Vf';
 
     LoggedSession logged(DateTime at, List<LoggedSet> sets, {String id = bench}) =>
-        LoggedSession(at, 1800, [LoggedExercise(id, 'Barbell Bench Press', 'chest', sets)]);
+        LoggedSession(at.add(const Duration(seconds: 1800)), 1800, [LoggedExercise(id, 'Barbell Bench Press', 'chest', sets)]);
 
     test('cada columna empieza el primer día de la semana y hoy cae en su fila', () {
       for (final start in [DateTime.monday, DateTime.sunday]) {
