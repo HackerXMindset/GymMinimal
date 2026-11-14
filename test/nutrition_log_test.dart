@@ -18,7 +18,7 @@ void main() {
     });
 
     test('lo tocado en el widget se apunta con su hora, en su día, y lo muy viejo se ignora', () {
-      final now = DateTime.now();
+      final now = DateTime.now().copyWith(hour: 12);
       final ms = now.subtract(const Duration(minutes: 5)).millisecondsSinceEpoch;
       final twoDays = now.subtract(const Duration(days: 2));
       final old = twoDays.millisecondsSinceEpoch;
