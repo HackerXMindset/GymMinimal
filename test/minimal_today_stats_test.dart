@@ -4,6 +4,7 @@ import 'package:gymmane/app/gymmane_app.dart';
 import 'package:gymmane/l10n/l10n.dart';
 import 'package:gymmane/models/workout.dart';
 import 'package:gymmane/services/local_store.dart';
+import 'package:gymmane/widgets/ui_kit.dart' show sentenceCase;
 import 'package:gymmane/services/minimal_insights.dart';
 import 'package:gymmane/state/fit_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -54,6 +55,8 @@ void main() {
     final bench = fit.matchExerciseByName('Barbell Bench Press')!;
     final routineId = fit.createRoutine('Push');
     fit.toggleRoutineExercise(routineId, bench.id);
+    // Complete the debounced persistence timer before this widget test ends.
+    await tester.pump(const Duration(milliseconds: 500));
     // The heaviest set was 60 days ago, so chest is cold and the lift has no
     // recent record.
     addBenchSessions([(60, 80), (50, 75), (45, 70), (40, 70)]);
@@ -62,12 +65,11 @@ void main() {
     await pumpApp(tester);
 
     expect(tester.takeException(), isNull);
-    expect(find.text('Up next'), findsOneWidget);
-    expect(find.text('Start Push'), findsOneWidget);
-    expect(find.text('Start empty workout'), findsOneWidget);
-    expect(find.text('Not trained lately'), findsOneWidget);
-    expect(find.text('No PR lately'), findsOneWidget);
-    expect(find.text('Last workout'), findsOneWidget);
+    expect(find.text(sentenceCase(t.circuitUpNext)), findsOneWidget);
+    expect(find.text(sentenceCase(t.startWorkout)), findsNWidgets(2));
+    expect(find.text(sentenceCase(t.untrainedTab)), findsOneWidget);
+    expect(find.text(sentenceCase(t.prs)), findsOneWidget);
+    expect(find.text(sentenceCase(t.historyTitle)), findsOneWidget);
     // Nav is sentence case.
     for (final label in ['Exercises', 'History', 'Stats', 'Settings']) {
       expect(find.text(label), findsOneWidget, reason: label);
@@ -92,9 +94,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
 
-    await tester.tap(find.text('All'));
+    await tester.tap(find.text(sentenceCase(t.periodAll)));
     await tester.pumpAndSettle();
-    expect(find.text('All time'), findsOneWidget);
+    expect(find.text(sentenceCase(t.periodAll)), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }
