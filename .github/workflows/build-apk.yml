@@ -69,40 +69,18 @@ jobs:
         id: tests
         run: flutter test
 
-      - name: Configure persistent Android signing
+      - name: Verify repository Android signing keystore
         id: signing
         if: always() && steps.dependencies.outcome == 'success'
         shell: bash
-        env:
-          ANDROID_SIGNING_CONFIG_JSON: ${{ secrets.ANDROID_SIGNING_CONFIG_JSON }}
         run: |
-          if [[ -z "${ANDROID_SIGNING_CONFIG_JSON:-}" ]]; then
-            echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::ANDROID_SIGNING_CONFIG_JSON is not configured. APK will be signed with the temporary runner debug key and will not be published as an updateable Release."
-            exit 0
-          fi
-
-          STORE_PASSWORD="$(jq -r '.storePassword // empty' <<< "$ANDROID_SIGNING_CONFIG_JSON")"
-          KEY_ALIAS="$(jq -r '.keyAlias // empty' <<< "$ANDROID_SIGNING_CONFIG_JSON")"
-          KEY_PASSWORD="$(jq -r '.keyPassword // empty' <<< "$ANDROID_SIGNING_CONFIG_JSON")"
-          KEYSTORE_BASE64="$(jq -r '.keystoreBase64 // empty' <<< "$ANDROID_SIGNING_CONFIG_JSON")"
-
-          if [[ -z "$STORE_PASSWORD" || -z "$KEY_ALIAS" || -z "$KEY_PASSWORD" || -z "$KEYSTORE_BASE64" ]]; then
-            echo "::error::ANDROID_SIGNING_CONFIG_JSON is malformed or missing required fields."
+          KEYSTORE="android/keystore/lifetracker.p12"
+          if [[ ! -s "$KEYSTORE" ]]; then
+            echo "::error::Repository signing keystore is missing: $KEYSTORE"
             exit 1
           fi
 
-          mkdir -p android/app
-          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > android/app/gymminimal-release-key.jks
-          keytool -list -keystore android/app/gymminimal-release-key.jks -storepass "$STORE_PASSWORD" -alias "$KEY_ALIAS" >/dev/null
-
-          cat > android/key.properties <<EOF
-          storeFile=gymminimal-release-key.jks
-          storePassword=$STORE_PASSWORD
-          keyAlias=$KEY_ALIAS
-          keyPassword=$KEY_PASSWORD
-          EOF
-
+          keytool -list -storetype PKCS12 -keystore "$KEYSTORE" -storepass lifetracker -alias lifetracker >/dev/null
           echo "configured=true" >> "$GITHUB_OUTPUT"
 
       - name: Allocate a higher Android version code for every CI build
@@ -203,7 +181,7 @@ jobs:
           files: build/app/outputs/flutter-apk/GymMinimal.apk
 
       - name: Explain why the APK was not published as a Release
-        if: always() && steps.build-apk.outcome == 'success' && (steps.signing.outputs.configured != 'true' || steps.release.outputs.publish != 'true')
+        if: always() && steps.build-apk.outcome == 'success' && steps.release.outputs.publish != 'true'
         run: |
           echo "The APK remains available in this run's Actions artifacts."
-          echo "A Release requires the persistent signing secret and a same-repository PR or main/manual run."
+          echo "Fork PRs do not have permission to publish repository Releases."
