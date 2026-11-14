@@ -36,7 +36,7 @@ void main() {
     }
 
     LoggedSession done(String routineId, int ago) => LoggedSession(
-          DateTime.now().subtract(Duration(days: ago)),
+          DateTime.now().subtract(Duration(days: ago)).add(const Duration(seconds: 1800)),
           1800,
           [LoggedExercise(ids[0], 'x', 'chest', [LoggedSet(8, 60)])],
           routineId: routineId,
@@ -80,7 +80,7 @@ void main() {
       });
 
       test('las series de la tarjeta semanal son las de la semana', () {
-        fit.sessions.add(LoggedSession(DateTime.now(), 600, [
+        fit.sessions.add(LoggedSession(DateTime.now().add(const Duration(seconds: 600)), 600, [
           LoggedExercise(ids[0], 'x', 'chest', [LoggedSet(8, 60), LoggedSet(8, 60)]),
         ]));
         expect(fit.weekSetCount, 2);
@@ -202,7 +202,7 @@ void main() {
     }
 
     LoggedSession logged(DateTime at, List<LoggedSet> sets, {String id = 'push', String primary = 'chest'}) =>
-        LoggedSession(at, 600, [LoggedExercise(id, id, primary, sets)]);
+        LoggedSession(at.add(const Duration(seconds: 600)), 600, [LoggedExercise(id, id, primary, sets)]);
 
     group('#117 objetivo semanal por días', () {
       test('dos sesiones el mismo día son un día', () {
@@ -321,7 +321,7 @@ void main() {
       test('el foco de hoy sigue siendo uno de los tres días', () {
         final today = DateTime.now();
         for (var week = 1; week <= 3; week++) {
-          fit.sessions.add(LoggedSession(today.subtract(Duration(days: 7 * week)), 3600,
+          fit.sessions.add(LoggedSession(today.subtract(Duration(days: 7 * week)).add(const Duration(seconds: 3600)), 3600,
               [LoggedExercise(bench(), 'Bench', 'chest', [LoggedSet(5, 60)])]));
         }
         expect(fit.familyOnWeekday(today.weekday), 'push');
