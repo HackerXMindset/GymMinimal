@@ -20,7 +20,7 @@ Rebuild the reference's compact phone experience in the existing Flutter app usi
 
 ## Progress
 
-**4 of 11 stages implemented and merged (36%).** Seven stages remain. Stage 4 is now in progress. Final cross-screen visual verification is consolidated in Stage 10.
+**4 of 11 stages implemented and merged (36%).** Seven stages remain. Stage 4 follow-up PR #13 and Stage 5 PR #14 are open concurrently. Stage 5 is in progress on its own branch from the latest `main`; final cross-screen visual verification is consolidated in Stage 10.
 
 | Stage | Area | Status | Last change / next step |
 |---|---|---|---|
@@ -29,7 +29,7 @@ Rebuild the reference's compact phone experience in the existing Flutter app usi
 | 2 | Today screen | Complete | PR #9 merged; CI run #43506289411 passed |
 | 3 | Live workout | Complete | PR #11 merged; CI run #43515792250 passed analysis, tests and one-APK build |
 | 4 | Exercise library | **In progress (PR #12)** | Minimal Name / Muscle / 1RM table, All/muscle chips and real historical 1RM values |
-| 5 | Exercise details | Planned | Ten metrics, range controls, 1RM/volume charts, PR history and session table |
+| 5 | Exercise details | **In progress (PR #14)** | Ten metrics, range-filtered 1RM/volume charts, PR history and per-session table; CI pending |
 | 6 | History | Planned | Latest-40 list, List/Table, eight-column table, search/sort and Excel |
 | 7 | Stats dashboard | Planned | Weekly volume, exercise 1RM, days-since-PR, 16-week heatmap, muscle sets |
 | 8 | Settings | Planned | Minimal display options, rest timer, Excel/JSON export |
@@ -40,8 +40,10 @@ Rebuild the reference's compact phone experience in the existing Flutter app usi
 
 - **Latest merged UI work:** PR #11, Stage 3 Live Workout, merge commit `7b9a8e3ea4492b56d3391f640c708062991c6297`.
 - **Latest merged repository baseline:** PR #11 Stage 3 merge commit `7b9a8e3ea4492b56d3391f640c708062991c6297`.
-- **Current implementation:** Stage 4 — Exercise library, PR #12, branch `feature/sample-html-parity-stage-4-exercise-library`.
-- **Stage 3 gate passed:** PR #11 Actions run #43515792250 passed analysis, full tests and the single-APK build; PR #11 is merged. The post-merge main run #43518506146 passed analysis and tests and was building the APK at this snapshot.
+- **Stage 4 follow-up:** PR #13 is open; it is not included in the Stage 5 branch.
+- **Current implementation:** Stage 5 — Exercise details, PR #14, branch `feat/minimal-stage-05-exercise-details`.
+- **Stage 3 gate passed:** PR #11 Actions run #43515792250 passed analysis, full tests and the single-APK build; PR #11 is merged.
+- **Stage 5 implementation:** ten per-exercise metrics, 4W/8W/12W/All range controls with earlier/later navigation, 1RM and volume charts, progressive PR history and a per-session table. PR #14 CI is pending.
 - **Do not restart Stage 2.** Reopen it only for a confirmed regression or mismatch. Its final screenshot/manual parity check belongs in Stage 10.
 
 ## Build and release

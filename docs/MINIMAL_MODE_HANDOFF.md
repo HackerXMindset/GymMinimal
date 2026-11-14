@@ -389,25 +389,30 @@ The Stage 3 implementation and CI gate are complete. The final physical-device v
 - [ ] No fake values and no regression to Standard library.
 - [ ] Tests, analysis, one-APK build and screenshot/manual review pass.
 
-### Stage 5 — Exercise detail and per-exercise statistics
+### Stage 5 — Exercise detail and per-exercise statistics — IN PROGRESS (PR #14)
 
 **Primary file:** `lib/screens/exercise_detail_screen.dart`.
 
-**Implementation outline**
-1. Trace existing exercise detail, PR/history calculations, charts and return navigation.
-2. Add the ten reference metrics using real logged sets and established app calculations.
-3. Implement 4W / 8W / 12W / All range selection and previous/later navigation without resetting the selected exercise.
-4. Add or adapt the 1RM trend and per-session volume chart.
-5. Present PR history and every-session records.
-6. Reuse shared chart components where appropriate; avoid a duplicate stats engine.
+**Reference:** `Sample.html` → `exercise()`, `rangeBar()`, `exSessions()`, `lineChart()`, `barsSvg()`.
 
-**Acceptance**
-- [ ] All ten metrics are present and correctly labelled.
-- [ ] Values match the underlying session history.
-- [ ] Date ranges and earlier/later controls work.
-- [ ] Trend, volume, PR and session history states handle no data/one data point.
-- [ ] Back navigation returns to the originating screen where appropriate.
-- [ ] Standard detail view is unchanged; tests, analysis, APK and visual review pass.
+**Implemented in PR #14**
+1. Ten Minimal-only overview metrics sourced from real logged exercise history.
+2. 4W / 8W / 12W / All selection with earlier/later range navigation.
+3. Range-filtered estimated 1RM trend and per-session volume bars.
+4. Progressive PR history and a per-session table with date, sets, volume and 1RM.
+5. Existing exercise history, set calculations, weight formatting and chart components reused.
+
+**Still required before completion**
+- [ ] Run dart format, Flutter analysis and the full test suite.
+- [ ] Add or confirm focused tests for metrics, sparse data and range navigation.
+- [ ] Verify the 360px phone layout and every range control.
+- [ ] Confirm Standard detail rendering is unchanged.
+- [ ] Confirm PR CI builds and uploads exactly one `GymMinimal.apk`.
+- [ ] Complete screenshot/manual comparison against `Sample.html`.
+
+**PR:** [#14](https://github.com/HackerXMindset/GymMinimal/pull/14).  
+**Branch:** `feat/minimal-stage-05-exercise-details`.  
+**Base:** latest `main`; Stage 4 follow-up PR #13 is intentionally not included.
 
 ### Stage 6 — History
 
@@ -649,17 +654,17 @@ Update this record at the end of every stage PR:
 
 | Field | Current value |
 |---|---|
-| Current stage | Stage 4 — Exercise library |
-| Stage state | In progress — PR #12 open; Minimal table and muscle chips implemented, CI pending |
+| Current stage | Stage 5 — Exercise details (PR #14 in progress) |
+| Stage state | In progress — PR #14 open; ten metrics, range charts, PR history and session table added; CI pending |
 | Last known base | `main` commit `7b9a8e3ea4492b56d3391f640c708062991c6297` (PR #11 merge) |
 | Current prerequisite | Stage 3 PR #11 merged; Actions run #43515792250 passed analysis, full tests and one-APK build |
 | Last completed UI stage | Stage 3 — Live Workout (PR #11 merged) |
 | Current owner | Unassigned / whoever takes the next stage |
-| Current branch | `feature/sample-html-parity-stage-4-exercise-library` |
-| Current PR | [PR #12](https://github.com/HackerXMindset/GymMinimal/pull/12) |
+| Current branch | `feat/minimal-stage-05-exercise-details` |
+| Current PR | [PR #14](https://github.com/HackerXMindset/GymMinimal/pull/14) |
 | Last verified test commit | Stage 3 PR #11 head `ceba4b53b8d2484bdb4c599fd63dddc8216bc1b4`; Actions run #43515792250 passed |
 | Known blocker | PR #12 CI is pending; physical-device screenshot/manual review is not available yet. |
-| Next concrete action | Verify PR #12 analysis, full tests and single-APK build; fix all failures before merging and starting Stage 5 |
+| Next concrete action | Verify PR #14 formatting, analysis, full tests, single-APK build and phone-width interactions; fix all failures before marking Stage 5 complete |
 
 For each future handoff, replace these values with the real current stage and live commit/PR/test state. Keep completed stages' PR references in the roadmap changelog. If a stage is partially done, state exactly which acceptance boxes passed, which failed, and the next unfinished item. Do not simply write "mostly done".
 

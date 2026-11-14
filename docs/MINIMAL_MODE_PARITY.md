@@ -15,7 +15,7 @@
 - [x] Stage 2 — Today screen
 - [x] Stage 3 — Live workout
 - [ ] Stage 4 — Exercise library
-- [ ] Stage 5 — Exercise details and per-exercise statistics
+- [ ] Stage 5 — Exercise details and per-exercise statistics (in progress, PR #14)
 - [ ] Stage 6 — History
 - [ ] Stage 7 — Stats dashboard
 - [ ] Stage 8 — Settings
@@ -86,17 +86,20 @@
 - [ ] Verify the 360px phone-width widget test, search/filter interactions and Standard library regression in CI.
 - [ ] Complete phone screenshot/manual parity review in Stage 10.
 
-### Stage 5 — Exercise details and per-exercise statistics
+### Stage 5 — Exercise details and per-exercise statistics — IN PROGRESS (PR #14)
 
 **Primary source:** `lib/screens/exercise_detail_screen.dart`.  
 **Reference:** `Sample.html` → `exercise()`, `rangeBar()`, `exSessions()`, `lineChart()`, `barsSvg()`.
 
-- [ ] Show all ten reference metrics: last done, last sets, first done, sessions, total sets, total reps, total volume, heaviest set, best estimated 1RM and last PR.
-- [ ] Match 4W / 8W / 12W / All range controls with earlier/later navigation.
-- [ ] Add estimated 1RM trend and volume-per-session charts.
-- [ ] Match PR history and every-session table.
-- [ ] Verify calculations against real sets, including warm-up rules, empty history, one session and ties.
-- [ ] Verify back navigation returns to the originating screen where appropriate.
+- [x] Add the ten reference metric slots using logged exercise history: last done, last sets, first done, sessions, total sets, total reps, total volume, heaviest set, best estimated 1RM and last PR.
+- [x] Add 4W / 8W / 12W / All controls and earlier/later navigation.
+- [x] Add range-filtered estimated 1RM and per-session volume charts.
+- [x] Add progressive PR history and a per-session table.
+- [ ] Verify empty/sparse history, range navigation, narrow phone layout and Standard detail regression in CI/manual review.
+- [ ] Confirm focused tests, formatting, analysis, full tests and one-APK CI build.
+- [ ] Complete phone screenshot/manual parity review in Stage 10.
+
+**PR #14 is open. Do not mark Stage 5 complete until CI and visual/interaction review pass.**
 
 ### Stage 6 — History
 
@@ -214,7 +217,7 @@ The authoritative workflow is the version already merged to `main` by PR #9: `.g
 | PR #11 | Merged — Stage 3 Live Workout; Actions run #43515792250 passed |
 | PR #10 merge commit | `7fbc49522965e638a110e9988c4fe53b29a11301` |
 | PR #10 Actions | Run #43510832870 passed; the newer single-job APK workflow was preserved |
-| Current UI stage | Stage 4 — Exercise library (in progress) |
+| Current UI stage | Stage 5 — Exercise details (PR #14 in progress); Stage 4 follow-up PR #13 remains open |
 | Stage 3 PR | [PR #11](https://github.com/HackerXMindset/GymMinimal/pull/11) — merged |
 | Stage 3 merge commit | `7b9a8e3ea4492b56d3391f640c708062991c6297` |
 | Stage 3 CI | Actions run #43515792250 passed analysis, full tests and one-APK build |
@@ -223,7 +226,9 @@ The authoritative workflow is the version already merged to `main` by PR #9: `.g
 | Stage 4 base | `main` at Stage 3 merge commit `7b9a8e3ea4492b56d3391f640c708062991c6297` |
 | Stage 4 CI | Pending; verify latest PR run before merge |
 | Remaining proof | Phone-sized screenshot/manual interaction review and Standard library regression review |
-| Next action | Pass Stage 4 CI and review the Minimal exercise table; fix all failures before merge and Stage 5 |
+| Stage 5 PR | [PR #14](https://github.com/HackerXMindset/GymMinimal/pull/14) — open; CI pending |
+| Stage 5 branch | `feat/minimal-stage-05-exercise-details` |
+| Next action | Review PR #14 CI and phone-width layout; resolve failures before merging Stage 5 |
 
 ## Change log
 
@@ -242,5 +247,5 @@ The authoritative workflow is the version already merged to `main` by PR #9: `.g
 
 1. Read [Complete Project Handoff](MINIMAL_MODE_HANDOFF.md).
 2. PR #10 is merged and conflict-free; PR #11 Stage 3 is also merged with CI run #43515792250 passing.
-3. Continue Stage 4 in [PR #12](https://github.com/HackerXMindset/GymMinimal/pull/12), keeping later stages in separate PRs.
-4. Start Stage 5 only after Stage 4's analysis, tests and single-APK build pass and its PR is merged.
+3. Stage 4 follow-up PR #13 remains open. Stage 5 implementation is in [PR #14](https://github.com/HackerXMindset/GymMinimal/pull/14) on its own branch from `main`.
+4. Review Stage 5 CI and phone-width interactions; do not mark the stage complete until every acceptance check passes.

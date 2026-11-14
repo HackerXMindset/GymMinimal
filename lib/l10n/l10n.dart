@@ -474,3 +474,44 @@ extension MinimalHistoryL10n on AppLocalizations {
     return labels[language]?[index] ?? english[index];
   }
 }
+
+/// Empty-state copy for Minimal exercise-detail statistics.
+extension MinimalExerciseDetailL10n on AppLocalizations {
+  String get minimalExerciseTrendEmpty => _minimalExerciseDetailLabel(0);
+  String get minimalExerciseVolumeEmpty => _minimalExerciseDetailLabel(1);
+  String get minimalExerciseRecordsEmpty => _minimalExerciseDetailLabel(2);
+
+  String _minimalExerciseDetailLabel(int index) {
+    const english = [
+      'Not enough sessions for a trend',
+      'No volume data in this range',
+      'No personal records yet',
+    ];
+    const labels = <String, List<String>>{
+      'ar': ['لا توجد جلسات كافية لعرض الاتجاه', 'لا توجد بيانات حجم في هذه الفترة', 'لا توجد أرقام قياسية شخصية بعد'],
+      'bn': ['ট্রেন্ড দেখানোর জন্য যথেষ্ট সেশন নেই', 'এই সময়সীমায় ভলিউমের কোনো ডেটা নেই', 'এখনও কোনো ব্যক্তিগত রেকর্ড নেই'],
+      'de': ['Nicht genügend Einheiten für einen Trend', 'Keine Volumendaten in diesem Zeitraum', 'Noch keine persönlichen Rekorde'],
+      'es': ['No hay suficientes sesiones para mostrar una tendencia', 'No hay datos de volumen en este periodo', 'Todavía no hay récords personales'],
+      'fa': ['جلسات کافی برای نمایش روند وجود ندارد', 'در این بازه داده‌ای برای حجم وجود ندارد', 'هنوز رکورد شخصی ثبت نشده است'],
+      'fr': ['Pas assez de séances pour afficher une tendance', 'Aucune donnée de volume sur cette période', 'Aucun record personnel pour le moment'],
+      'hi': ['ट्रेंड दिखाने के लिए पर्याप्त सेशन नहीं हैं', 'इस अवधि में वॉल्यूम का डेटा नहीं है', 'अभी तक कोई व्यक्तिगत रिकॉर्ड नहीं है'],
+      'id': ['Sesi belum cukup untuk menampilkan tren', 'Tidak ada data volume dalam rentang ini', 'Belum ada rekor pribadi'],
+      'it': ['Sessioni insufficienti per mostrare una tendenza', 'Nessun dato sul volume in questo intervallo', 'Ancora nessun record personale'],
+      'ja': ['推移を表示するにはセッションが足りません', 'この期間のボリュームデータはありません', '自己記録はまだありません'],
+      'ko': ['추세를 표시할 세션이 부족합니다', '이 기간에는 볼륨 데이터가 없습니다', '아직 개인 기록이 없습니다'],
+      'nl': ['Niet genoeg sessies voor een trend', 'Geen volumedata in deze periode', 'Nog geen persoonlijke records'],
+      'pl': ['Za mało sesji, aby pokazać trend', 'Brak danych o objętości w tym zakresie', 'Nie ma jeszcze rekordów osobistych'],
+      'pt': ['Sessões insuficientes para mostrar uma tendência', 'Não há dados de volume neste período', 'Ainda não há recordes pessoais'],
+      'ru': ['Недостаточно тренировок для графика динамики', 'Нет данных об объёме за этот период', 'Личных рекордов пока нет'],
+      'tr': ['Trend göstermek için yeterli antrenman yok', 'Bu aralıkta hacim verisi yok', 'Henüz kişisel rekor yok'],
+      'uk': ['Недостатньо тренувань для відображення тенденції', 'За цей період немає даних про обсяг', 'Особистих рекордів поки немає'],
+      'ur': ['رجحان دکھانے کے لیے کافی سیشن نہیں ہیں', 'اس مدت میں حجم کا ڈیٹا موجود نہیں', 'ابھی تک کوئی ذاتی ریکارڈ نہیں'],
+      'vi': ['Chưa đủ buổi tập để hiển thị xu hướng', 'Không có dữ liệu khối lượng trong khoảng này', 'Chưa có kỷ lục cá nhân'],
+      'zh': ['训练次数不足，无法显示趋势', '此时间范围内没有训练量数据', '暂无个人纪录'],
+      'zh_Hant': ['訓練次數不足，無法顯示趨勢', '此時間範圍內沒有訓練量資料', '尚無個人紀錄'],
+    };
+    final locale = localeName.toLowerCase();
+    final language = locale.startsWith('zh_hant') ? 'zh_Hant' : locale.split('_').first;
+    return labels[language]?[index] ?? english[index];
+  }
+}

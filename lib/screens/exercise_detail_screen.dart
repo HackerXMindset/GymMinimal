@@ -37,6 +37,7 @@ class ExerciseDetailScreen extends StatefulWidget {
 
 class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   int _rangeDays = 84;
+  int _rangeOffset = 0;
   bool _showHowTo = false;
   bool _showSettings = false;
 
@@ -212,9 +213,12 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
           _meta(gc, t.equipmentLabel, t.equipment(ex.equipment)),
         ],
       ),
-      if (minimal && history.isNotEmpty) ...[
-        const SizedBox(height: 10),
-        _minimalOverview(gc, history, pr),
+      if (minimal) ...[
+        if (history.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          _minimalOverview(gc, history),
+        ],
+        _minimalHistorySections(gc, history),
       ],
       SizedBox(height: minimal ? 10 : 18),
       _addToRoutineRow(context, gc, ex),
@@ -596,68 +600,119 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   Widget _minimalOverview(
     GymColors gc,
     List<({DateTime date, LoggedExercise ex})> history,
-    PersonalRecord? pr,
   ) {
-    if (history.isEmpty) return const SizedBox.shrink();
     final sets = [for (final item in history) ...item.ex.workingSets];
-    final totalSets = sets.length;
-    final totalReps = sets.fold<int>(0, (sum, set) => sum + set.reps);
-    final totalVolume = sets.fold<double>(0, (sum, set) => sum + set.volume);
-    final last = history.first;
-    final daysAgo = math.max(0, DateTime.now().difference(last.date).inDays).toInt();
-    final metrics = <(String, String, String?)>[
-      (t.lastDoneAgo(daysAgo), _fmtDate(last.date), fit.setsSummary(last.ex.sets)),
-      (t.allTimeSessions, '${history.length}', '${_fmtDate(history.last.date)} – ${_fmtDate(last.date)}'),
-      (t.allTimeSets, '$totalSets', null),
-      (t.repsTitle, '$totalReps', null),
-      (t.volume, fit.volumeLabel(totalVolume), null),
-      if (pr != null) (t.personalRecord, fit.recordLabel(pr), fit.recordDetail(pr)),
+    final last = history.isEmpty ? null : history.first;
+    final first = history.isEmpty ? null : history.last;
+    final reps = sets.fold<int>(0, (sum, set) => sum + set.reps);
+    final volume = sets.fold<double>(0, (sum, set) => sum + set.volume);
+    final heavy = sets.isEmpty ? null : sets.reduce((a, b) => a.weight > b.weight || (a.weight == b.weight && a.reps > b.reps) ? a : b);
+    final best = sets.isEmpty ? null : sets.reduce((a, b) => a.oneRm > b.oneRm ? a : b);
+    var bestSoFar = 0.0;
+    var lastPrLabel = '–';
+    for (final item in [...history]..sort((a, b) => a.date.compareTo(b.date))) {
+      final value = item.ex.bestOneRm;
+      if (value > bestSoFar + 0.01) {
+        bestSoFar = value;
+        lastPrLabel = _fmtDate(item.date) + ' · ' + fit.weightLabel(value);
+      }
+    }
+    final metrics = <(String, String)>[
+      ('Last done', last == null ? 'Not logged' : _fmtDate(last.date)),
+      ('Last sets', last == null ? '–' : fit.setsSummary(last.ex.sets)),
+      ('First done', first == null ? '–' : _fmtDate(first.date)),
+      ('Sessions', history.length.toString()),
+      ('Total sets', sets.length.toString()),
+      ('Total reps', reps.toString()),
+      ('Total volume', fit.volumeLabel(volume)),
+      ('Heaviest set', heavy == null ? '–' : fit.weightLabel(heavy.weight) + ' × ' + heavy.reps.toString()),
+      ('Best 1RM', best == null ? '–' : fit.weightLabel(best.oneRm)),
+      ('Last PR', lastPrLabel),
     ];
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      decoration: BoxDecoration(
-        border: Border.symmetric(horizontal: BorderSide(color: gc.border.withValues(alpha: 0.75))),
-      ),
-      child: LayoutBuilder(
-        builder: (context, box) {
-          final width = (box.maxWidth - 12) / 2;
-          return Wrap(
-            spacing: 12,
-            runSpacing: 0,
-            children: [
-              for (final metric in metrics)
-                SizedBox(
-                  width: width,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 7),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(metric.$1.toUpperCase(),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppTheme.f(9.5, weight: FontWeight.w700, color: gc.textTertiary, letterSpacing: 0.6)),
-                        const SizedBox(height: 3),
-                        Text(metric.$2,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppTheme.f(13, weight: FontWeight.w700, color: gc.text)),
-                        if (metric.$3 != null) ...[
-                          const SizedBox(height: 2),
-                          Text(metric.$3!,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTheme.f(10, weight: FontWeight.w500, color: gc.textSecondary)),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-            ],
-          );
-        },
-      ),
+      decoration: BoxDecoration(border: Border.symmetric(horizontal: BorderSide(color: gc.border))),
+      child: LayoutBuilder(builder: (context, box) {
+        final width = (box.maxWidth - 12) / 2;
+        return Wrap(spacing: 12, children: [
+          for (final metric in metrics)
+            SizedBox(width: width, child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 7),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(metric.$1.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: AppTheme.f(9.5, weight: FontWeight.w700, color: gc.textTertiary)),
+                const SizedBox(height: 3),
+                Text(metric.$2, maxLines: 2, overflow: TextOverflow.ellipsis,
+                  style: AppTheme.f(12.5, weight: FontWeight.w700, color: gc.text)),
+              ]),
+            )),
+        ]);
+      }),
     );
+  }
+
+  Widget _minimalHistorySections(GymColors gc, List<({DateTime date, LoggedExercise ex})> history) {
+    final end = DateTime.now().subtract(Duration(days: _rangeOffset));
+    final start = _rangeDays == 0 ? DateTime(2000) : end.subtract(Duration(days: _rangeDays - 1));
+    final rows = history.where((h) => !h.date.isAfter(end) && !h.date.isBefore(start)).toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
+    final trend = [for (final h in rows) if (h.ex.bestOneRm > 0) h.ex.bestOneRm];
+    final maxVolume = rows.fold<double>(1, (m, h) => math.max(m, h.ex.volume).toDouble());
+    final prs = <({DateTime date, double value})>[];
+    var record = 0.0;
+    for (final h in [...history]..sort((a, b) => a.date.compareTo(b.date))) {
+      if (h.ex.bestOneRm > record + 0.01) {
+        record = h.ex.bestOneRm;
+        prs.add((date: h.date, value: record));
+      }
+    }
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      const SizedBox(height: 12),
+      Row(children: [Expanded(child: _section(gc, 'Estimated 1RM')), _minimalRangePicker(gc)]),
+      const SizedBox(height: 8),
+      if (trend.length > 1) TrendChart(values: trend.map(fit.toDisplayWeight).toList(), height: 82, scale: fmt)
+      else Text(t.minimalExerciseTrendEmpty, style: AppTheme.f(11, color: gc.textSecondary)),
+      const SizedBox(height: 14),
+      _section(gc, 'Volume per session'),
+      const SizedBox(height: 8),
+      if (rows.isEmpty) Text(t.minimalExerciseVolumeEmpty, style: AppTheme.f(11, color: gc.textSecondary))
+      else SizedBox(height: 88, child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        for (final h in rows) Expanded(child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2),
+          child: Tooltip(message: _fmtDate(h.date) + ' · ' + fit.volumeLabel(h.ex.volume),
+            child: Container(height: math.max(2, 64 * h.ex.volume / maxVolume).toDouble(),
+              decoration: BoxDecoration(color: gc.ember.withValues(alpha: 0.75),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(3)))),
+          ),
+        )),
+      ])),
+      const SizedBox(height: 14),
+      _section(gc, 'PR history'),
+      const SizedBox(height: 6),
+      if (prs.isEmpty) Text(t.minimalExerciseRecordsEmpty, style: AppTheme.f(11, color: gc.textSecondary))
+      else for (final p in prs.reversed) Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5),
+        child: Row(children: [
+          Expanded(child: Text(_fmtDate(p.date), style: AppTheme.f(11, color: gc.textSecondary))),
+          Text(fit.weightLabel(p.value), style: AppTheme.f(12, weight: FontWeight.w700, color: gc.text)),
+        ]),
+      ),
+      const SizedBox(height: 14),
+      _section(gc, 'Every session'),
+      const SizedBox(height: 6),
+      for (final h in history) Container(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: gc.border))),
+        child: Row(children: [
+          SizedBox(width: 62, child: Text(_fmtDate(h.date), style: AppTheme.f(9.5, color: gc.textSecondary))),
+          Expanded(child: Text(h.ex.sets.map((x) => fit.weightLabel(x.weight) + '×' + x.reps.toString()).join('  '),
+            maxLines: 2, overflow: TextOverflow.ellipsis, style: AppTheme.f(10, color: gc.text))),
+          Text(fit.volumeLabel(h.ex.volume), style: AppTheme.f(9.5, color: gc.textSecondary)),
+          const SizedBox(width: 8),
+          Text(h.ex.bestOneRm > 0 ? fit.weightLabel(h.ex.bestOneRm) : '–', style: AppTheme.f(9.5, color: gc.textSecondary)),
+        ]),
+      ),
+    ]);
   }
 
   Widget _minimalRangePicker(GymColors gc) {
@@ -665,10 +720,11 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        if (_rangeDays != 0) GestureDetector(onTap: () => setState(() => _rangeOffset += _rangeDays), child: Icon(PhosphorIconsRegular.caretLeft, size: 14, color: gc.textSecondary)),
         for (final range in ranges)
           GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: () => setState(() => _rangeDays = range.$1),
+            onTap: () => setState(() { _rangeDays = range.$1; _rangeOffset = 0; }),
             child: Container(
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
@@ -687,6 +743,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               ),
             ),
           ),
+        if (_rangeDays != 0) GestureDetector(onTap: _rangeOffset > 0 ? () => setState(() => _rangeOffset = math.max(0, _rangeOffset - _rangeDays)) : null, child: Icon(PhosphorIconsRegular.caretRight, size: 14, color: gc.textSecondary)),
       ],
     );
   }
