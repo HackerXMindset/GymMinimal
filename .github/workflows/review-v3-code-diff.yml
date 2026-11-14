@@ -1,0 +1,61 @@
+name: Review GymMinimal v3 application diffs
+
+on:
+  push:
+    branches:
+      - import/gymminimal-v3-corrected-snapshot
+
+permissions:
+  contents: read
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Print bounded source diffs from the ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin main
+          archive="$RUNNER_TEMP/GymMinimal-v3-full.zip"
+          git show origin/main:GymMinimal-v3-full.zip > "$archive"
+          python3 - "$archive" <<'PY'
+          import difflib, sys, zipfile
+          from pathlib import PurePosixPath
+
+          changed = [
+              "test/minimal_history_test.dart",
+              "test/smoke_test.dart",
+              "lib/app/app_shell.dart",
+              "lib/screens/progress_screen.dart",
+              "lib/screens/home_screen.dart",
+              "lib/screens/session_screen.dart",
+              "lib/screens/history_screen.dart",
+              "lib/screens/exercises_screen.dart",
+          ]
+          added = [
+              "test/minimal_today_stats_test.dart",
+              "lib/services/minimal_insights.dart",
+              "docs/design/minimal-gymmane-v3.html",
+          ]
+          with zipfile.ZipFile(sys.argv[1]) as z:
+              members = {str(PurePosixPath(*PurePosixPath(i.filename).parts[1:])): i
+                         for i in z.infolist() if not i.is_dir() and i.filename.startswith("gymminimal/")}
+              for path in changed:
+                  old = open(path, "r", encoding="utf-8").read().splitlines() if __import__("os").path.isfile(path) else []
+                  new = z.read(members[path]).decode("utf-8").splitlines()
+                  diff = list(difflib.unified_diff(old, new, fromfile="main/" + path, tofile="zip/" + path, lineterm=""))
+                  print("\n===== DIFF " + path + " (" + str(len(diff)) + " diff lines) =====")
+                  for line in diff[:160]:
+                      print(line)
+                  if len(diff) > 160:
+                      print("... diff truncated; remaining lines:", len(diff)-160)
+              for path in added:
+                  print("\n===== NEW FILE " + path + " =====")
+                  lines = z.read(members[path]).decode("utf-8").splitlines()
+                  for line in lines[:120]:
+                      print(line)
+                  if len(lines) > 120:
+                      print("... file truncated; total lines:", len(lines))
+          PY
