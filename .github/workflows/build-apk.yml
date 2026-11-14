@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Optional release tag (defaults to minimal-mode-preview)'
+        description: 'Optional release tag (defaults to a unique build-N tag)'
         required: false
         type: string
 
@@ -134,8 +134,8 @@ jobs:
               echo "::notice::Fork PRs build an Actions artifact only; GitHub does not grant them write access to repository Releases."
             fi
           else
-            TAG="${DISPATCH_TAG:-minimal-mode-preview}"
-            NAME="GymMinimal — Minimal Mode"
+            TAG="${DISPATCH_TAG:-build-${GITHUB_RUN_NUMBER}}"
+            NAME="GymMinimal — Build #${GITHUB_RUN_NUMBER}"
             PUBLISH=true
           fi
 
@@ -171,15 +171,19 @@ jobs:
           tag_name: ${{ steps.release.outputs.tag }}
           name: ${{ steps.release.outputs.name }}
           body: |
-            Automatically updated, signed GymMinimal preview build.
+            Signed GymMinimal preview build.
 
+            Build: #${{ github.run_number }} (attempt #${{ github.run_attempt }})
+            Android version code: ${{ steps.android-build-number.outputs.value }}
             Source commit: ${{ github.sha }}
+            Commit: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
             Trigger: ${{ github.event_name }}
             Analysis result: ${{ steps.analyze.outcome }}
             Test result: ${{ steps.tests.outcome }}
+            Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
             Pull request: ${{ github.event.pull_request.html_url || 'not applicable' }}
 
-            Download GymMinimal.apk and install it over the previous preview build.
+            Download GymMinimal.apk. It is signed with the repository's existing persistent Android signing key; install it over the existing app without uninstalling.
           prerelease: true
           make_latest: false
           overwrite_files: true
