@@ -349,7 +349,7 @@ class SettingsScreen extends StatelessWidget {
                 TextButton(
                   style: buttonStyle,
                   onPressed: () => _exportXlsx(context),
-                  child: const Text('Excel (.xlsx)'),
+                  child: const Text('.xlsx'),
                 ),
               ),
               row(
@@ -364,7 +364,7 @@ class SettingsScreen extends StatelessWidget {
             ]),
             const SizedBox(height: 12),
             Text(
-              'No account, no sync, no network. Everything stays on the phone.',
+              t.fullyOfflineWhy,
               textAlign: TextAlign.center,
               style: AppTheme.f(10.5, weight: FontWeight.w500, color: gc.textTertiary, height: 1.35),
             ),
