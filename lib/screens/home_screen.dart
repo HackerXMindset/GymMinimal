@@ -143,7 +143,7 @@ class HomeScreen extends StatelessWidget {
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   foregroundColor: gc.accent,
                 ),
-                child: Text('Start', style: AppTheme.f(11, weight: FontWeight.w700)),
+                child: Text(sentenceCase(t.startWorkout), style: AppTheme.f(11, weight: FontWeight.w700)),
               ),
             ]),
             children: [
@@ -172,15 +172,13 @@ class HomeScreen extends StatelessWidget {
     Widget heroCard() {
       final routine = next;
       final title = active
-          ? 'Workout in progress'
+          ? sentenceCase(t.inProgress)
           : routine == null
-              ? 'Start training'
+              ? sentenceCase(t.startWorkout)
               : fit.routineTitle(routine);
       final buttonLabel = active
-          ? t.keepTraining
-          : routine == null
-              ? 'Start empty workout'
-              : 'Start $title';
+          ? sentenceCase(t.continueWorkout)
+          : sentenceCase(t.startWorkout);
       return Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
@@ -189,7 +187,7 @@ class HomeScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(active ? 'In progress' : 'Up next',
+          Text(active ? sentenceCase(t.inProgress) : sentenceCase(t.circuitUpNext),
               style: AppTheme.f(10.5, weight: FontWeight.w500, color: gc.textSecondary)),
           const SizedBox(height: 2),
           Text(title,
@@ -242,7 +240,7 @@ class HomeScreen extends StatelessWidget {
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   foregroundColor: gc.textSecondary,
                 ),
-                child: Text('Start empty workout', style: AppTheme.f(11, weight: FontWeight.w600)),
+                child: Text(sentenceCase(t.startWorkout), style: AppTheme.f(11, weight: FontWeight.w600)),
               ),
             ),
         ]),
@@ -317,18 +315,18 @@ class HomeScreen extends StatelessWidget {
             child: Row(children: [
               Expanded(
                 child: Text(
-                  '${thisWeek.sessions} ${thisWeek.sessions == 1 ? 'session' : 'sessions'} this week',
+                  '${t.sessionsLogged(thisWeek.sessions)} · ${sentenceCase(t.thisWeekTitle)}',
                   style: AppTheme.f(11, weight: FontWeight.w500, color: gc.textSecondary),
                 ),
               ),
               Text(
-                fit.volumeLabel(thisWeek.volume) + (weekChange == null ? '' : '  $weekChange vs last week'),
+                fit.volumeLabel(thisWeek.volume) + (weekChange == null ? '' : '  $weekChange · ${sentenceCase(t.vsLastTime)}'),
                 style: AppTheme.f(11, weight: FontWeight.w600, color: gc.text),
               ),
             ]),
           ),
           if (cold.isNotEmpty) ...[
-            sectionTitle('Not trained lately'),
+            sectionTitle(sentenceCase(t.untrainedTab)),
             for (final item in cold)
               valueRow(t.muscle(item.muscle), '${item.days} days', () {
                 fit.clearExFilters();
@@ -337,7 +335,7 @@ class HomeScreen extends StatelessWidget {
               }),
           ],
           if (stuck.isNotEmpty) ...[
-            sectionTitle('No PR lately'),
+            sectionTitle(sentenceCase(t.prs)),
             for (final item in stuck)
               valueRow(t.catalogName(item.record.id, item.record.name), '${item.days} days',
                   () => fit.openExercise(item.record.id)),
@@ -351,7 +349,7 @@ class HomeScreen extends StatelessWidget {
             )
           else
             for (final routine in otherRoutines) routineRow(routine),
-          sectionTitle('Last workout'),
+          sectionTitle(sentenceCase(t.historyTitle)),
           if (last == null)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
@@ -368,7 +366,7 @@ class HomeScreen extends StatelessWidget {
               ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(
-                    last.name?.trim().isNotEmpty == true ? last.name! : 'Workout',
+                    last.name?.trim().isNotEmpty == true ? last.name! : sentenceCase(t.workoutOverview),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppTheme.f(12.5, weight: FontWeight.w700, color: gc.text)),
