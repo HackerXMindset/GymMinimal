@@ -71,7 +71,7 @@ jobs:
 
       - name: Verify repository Android signing keystore
         id: signing
-        if: always() && steps.dependencies.outcome == 'success'
+        if: success() && steps.dependencies.outcome == 'success'
         shell: bash
         run: |
           KEYSTORE="android/keystore/lifetracker.p12"
@@ -85,7 +85,7 @@ jobs:
 
       - name: Allocate a higher Android version code for every CI build
         id: android-build-number
-        if: always() && steps.dependencies.outcome == 'success'
+        if: success() && steps.dependencies.outcome == 'success'
         shell: bash
         run: |
           BUILD_NUMBER=$((GITHUB_RUN_NUMBER * 100 + GITHUB_RUN_ATTEMPT))
@@ -94,16 +94,16 @@ jobs:
 
       - name: Build one installable APK
         id: build-apk
-        if: always() && steps.dependencies.outcome == 'success'
+        if: success() && steps.dependencies.outcome == 'success'
         run: flutter build apk --release --target-platform android-arm64 --build-number "${{ steps.android-build-number.outputs.value }}"
 
       - name: Rename APK
         id: rename-apk
-        if: always() && steps.build-apk.outcome == 'success'
+        if: success() && steps.build-apk.outcome == 'success'
         run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/GymMinimal.apk
 
       - name: Upload single APK artifact
-        if: always() && steps.rename-apk.outcome == 'success'
+        if: success() && steps.rename-apk.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: gymminimal-apk
@@ -112,7 +112,7 @@ jobs:
 
       - name: Select release destination
         id: release
-        if: always()
+        if: success()
         shell: bash
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -139,7 +139,7 @@ jobs:
           echo "publish=$PUBLISH" >> "$GITHUB_OUTPUT"
 
       - name: Point this preview tag at the built commit
-        if: always() && steps.build-apk.outcome == 'success' && steps.release.outputs.publish == 'true' && steps.signing.outputs.configured == 'true'
+        if: success() && steps.build-apk.outcome == 'success' && steps.release.outputs.publish == 'true' && steps.signing.outputs.configured == 'true'
         env:
           RELEASE_TAG: ${{ steps.release.outputs.tag }}
         run: |
@@ -147,7 +147,7 @@ jobs:
           git push origin "refs/tags/$RELEASE_TAG" --force
 
       - name: Remove previous APK assets from this preview release
-        if: always() && steps.build-apk.outcome == 'success' && steps.release.outputs.publish == 'true' && steps.signing.outputs.configured == 'true'
+        if: success() && steps.build-apk.outcome == 'success' && steps.release.outputs.publish == 'true' && steps.signing.outputs.configured == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ steps.release.outputs.tag }}
@@ -160,7 +160,7 @@ jobs:
           fi
 
       - name: Publish the built APK to GitHub Releases
-        if: always() && steps.build-apk.outcome == 'success' && steps.release.outputs.publish == 'true' && steps.signing.outputs.configured == 'true'
+        if: success() && steps.build-apk.outcome == 'success' && steps.release.outputs.publish == 'true' && steps.signing.outputs.configured == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.release.outputs.tag }}
@@ -181,7 +181,7 @@ jobs:
           files: build/app/outputs/flutter-apk/GymMinimal.apk
 
       - name: Explain why the APK was not published as a Release
-        if: always() && steps.build-apk.outcome == 'success' && steps.release.outputs.publish != 'true'
+        if: success() && steps.build-apk.outcome == 'success' && steps.release.outputs.publish != 'true'
         run: |
           echo "The APK remains available in this run's Actions artifacts."
           echo "Fork PRs do not have permission to publish repository Releases."

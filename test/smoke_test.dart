@@ -31,6 +31,65 @@ void main() {
     expect(tester.takeException(), isNull, reason: 'la pantalla $route reventó');
   }
 
+  testWidgets('Minimal Today renders content with both populated and empty history', (tester) async {
+    final previousMode = fit.minimalMode;
+    addTearDown(() => fit.minimalMode = previousMode);
+    fit.minimalMode = true;
+    fit.route = 'home';
+
+    await tester.pumpWidget(const GymManeApp());
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(tester.takeException(), isNull);
+    expect(find.byKey(const PageStorageKey('home-minimal')), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byKey(const PageStorageKey('home-minimal')),
+        matching: find.text(t.today),
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Start empty workout'), findsOneWidget);
+    expect(find.text('Last workout'), findsOneWidget);
+
+    fit.sessions.clear();
+    fit.notifyListeners();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(tester.takeException(), isNull);
+    expect(find.byKey(const PageStorageKey('home-minimal')), findsOneWidget);
+    expect(find.text(t.noHistory), findsOneWidget);
+  });
+
+  testWidgets('Minimal Settings shows the complete compact settings page', (tester) async {
+    final previousMode = fit.minimalMode;
+    addTearDown(() => fit.minimalMode = previousMode);
+    fit.minimalMode = true;
+    fit.route = 'preferences';
+
+    await tester.pumpWidget(const GymManeApp());
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(tester.takeException(), isNull);
+    expect(find.byKey(const PageStorageKey('minimal-settings')), findsOneWidget);
+    for (final label in [
+      'Minimal view',
+      'Text size',
+      'Row height',
+      'Previous column',
+      'How-to button (?)',
+      'Notes',
+      'Exercise icons',
+      'Totals strip',
+      'Settings button in header',
+      'Rest timer',
+      '.xlsx',
+      'JSON',
+    ]) {
+      expect(find.text(label), findsOneWidget, reason: 'Missing Minimal setting: $label');
+    }
+  });
+
   for (final route in const [
     'home',
     'progress',

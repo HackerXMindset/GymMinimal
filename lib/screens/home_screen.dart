@@ -33,9 +33,14 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gc = context.gc;
+    // Minimal Today does not use the Standard-mode recommendation engine.
+    // Keep that work out of this path so a recommendation calculation cannot
+    // prevent the Minimal home screen from rendering.
+    if (fit.minimalMode) {
+      return _minimalHome(context, gc, fit.routinesByLastDone);
+    }
     final recommended = fit.recommendedExercises(8);
     final routines = fit.routinesByLastDone;
-    if (fit.minimalMode) return _minimalHome(context, gc, routines);
     if (DesktopScope.of(context)) return _desktop(context, gc, routines, recommended);
 
     return RiseScope(
@@ -162,7 +167,7 @@ class HomeScreen extends StatelessWidget {
         key: const PageStorageKey('home-minimal'),
         padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Row(crossAxisAlignment: CrossAxisAlignment.baseline, children: [
+          Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
             Expanded(
               child: Text(t.today,
                   style: AppTheme.f(17, weight: FontWeight.w700, color: gc.text)),
