@@ -76,7 +76,7 @@ void main() {
       'Totals strip',
       'Settings button in header',
       'Rest timer',
-      'Excel (.xlsx)',
+      '.xlsx',
       'JSON',
     ]) {
       expect(find.text(label), findsOneWidget, reason: 'Missing Minimal setting: $label');
