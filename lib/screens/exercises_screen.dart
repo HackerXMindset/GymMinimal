@@ -11,6 +11,7 @@ import '../catalog/exercise_catalog.dart';
 import '../l10n/l10n.dart';
 import '../models/exercise.dart';
 import '../services/media_store.dart';
+import '../services/minimal_insights.dart';
 import '../state/fit_state.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
@@ -364,7 +365,9 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
   Widget _quickChips(BuildContext context, GymColors gc) {
     if (fit.minimalMode) {
       final selected = fit.exMuscleFilter;
-      final allSelected = selected == null && fit.exZoneFilter == null;
+      final recentChip = fit.minimalShowRecent && fit.recentExerciseIds(limit: 1).isNotEmpty;
+      final recentSelected = fit.exRecentActive;
+      final allSelected = !recentSelected && selected == null && fit.exZoneFilter == null;
       Widget musclePill(String label, bool active, VoidCallback onTap) => Pill(
             label: label,
             bg: active ? gc.ember : gc.bgRaised2,
@@ -379,10 +382,11 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
         scrollDirection: Axis.horizontal,
         clipBehavior: Clip.none,
         child: Row(children: [
-          musclePill('All', allSelected, () {
-            if (fit.exMuscleFilter != null) fit.setMuscleFilter(fit.exMuscleFilter!);
-            if (fit.exZoneFilter != null) fit.setZoneFilter(null);
-          }),
+          if (recentChip) ...[
+            musclePill('Recent', recentSelected, fit.showRecentExercises),
+            const SizedBox(width: 7),
+          ],
+          musclePill('All', allSelected, fit.showAllExercises),
           for (final muscle in kFilterMuscles) ...[
             const SizedBox(width: 7),
             musclePill(muscleLabel(muscle), selected == muscle,
@@ -571,7 +575,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
           ),
           SizedBox(
             width: 78,
-            child: Text(_minimalColumnLabel(t.muscleFilter),
+            child: Text(fit.exRecentActive ? 'Last' : _minimalColumnLabel(t.muscleFilter),
                 style: AppTheme.f(10, weight: FontWeight.w700,
                     color: gc.textSecondary, letterSpacing: 0.35)),
           ),
@@ -585,10 +589,18 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
         ]),
       );
 
+  String _lastDone(String id) {
+    final history = fit.exerciseHistory(id);
+    if (history.isEmpty) return '–';
+    final days = MinimalInsights.daysSince(history.first.date);
+    return days <= 0 ? 'Today' : days == 1 ? 'Yesterday' : '${days}d ago';
+  }
+
   Widget _row(GymColors gc, Exercise ex, {required bool first, required bool last}) {
     final fav = fit.favorites[ex.id] ?? false;
     if (fit.minimalMode) {
       final best = fit.bestLift(ex.id);
+      final recent = fit.exRecentActive;
       final vertical = switch (fit.minimalRowHeight) {
         'roomy' => 10.0,
         'tight' => 4.0,
@@ -609,7 +621,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
               ),
               SizedBox(
                 width: 78,
-                child: Text(muscleLabel(ex.primary),
+                child: Text(recent ? _lastDone(ex.id) : muscleLabel(ex.primary),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppTheme.f(10.5, weight: FontWeight.w500, color: gc.textSecondary)),

@@ -306,6 +306,32 @@ class SettingsScreen extends StatelessWidget {
                   onTap: () => fit.updateMinimalOptions(showTotals: !fit.minimalShowTotals),
                 ),
                 row(
+                  'Expand exercises in workout',
+                  TinySwitch(on: fit.minimalExpandExercises),
+                  key: 'minimal-toggle-expand',
+                  hint: 'Off: exercises start collapsed. Tap one to open its sets.',
+                  onTap: () => fit.updateMinimalOptions(expandExercises: !fit.minimalExpandExercises),
+                ),
+                row(
+                  'Recent exercises first',
+                  TinySwitch(on: fit.minimalShowRecent),
+                  key: 'minimal-toggle-recent',
+                  onTap: () => fit.updateMinimalOptions(showRecent: !fit.minimalShowRecent),
+                ),
+                row(
+                  'Animate exercise demo',
+                  TinySwitch(on: fit.minimalAnimateDemo),
+                  key: 'minimal-toggle-animate',
+                  hint: 'Loops the movement in How-to. Off shows a still picture.',
+                  onTap: () => fit.updateMinimalOptions(animateDemo: !fit.minimalAnimateDemo),
+                ),
+                row(
+                  'Rep records on exercise page',
+                  TinySwitch(on: fit.minimalRepRecords),
+                  key: 'minimal-toggle-reprecords',
+                  onTap: () => fit.updateMinimalOptions(repRecords: !fit.minimalRepRecords),
+                ),
+                row(
                   'Settings button in header',
                   TinySwitch(on: fit.minimalShowSettingsButton),
                   key: 'minimal-toggle-header-settings',
@@ -854,6 +880,30 @@ class SettingsScreen extends StatelessWidget {
                         onTap: () => fit.updateMinimalOptions(showTotals: !fit.minimalShowTotals),
                         child: _prefRow(gc, PhosphorIconsRegular.chartBar, 'Totals strip',
                             TinySwitch(on: fit.minimalShowTotals)),
+                      ),
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => fit.updateMinimalOptions(expandExercises: !fit.minimalExpandExercises),
+                        child: _prefRow(gc, PhosphorIconsRegular.caretDown, 'Expand exercises in workout',
+                            TinySwitch(on: fit.minimalExpandExercises)),
+                      ),
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => fit.updateMinimalOptions(showRecent: !fit.minimalShowRecent),
+                        child: _prefRow(gc, PhosphorIconsRegular.clockCounterClockwise, 'Recent exercises first',
+                            TinySwitch(on: fit.minimalShowRecent)),
+                      ),
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => fit.updateMinimalOptions(animateDemo: !fit.minimalAnimateDemo),
+                        child: _prefRow(gc, PhosphorIconsRegular.image, 'Animate exercise demo',
+                            TinySwitch(on: fit.minimalAnimateDemo)),
+                      ),
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => fit.updateMinimalOptions(repRecords: !fit.minimalRepRecords),
+                        child: _prefRow(gc, PhosphorIconsRegular.chartBar, 'Rep records on exercise page',
+                            TinySwitch(on: fit.minimalRepRecords)),
                       ),
                       GestureDetector(
                         behavior: HitTestBehavior.opaque,

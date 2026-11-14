@@ -36,6 +36,7 @@ Future<void> main() async {
   await RestAlarm.instance.init();
   GraphicsMode.load();
   fit.loadFromStore();
+  fit.applyMinimalDefaultOnce();
   fit.syncPhotoReminder();
   fit.syncMeasureReminder();
   fit.syncTrainReminder();

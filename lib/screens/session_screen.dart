@@ -675,7 +675,7 @@ class SessionScreen extends StatelessWidget {
     return Column(children: [
       ExpansionTile(
         key: PageStorageKey('minimal-exercise-$i-${ex.id}'),
-        initiallyExpanded: true,
+        initiallyExpanded: fit.minimalExpandExercises,
         tilePadding: const EdgeInsets.symmetric(horizontal: 4),
         childrenPadding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
         backgroundColor: Colors.transparent,
