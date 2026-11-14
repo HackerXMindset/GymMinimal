@@ -1,0 +1,35 @@
+name: Inspect replacement archive
+
+on:
+  push:
+    branches:
+      - feat/minimal-stage-08-settings-home-fix
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate and inspect GymMinimal-v3-full.zip
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="GymMinimal-v3-full.zip"
+          test -s "$archive"
+          echo "Archive size:"
+          du -h "$archive"
+          echo "Integrity check:"
+          unzip -tq "$archive"
+          echo "Top-level entries:"
+          unzip -Z1 "$archive" | awk -F/ 'NF { print $1 }' | sort -u
+          echo "Project manifests:"
+          unzip -Z1 "$archive" | grep -E '(^|/)pubspec.yaml$|(^|/)pubspec.lock$|(^|/)Sample.html$|(^|/)\.metadata$' | head -100 || true
+          echo "File and directory counts:"
+          unzip -Z1 "$archive" | awk 'END { print "entries=" NR }'
+          echo "First 250 archive paths:"
+          unzip -Z1 "$archive" | sed -n '1,250p'
