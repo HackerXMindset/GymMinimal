@@ -3414,7 +3414,7 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
       final index = day.difference(start).inDays ~/ 7;
       if (index >= 0 && index < count) values[index] += session.volume;
     }
-    final maxValue = values.fold<double>(0, math.max);
+    final maxValue = values.reduce((a, b) => a > b ? a : b);
     if (maxValue <= 0) return Text(t.noHistory, style: AppTheme.f(11.5, color: gc.textTertiary));
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
@@ -3657,7 +3657,7 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
                     if (trend.isNotEmpty) ...[
                       const SizedBox(height: 8),
                       Row(children: [
-                        _metric(gc, 'Best', fit.weightLabel(trend.map((point) => point.value).reduce(math.max))),
+                        _metric(gc, 'Best', fit.weightLabel(trend.map((point) => point.value).reduce((a, b) => a > b ? a : b))),
                         _metric(gc, 'Last PR', _ageLabel(id == null ? null : records
                             .where((record) => record.id == id).map(_lastRecordDate)
                             .whereType<DateTime>().fold<DateTime?>(null, (best, date) =>
