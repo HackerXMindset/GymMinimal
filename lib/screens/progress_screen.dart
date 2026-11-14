@@ -11,6 +11,7 @@ import '../models/progress_shot.dart';
 import '../models/workout.dart';
 import '../services/food_library.dart' show foldText;
 import '../services/media_store.dart';
+import '../services/minimal_insights.dart';
 import '../state/fit_state.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
@@ -3304,8 +3305,106 @@ class _MinimalProgressScreen extends StatefulWidget {
 }
 
 class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
-  int _rangeWeeks = 12;
+  int _rangeWeeks = 8;
+  int _offset = 0;
   String? _exerciseId;
+
+  String _dm(DateTime d) => '${d.day} ${t.monthShort(d.month)}';
+
+  /// The one window the whole screen is drawn from. [back] steps to the
+  /// previous window of the same length. Null means all time.
+  ({DateTime start, DateTime end})? _window([int back = 0]) {
+    if (_rangeWeeks == 0) return null;
+    final span = _rangeWeeks * 7;
+    final end = DateUtils.dateOnly(DateTime.now()).subtract(Duration(days: (_offset + back) * span));
+    return (start: end.subtract(Duration(days: span - 1)), end: end);
+  }
+
+  bool _inWindow(DateTime date, ({DateTime start, DateTime end})? window) {
+    if (window == null) return true;
+    final day = DateUtils.dateOnly(date);
+    return !day.isBefore(window.start) && !day.isAfter(window.end);
+  }
+
+  ({int sessions, double volume, int sets, int seconds}) _totals(
+      List<LoggedSession> sessions, ({DateTime start, DateTime end})? window) {
+    var count = 0;
+    var volume = 0.0;
+    var sets = 0;
+    var seconds = 0;
+    for (final session in sessions) {
+      if (!_inWindow(session.day, window)) continue;
+      count++;
+      volume += session.volume;
+      sets += session.setCount;
+      seconds += session.durationSec;
+    }
+    return (sessions: count, volume: volume, sets: sets, seconds: seconds);
+  }
+
+  Widget _rangeBar(GymColors gc, List<LoggedSession> sessions) {
+    final window = _window();
+    final oldest = sessions.isEmpty
+        ? null
+        : sessions.map((s) => DateUtils.dateOnly(s.day)).reduce((a, b) => a.isBefore(b) ? a : b);
+    final canGoBack = window != null && oldest != null && oldest.isBefore(window.start);
+    final canGoForward = window != null && _offset > 0;
+    Widget arrow(IconData icon, bool enabled, VoidCallback onTap, String label) => IconButton(
+          tooltip: label,
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+          onPressed: enabled ? onTap : null,
+          icon: Icon(icon, size: 14, color: enabled ? gc.textSecondary : gc.border),
+        );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Wrap(
+          spacing: 5,
+          runSpacing: 4,
+          children: [for (final weeks in [4, 8, 12, 0]) _rangeChip(gc, weeks)],
+        ),
+        const SizedBox(height: 4),
+        if (window == null)
+          const SizedBox.shrink()
+        else
+          Row(children: [
+            arrow(PhosphorIconsBold.caretLeft, canGoBack, () => setState(() => _offset++), 'Earlier'),
+            Expanded(
+              child: Text('${_dm(window.start)} – ${_dm(window.end)}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: AppTheme.f(10.5, weight: FontWeight.w500, color: gc.textSecondary)),
+            ),
+            arrow(PhosphorIconsBold.caretRight, canGoForward, () => setState(() => _offset--), 'Later'),
+          ]),
+      ],
+    );
+  }
+
+  Widget _summary(GymColors gc, List<LoggedSession> sessions) {
+    final window = _window();
+    final current = _totals(sessions, window);
+    final previous = window == null ? null : _totals(sessions, _window(1));
+    String? delta(num now, num? before) => before == null ? null : MinimalInsights.change(now, before);
+    String time(int seconds) {
+      final minutes = (seconds / 60).round();
+      return '${minutes ~/ 60}h ${(minutes % 60).toString().padLeft(2, '0')}';
+    }
+    Widget divider() => Container(width: 1, height: 42, color: gc.border);
+    return Row(children: [
+      _metric(gc, 'Sessions', '${current.sessions}', note: delta(current.sessions, previous?.sessions)),
+      divider(),
+      _metric(gc, 'Volume', fit.volumeValue(current.volume),
+          note: delta(current.volume, previous?.volume)),
+      divider(),
+      _metric(gc, 'Sets', groupedInt(current.sets), note: delta(current.sets, previous?.sets)),
+      divider(),
+      _metric(gc, 'Time', time(current.seconds), note: delta(current.seconds, previous?.seconds)),
+    ]);
+  }
 
   DateTime? _lastRecordDate(PersonalRecord record) {
     var best = 0.0;
@@ -3339,8 +3438,8 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
         child: Row(children: [
           Expanded(
             child: Text(
-              label.toUpperCase(),
-              style: AppTheme.f(10, weight: FontWeight.w800, color: gc.textTertiary, letterSpacing: 1.25),
+              sentenceCase(label),
+              style: AppTheme.f(12.5, weight: FontWeight.w700, color: gc.text),
             ),
           ),
           if (trailing != null) trailing,
@@ -3351,15 +3450,15 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(label.toUpperCase(),
+            Text(sentenceCase(label),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: AppTheme.f(9, weight: FontWeight.w700, color: gc.textTertiary, letterSpacing: 0.9)),
+                style: AppTheme.f(10.5, weight: FontWeight.w500, color: gc.textSecondary)),
             const SizedBox(height: 3),
             Text(value,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: AppTheme.f(18, weight: FontWeight.w800, color: gc.text, height: 1.05)),
+                style: AppTheme.f(17, weight: FontWeight.w700, color: gc.text, height: 1.05)),
             if (note != null) ...[
               const SizedBox(height: 2),
               Text(note,
@@ -3382,10 +3481,14 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
 
   Widget _rangeChip(GymColors gc, int weeks) {
     final selected = _rangeWeeks == weeks;
-    final label = weeks == 0 ? 'All' : '${weeks}W';
+    final label = weeks == 0 ? sentenceCase(t.periodAll) : '${weeks}W';
     return GestureDetector(
+      key: ValueKey('minimal-progress-range-$weeks'),
       behavior: HitTestBehavior.opaque,
-      onTap: () => setState(() => _rangeWeeks = weeks),
+      onTap: () => setState(() {
+        _rangeWeeks = weeks;
+        _offset = 0;
+      }),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
         decoration: BoxDecoration(
@@ -3399,32 +3502,39 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
     );
   }
 
-  Widget _weeklyVolumeChart(GymColors gc, List<LoggedSession> sessions) {
+  Widget _weeklyChart(
+    GymColors gc,
+    List<LoggedSession> sessions, {
+    required double Function(LoggedSession) value,
+    required String caption,
+  }) {
+    final window = _window();
     final now = DateUtils.dateOnly(DateTime.now());
     final oldest = sessions.isEmpty ? now : sessions
         .map((session) => DateUtils.dateOnly(session.day))
         .reduce((a, b) => a.isBefore(b) ? a : b);
     final availableWeeks = math.max(1, (now.difference(oldest).inDays ~/ 7) + 1).toInt();
-    final count = _rangeWeeks == 0 ? math.min(availableWeeks, 52).toInt() : _rangeWeeks;
-    final start = now.subtract(Duration(days: count * 7 - 1));
+    final count = window == null ? math.min(availableWeeks, 52).toInt() : _rangeWeeks;
+    final end = window?.end ?? now;
+    final start = end.subtract(Duration(days: count * 7 - 1));
     final values = List<double>.filled(count, 0);
     for (final session in sessions) {
       final day = DateUtils.dateOnly(session.day);
-      if (day.isBefore(start) || day.isAfter(now)) continue;
+      if (day.isBefore(start) || day.isAfter(end)) continue;
       final index = day.difference(start).inDays ~/ 7;
-      if (index >= 0 && index < count) values[index] += session.volume;
+      if (index >= 0 && index < count) values[index] += value(session);
     }
     final maxValue = values.reduce((a, b) => a > b ? a : b);
     if (maxValue <= 0) return Text(t.noHistory, style: AppTheme.f(11.5, color: gc.textTertiary));
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-        for (final value in values)
+        for (final v in values)
           Expanded(child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 1.5),
             child: Container(
-              height: math.max(2.0, 54 * value / maxValue).toDouble(),
+              height: math.max(2.0, 54 * v / maxValue).toDouble(),
               decoration: BoxDecoration(
-                color: gc.accent.withValues(alpha: value == 0 ? 0.12 : 0.82),
+                color: gc.accent.withValues(alpha: v == 0 ? 0.12 : 0.82),
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(2)),
               ),
             ),
@@ -3432,12 +3542,12 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
       ]),
       const SizedBox(height: 5),
       Row(children: [
-        Text('${start.month.toString().padLeft(2, '0')}/${start.day.toString().padLeft(2, '0')}', style: AppTheme.f(9, color: gc.textTertiary)),
+        Text(_dm(start), style: AppTheme.f(9, color: gc.textTertiary)),
         const Spacer(),
-        Text('${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')}', style: AppTheme.f(9, color: gc.textTertiary)),
+        Text(_dm(end), style: AppTheme.f(9, color: gc.textTertiary)),
       ]),
       const SizedBox(height: 4),
-      Text('Weekly total · ${fit.volumeUnit}', style: AppTheme.f(9, color: gc.textTertiary)),
+      Text(caption, style: AppTheme.f(9, color: gc.textTertiary)),
     ]);
   }
 
@@ -3476,7 +3586,6 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
     final gc = _minimalProgressColors(context.gc);
     final theme = Theme.of(context).copyWith(extensions: [gc]);
     final sessions = fit.sessions;
-    final volumeChange = fit.volumeChangePct;
     final trackedNames = <String, String>{};
     for (final session in sessions) {
       for (final exercise in session.exercises) {
@@ -3491,16 +3600,17 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
           : (exerciseIds.isEmpty ? null : exerciseIds.first);
     }
     final id = _exerciseId;
-    final trend = id == null ? const <({DateTime date, double value})>[] : fit.exerciseTrend(
-      id,
-      days: _rangeWeeks == 0 ? 0 : _rangeWeeks * 7,
-    );
+    final window = _window();
+    final trend = id == null
+        ? const <({DateTime date, double value})>[]
+        : [
+            for (final point in fit.exerciseTrend(id, days: 0))
+              if (_inWindow(point.date, window)) point,
+          ];
     final muscleSets = fit.muscleSetsOver(30).entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
     final maxMuscleSets = muscleSets.isEmpty ? 0.0 : muscleSets.first.value;
     final records = fit.personalRecords;
-    final lifted = fit.liftedSpanOf(fit.totalVolumeKg);
-    final volume = fit.volumeValue(fit.volume30dKg);
     final heatLevels = fit.heatmapWeeksFor(16);
     final heatStart = fit.heatmapWeekDate(0, weeks: 16);
 
@@ -3515,8 +3625,8 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               Row(children: [
                 Expanded(
-                  child: Text(t.progressTitle,
-                      style: AppTheme.f(20, weight: FontWeight.w800, color: gc.text)),
+                  child: Text(MinimalInsights.statsLabel(),
+                      style: AppTheme.f(17, weight: FontWeight.w700, color: gc.text)),
                 ),
                 IconButton(
                   tooltip: sentenceCase(t.historyTitle),
@@ -3538,32 +3648,14 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
                 ),
               ]),
               const SizedBox(height: 8),
-              Row(children: [
-                _metric(gc, t.tileVolume30, volume, note: fit.volumeUnit),
-                Container(width: 1, height: 42, color: gc.border),
-                _metric(gc, t.allTimeSessions, groupedInt(fit.totalSessions)),
-                Container(width: 1, height: 42, color: gc.border),
-                _metric(gc, t.allTimeSets, groupedInt(fit.totalSets)),
+              _rangeBar(gc, sessions),
+              const SizedBox(height: 6),
+              _summary(gc, sessions),
+              _flatSection(gc, 'Weekly volume · ${fit.volumeUnit}', [
+                _weeklyChart(gc, sessions, value: (session) => session.volume, caption: 'Weekly total'),
               ]),
-              Row(children: [
-                _metric(gc, t.allTimeTime, fit.totalTime.inHours > 0
-                    ? '${fit.totalTime.inHours}h'
-                    : '${fit.totalTime.inMinutes}m'),
-                Container(width: 1, height: 42, color: gc.border),
-                _metric(gc, t.allTimeLifted, lifted.$1, note: lifted.$2),
-                Container(width: 1, height: 42, color: gc.border),
-                _metric(gc, '30d change', volumeChange == null ? '—' : '${volumeChange > 0 ? '+' : ''}${volumeChange}%',
-                    note: t.tileVolume30),
-              ]),
-              _flatSection(gc, 'Weekly volume · kg', [
-                Row(children: [
-                  for (final weeks in [4, 8, 12, 0]) ...[
-                    if (weeks != 4) const SizedBox(width: 5),
-                    _rangeChip(gc, weeks),
-                  ],
-                ]),
-                const SizedBox(height: 10),
-                _weeklyVolumeChart(gc, sessions),
+              _flatSection(gc, 'Sessions per week', [
+                _weeklyChart(gc, sessions, value: (_) => 1.0, caption: 'Sessions'),
               ]),
               _flatSection(
                 gc,
@@ -3635,16 +3727,6 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 9),
-                    Row(children: [
-                      _rangeChip(gc, 4),
-                      const SizedBox(width: 5),
-                      _rangeChip(gc, 8),
-                      const SizedBox(width: 5),
-                      _rangeChip(gc, 12),
-                      const SizedBox(width: 5),
-                      _rangeChip(gc, 0),
-                    ]),
                     const SizedBox(height: 8),
                     if (trend.length > 1)
                       TrendChart(
@@ -3679,16 +3761,6 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
                     fit.goHistory(month: day);
                   },
                 ),
-                const SizedBox(height: 5),
-                Row(children: [
-                  Icon(PhosphorIconsFill.fire, size: 12, color: gc.accent),
-                  const SizedBox(width: 5),
-                  Text(t.streakDays(fit.currentStreak),
-                      style: AppTheme.f(10, weight: FontWeight.w600, color: gc.textSecondary)),
-                  const Spacer(),
-                  Text(t.weekOfGoal(fit.daysDoneThisWeek, fit.weeklyTarget),
-                      style: AppTheme.f(9.5, weight: FontWeight.w500, color: gc.textTertiary)),
-                ]),
               ]),
               _flatSection(gc, 'Sets per muscle · 30 days', [
                 if (muscleSets.isEmpty)
