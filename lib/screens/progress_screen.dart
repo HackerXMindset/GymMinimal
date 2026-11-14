@@ -3367,11 +3367,7 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
         ),
         const SizedBox(height: 4),
         if (window == null)
-          Align(
-            alignment: AlignmentDirectional.centerEnd,
-            child: Text(sentenceCase(t.periodAll),
-                style: AppTheme.f(10.5, weight: FontWeight.w500, color: gc.textSecondary)),
-          )
+          const SizedBox.shrink()
         else
           Row(children: [
             arrow(PhosphorIconsBold.caretLeft, canGoBack, () => setState(() => _offset++), 'Earlier'),
@@ -3487,6 +3483,7 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
     final selected = _rangeWeeks == weeks;
     final label = weeks == 0 ? sentenceCase(t.periodAll) : '${weeks}W';
     return GestureDetector(
+      key: ValueKey('minimal-progress-range-$weeks'),
       behavior: HitTestBehavior.opaque,
       onTap: () => setState(() {
         _rangeWeeks = weeks;
