@@ -3309,9 +3309,7 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
   int _offset = 0;
   String? _exerciseId;
 
-  static const _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-  String _dm(DateTime d) => '${d.day} ${_months[d.month - 1]}';
+  String _dm(DateTime d) => '${d.day} ${t.monthShort(d.month)}';
 
   /// The one window the whole screen is drawn from. [back] steps to the
   /// previous window of the same length. Null means all time.
@@ -3359,21 +3357,35 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
           onPressed: enabled ? onTap : null,
           icon: Icon(icon, size: 14, color: enabled ? gc.textSecondary : gc.border),
         );
-    return Row(children: [
-      for (final weeks in [4, 8, 12, 0]) ...[
-        if (weeks != 4) const SizedBox(width: 5),
-        _rangeChip(gc, weeks),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Wrap(
+          spacing: 5,
+          runSpacing: 4,
+          children: [for (final weeks in [4, 8, 12, 0]) _rangeChip(gc, weeks)],
+        ),
+        const SizedBox(height: 4),
+        if (window == null)
+          Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: Text(sentenceCase(t.periodAll),
+                style: AppTheme.f(10.5, weight: FontWeight.w500, color: gc.textSecondary)),
+          )
+        else
+          Row(children: [
+            arrow(PhosphorIconsBold.caretLeft, canGoBack, () => setState(() => _offset++), 'Earlier'),
+            Expanded(
+              child: Text('${_dm(window.start)} – ${_dm(window.end)}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: AppTheme.f(10.5, weight: FontWeight.w500, color: gc.textSecondary)),
+            ),
+            arrow(PhosphorIconsBold.caretRight, canGoForward, () => setState(() => _offset--), 'Later'),
+          ]),
       ],
-      const Spacer(),
-      if (window == null)
-        Text('All time', style: AppTheme.f(10.5, weight: FontWeight.w500, color: gc.textSecondary))
-      else ...[
-        arrow(PhosphorIconsBold.caretLeft, canGoBack, () => setState(() => _offset++), 'Earlier'),
-        Text('${_dm(window.start)} to ${_dm(window.end)}',
-            style: AppTheme.f(10.5, weight: FontWeight.w500, color: gc.textSecondary)),
-        arrow(PhosphorIconsBold.caretRight, canGoForward, () => setState(() => _offset--), 'Later'),
-      ],
-    ]);
+    );
   }
 
   Widget _summary(GymColors gc, List<LoggedSession> sessions) {
@@ -3473,7 +3485,7 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
 
   Widget _rangeChip(GymColors gc, int weeks) {
     final selected = _rangeWeeks == weeks;
-    final label = weeks == 0 ? 'All' : '${weeks}W';
+    final label = weeks == 0 ? sentenceCase(t.periodAll) : '${weeks}W';
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => setState(() {
