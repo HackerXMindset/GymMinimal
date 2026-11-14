@@ -479,6 +479,10 @@ The Stage 3 implementation and CI gate are complete. The final physical-device v
 
 This is a cross-screen integration stage, not a reason to rewrite the state architecture.
 
+**Parallel-work boundary:** Stage 8 Settings is being built separately. Stage 9 uses the existing FitState, local-store, workout-history and backup APIs; keep this branch isolated from Stage 8 UI files and reconcile after Stage 8 merges.
+
+**Current implementation:** branch feat/minimal-stage-09-behaviour-persistence. Added test/minimal_stage_09_integration_test.dart to exercise active-session persistence/restart, paused-rest restoration, completion, shared history/detail/stats calculations, XLSX contents, and JSON restore in one journey. CI and any failures remain to be verified.
+
 **Implementation outline**
 1. Test a complete user journey: launch → Today → start routine/empty workout → edit and complete sets → rest → pause/resume → finish → History → Exercise Detail → Stats.
 2. Restart the app with an active session and verify the intended resume behavior.
