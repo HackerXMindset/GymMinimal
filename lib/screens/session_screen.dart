@@ -381,6 +381,7 @@ class SessionScreen extends StatelessWidget {
                   _minimalToolbar(context, gc, locked),
               ]),
             ),
+            if (_minimalSameColumns(s)) _minimalPinnedHeader(gc, s),
             Expanded(
               child: NotificationListener<ScrollNotification>(
                 onNotification: (_) => true,
@@ -553,16 +554,40 @@ class SessionScreen extends StatelessWidget {
         }),
       );
 
+  /// True when every exercise shares the same set columns, so one column
+  /// header can serve the whole workout.
+  bool _minimalSameColumns(WorkoutSession s) {
+    final firstId = s.exercises.isEmpty ? null : s.exercises.first.id;
+    return firstId != null &&
+        s.exercises.every((e) =>
+            fit.modeOf(e.id) == fit.modeOf(firstId) &&
+            fit.isRepsOnly(e.id) == fit.isRepsOnly(firstId) &&
+            (fit.isEachSide(e.id) || fit.isSidedReps(e.id)) ==
+                (fit.isEachSide(firstId) || fit.isSidedReps(firstId)) &&
+            fit.unitsFor(e.id) == fit.unitsFor(firstId) &&
+            fit.distanceUnitFor(e.id) == fit.distanceUnitFor(firstId));
+  }
+
+  /// The shared column header, pinned under the toolbar so it stays in view
+  /// while the exercises scroll.
+  Widget _minimalPinnedHeader(GymColors gc, WorkoutSession s) {
+    final first = s.exercises.first;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(18, 2, 18, 4),
+      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: gc.border))),
+      child: _setsHeader(
+        gc,
+        fit.modeOf(first.id),
+        fit.isRepsOnly(first.id),
+        fit.isEachSide(first.id) || fit.isSidedReps(first.id),
+        list: fit.minimalShowPrevious,
+        exId: first.id,
+      ),
+    );
+  }
+
   Widget _minimalActive(BuildContext context, GymColors gc, WorkoutSession s, bool locked) {
-    final first = s.exercises.isEmpty ? null : s.exercises.first;
-    final firstId = first?.id;
-    final sameColumns = firstId != null && s.exercises.every((e) =>
-        fit.modeOf(e.id) == fit.modeOf(firstId) &&
-        fit.isRepsOnly(e.id) == fit.isRepsOnly(firstId) &&
-        (fit.isEachSide(e.id) || fit.isSidedReps(e.id)) ==
-            (fit.isEachSide(firstId) || fit.isSidedReps(firstId)) &&
-        fit.unitsFor(e.id) == fit.unitsFor(firstId) &&
-        fit.distanceUnitFor(e.id) == fit.distanceUnitFor(firstId));
+    final sameColumns = _minimalSameColumns(s);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -571,18 +596,6 @@ class SessionScreen extends StatelessWidget {
           const SizedBox(height: 8),
           _deloadNote(gc),
         ],
-        if (first != null && sameColumns)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(6, 12, 6, 4),
-            child: _setsHeader(
-              gc,
-              fit.modeOf(first.id),
-              fit.isRepsOnly(first.id),
-              fit.isEachSide(first.id) || fit.isSidedReps(first.id),
-              list: fit.minimalShowPrevious,
-              exId: first.id,
-            ),
-          ),
         for (var i = 0; i < s.exercises.length; i++)
           _minimalExercise(context, gc, s, i, locked,
               sharedHeader: sameColumns, showPrevious: fit.minimalShowPrevious),

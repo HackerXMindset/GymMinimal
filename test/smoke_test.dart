@@ -7,6 +7,7 @@ import 'package:gymmane/state/fit_state.dart';
 import 'package:gymmane/theme/app_colors.dart';
 import 'package:gymmane/theme/app_theme.dart';
 import 'package:gymmane/widgets/share_cards.dart';
+import 'package:gymmane/widgets/ui_kit.dart' show sentenceCase;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -45,7 +46,7 @@ void main() {
     expect(
       find.descendant(
         of: find.byKey(const PageStorageKey('home-minimal')),
-        matching: find.text(t.today),
+        matching: find.text(sentenceCase(t.today)),
       ),
       findsOneWidget,
     );
