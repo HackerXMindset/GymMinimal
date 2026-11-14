@@ -8,6 +8,7 @@ import '../app/desktop.dart';
 import '../widgets/medal.dart' show Medal;
 import '../l10n/l10n.dart';
 import '../models/exercise.dart';
+import '../services/minimal_insights.dart';
 import '../models/workout.dart';
 import '../state/fit_state.dart';
 import '../theme/app_colors.dart';
@@ -142,7 +143,7 @@ class HomeScreen extends StatelessWidget {
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   foregroundColor: gc.accent,
                 ),
-                child: Text(t.startWorkout, style: AppTheme.f(11, weight: FontWeight.w700)),
+                child: Text(sentenceCase(t.startWorkout), style: AppTheme.f(11, weight: FontWeight.w700)),
               ),
             ]),
             children: [
@@ -161,6 +162,113 @@ class HomeScreen extends StatelessWidget {
           ),
         );
 
+    final next = active ? null : MinimalInsights.nextRoutine();
+    final thisWeek = MinimalInsights.weekTotals(0);
+    final lastWeek = MinimalInsights.weekTotals(1);
+    final weekChange = MinimalInsights.change(thisWeek.volume, lastWeek.volume);
+    final cold = MinimalInsights.coldMuscles();
+    final stuck = MinimalInsights.stuckRecords();
+
+    Widget heroCard() {
+      final routine = next;
+      final title = active
+          ? sentenceCase(t.inProgress)
+          : routine == null
+              ? sentenceCase(t.startWorkout)
+              : fit.routineTitle(routine);
+      final buttonLabel = active
+          ? sentenceCase(t.continueWorkout)
+          : sentenceCase(t.startWorkout);
+      return Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: gc.bgRaised,
+          border: Border.all(color: gc.border),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(active ? sentenceCase(t.inProgress) : sentenceCase(t.circuitUpNext),
+              style: AppTheme.f(10.5, weight: FontWeight.w500, color: gc.textSecondary)),
+          const SizedBox(height: 2),
+          Text(title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTheme.f(17, weight: FontWeight.w700, color: gc.text)),
+          if (routine != null) ...[
+            const SizedBox(height: 3),
+            Text(
+              t.exerciseCount(routine.exerciseIds.length) +
+                  ', ' +
+                  routine.exerciseIds
+                      .take(3)
+                      .map((id) => t.catalogName(id, fit.exerciseById(id)?.name ?? id))
+                      .join(', ') +
+                  (routine.exerciseIds.length > 3 ? '…' : ''),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTheme.f(10.5, weight: FontWeight.w500, color: gc.textSecondary),
+            ),
+          ],
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: active
+                  ? fit.stepBackIntoSession
+                  : routine != null
+                      ? () => fit.startRoutine(routine)
+                      : () => fit.startWorkout(null),
+              style: FilledButton.styleFrom(
+                backgroundColor: gc.ember,
+                foregroundColor: gc.onEmber,
+                padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 10),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                textStyle: AppTheme.f(12.5, weight: FontWeight.w800),
+              ),
+              child: Text(buttonLabel, maxLines: 1, overflow: TextOverflow.ellipsis),
+            ),
+          ),
+          if (!active && routine != null)
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: TextButton(
+                onPressed: () => fit.startWorkout(null),
+                style: TextButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                  minimumSize: const Size(0, 28),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  foregroundColor: gc.textSecondary,
+                ),
+                child: Text(sentenceCase(t.startWorkout), style: AppTheme.f(11, weight: FontWeight.w600)),
+              ),
+            ),
+        ]),
+      );
+    }
+
+    Widget valueRow(String label, String value, VoidCallback onTap) => InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+            child: Row(children: [
+              Expanded(
+                child: Text(label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTheme.f(12, weight: FontWeight.w600, color: gc.text)),
+              ),
+              const SizedBox(width: 8),
+              Text(value, style: AppTheme.f(11, weight: FontWeight.w500, color: gc.textSecondary)),
+            ]),
+          ),
+        );
+
+    final otherRoutines = [
+      for (final routine in routines)
+        if (next == null || routine.id != next.id) routine,
+    ];
+
     return SafeArea(
       bottom: false,
       child: SingleChildScrollView(
@@ -169,13 +277,15 @@ class HomeScreen extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
             Expanded(
-              child: Text(t.today,
+              child: Text(sentenceCase(t.today),
                   style: AppTheme.f(17, weight: FontWeight.w700, color: gc.text)),
             ),
             Text(t.longDate(now),
                 style: AppTheme.f(10.5, weight: FontWeight.w500, color: gc.textSecondary)),
           ]),
           const SizedBox(height: 10),
+          heroCard(),
+          const SizedBox(height: 12),
           Row(children: [
             for (var i = 0; i < dates.length; i++) ...[
               if (i > 0) const SizedBox(width: 5),
@@ -187,14 +297,11 @@ class HomeScreen extends StatelessWidget {
                   Container(
                     height: 19,
                     decoration: BoxDecoration(
-                      color: dates[i].isAtSameMomentAs(today) ||
-                              trainedDays.contains(dates[i].millisecondsSinceEpoch)
+                      color: trainedDays.contains(dates[i].millisecondsSinceEpoch)
                           ? gc.accent
                           : gc.bgRaised,
                       border: Border.all(
-                        color: dates[i].isAtSameMomentAs(today)
-                            ? gc.accent
-                            : gc.border,
+                        color: dates[i].isAtSameMomentAs(today) ? gc.textSecondary : Colors.transparent,
                       ),
                       borderRadius: BorderRadius.circular(3),
                     ),
@@ -203,24 +310,37 @@ class HomeScreen extends StatelessWidget {
               ),
             ],
           ]),
-          const SizedBox(height: 14),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton.icon(
-              onPressed: active ? fit.stepBackIntoSession : () => fit.startWorkout(null),
-              icon: Icon(active ? PhosphorIconsRegular.play : PhosphorIconsRegular.plus, size: 16),
-              label: Text(active ? t.keepTraining : 'Start empty workout',
-                  maxLines: 1, overflow: TextOverflow.ellipsis),
-              style: FilledButton.styleFrom(
-                backgroundColor: gc.ember,
-                foregroundColor: gc.onEmber,
-                padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 10),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                textStyle: AppTheme.f(12, weight: FontWeight.w800),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(2, 8, 2, 0),
+            child: Row(children: [
+              Expanded(
+                child: Text(
+                  '${t.sessionsLogged(thisWeek.sessions)} · ${sentenceCase(t.thisWeekTitle)}',
+                  style: AppTheme.f(11, weight: FontWeight.w500, color: gc.textSecondary),
+                ),
               ),
-            ),
+              Text(
+                fit.volumeLabel(thisWeek.volume) + (weekChange == null ? '' : '  $weekChange · ${sentenceCase(t.vsLastTime)}'),
+                style: AppTheme.f(11, weight: FontWeight.w600, color: gc.text),
+              ),
+            ]),
           ),
-          sectionTitle(t.routines, action: '+ New', onTap: fit.goRoutines),
+          if (cold.isNotEmpty) ...[
+            sectionTitle(sentenceCase(t.untrainedTab)),
+            for (final item in cold)
+              valueRow(t.muscle(item.muscle), '${item.days} days', () {
+                fit.clearExFilters();
+                fit.setMuscleFilter(item.muscle);
+                fit.goExercises();
+              }),
+          ],
+          if (stuck.isNotEmpty) ...[
+            sectionTitle(sentenceCase(t.prs)),
+            for (final item in stuck)
+              valueRow(t.catalogName(item.record.id, item.record.name), '${item.days} days',
+                  () => fit.openExercise(item.record.id)),
+          ],
+          sectionTitle(sentenceCase(t.routines), action: '+ New', onTap: fit.goRoutines),
           if (routines.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
@@ -228,8 +348,8 @@ class HomeScreen extends StatelessWidget {
                   style: AppTheme.f(11, weight: FontWeight.w500, color: gc.textSecondary)),
             )
           else
-            for (final routine in routines) routineRow(routine),
-          sectionTitle('Last workout'),
+            for (final routine in otherRoutines) routineRow(routine),
+          sectionTitle(sentenceCase(t.historyTitle)),
           if (last == null)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
@@ -237,14 +357,16 @@ class HomeScreen extends StatelessWidget {
                   style: AppTheme.f(11, weight: FontWeight.w500, color: gc.textSecondary)),
             )
           else
-            Container(
+            InkWell(
+              onTap: fit.goHistoryTab,
+              child: Container(
               padding: const EdgeInsets.fromLTRB(4, 9, 4, 10),
               decoration: BoxDecoration(
                 border: Border(top: BorderSide(color: gc.border)),
               ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(
-                    last.name?.trim().isNotEmpty == true ? last.name! : 'Workout',
+                    last.name?.trim().isNotEmpty == true ? last.name! : sentenceCase(t.workoutOverview),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppTheme.f(12.5, weight: FontWeight.w700, color: gc.text)),
@@ -257,6 +379,7 @@ class HomeScreen extends StatelessWidget {
                   style: AppTheme.f(10.5, weight: FontWeight.w500, color: gc.textSecondary),
                 ),
               ]),
+              ),
             ),
         ]),
       ),
