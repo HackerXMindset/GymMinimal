@@ -2,15 +2,17 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-import '../theme/app_colors.dart';
+import '../theme/app_colors.dart';
+
 import 'local_image.dart';
 
 class AppBackground extends StatelessWidget {
-  const AppBackground({super.key, required this.pattern, this.photo, this.dim = 0.55});
+  const AppBackground({super.key, required this.pattern, this.photo, this.dim = 0.55, this.tint});
 
   final String pattern;
   final String? photo;
   final double dim;
+  final Color? tint;
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +39,8 @@ class AppBackground extends StatelessWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      gc.bg.withValues(alpha: dim),
-                      gc.bg.withValues(alpha: (dim + 0.18).clamp(0.0, 1.0)),
+                      (tint ?? gc.bg).withValues(alpha: dim),
+                      (tint ?? gc.bg).withValues(alpha: (dim + 0.18).clamp(0.0, 1.0)),
                     ],
                   ),
                 ),

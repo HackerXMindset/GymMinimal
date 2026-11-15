@@ -452,12 +452,13 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver, Single
                           color: fit.minimalMode ? const Color(0xFF141413) : context.gc.bg,
                         ),
                       ),
-                      if (!fit.minimalMode)
+                      if (!fit.minimalMode || fit.minimalWallpaperOn)
                         Positioned.fill(
                           child: AppBackground(
                             pattern: fit.bgPattern,
                             photo: fit.bgPhotoPath,
                             dim: fit.bgDim,
+                            tint: fit.minimalMode ? const Color(0xFF141413) : null,
                           ),
                         ),
                       Scaffold(

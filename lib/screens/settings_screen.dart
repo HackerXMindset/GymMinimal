@@ -319,6 +319,13 @@ class SettingsScreen extends StatelessWidget {
                   onTap: () => fit.updateMinimalOptions(historyCalendar: !fit.minimalHistoryCalendar),
                 ),
                 row(
+                  'Wallpaper',
+                  TinySwitch(on: fit.minimalWallpaper),
+                  key: 'minimal-toggle-wallpaper',
+                  hint: 'Shows the wallpaper you set in Appearance.',
+                  onTap: () => fit.updateMinimalOptions(wallpaper: !fit.minimalWallpaper),
+                ),
+                row(
                   'Expand exercises in workout',
                   TinySwitch(on: fit.minimalExpandExercises),
                   key: 'minimal-toggle-expand',
@@ -905,6 +912,12 @@ class SettingsScreen extends StatelessWidget {
                         onTap: () => fit.updateMinimalOptions(historyCalendar: !fit.minimalHistoryCalendar),
                         child: _prefRow(gc, PhosphorIconsRegular.calendarDots, 'Calendar in History list',
                             TinySwitch(on: fit.minimalHistoryCalendar)),
+                      ),
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => fit.updateMinimalOptions(wallpaper: !fit.minimalWallpaper),
+                        child: _prefRow(gc, PhosphorIconsRegular.image, 'Wallpaper in Minimal view',
+                            TinySwitch(on: fit.minimalWallpaper)),
                       ),
                       GestureDetector(
                         behavior: HitTestBehavior.opaque,

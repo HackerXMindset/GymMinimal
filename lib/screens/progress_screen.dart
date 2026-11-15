@@ -3608,7 +3608,7 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
     return Theme(
       data: theme,
       child: ColoredBox(
-        color: gc.bg,
+        color: fit.minimalWallpaperOn ? Colors.transparent : gc.bg,
         child: SafeArea(
           bottom: false,
           child: SingleChildScrollView(

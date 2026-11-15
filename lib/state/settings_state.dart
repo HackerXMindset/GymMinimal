@@ -38,6 +38,7 @@ mixin SettingsState on FitCore, ToolsState, LibraryState {
   bool minimalDefaultApplied = false;
   bool minimalTodayCalendar = true;
   bool minimalHistoryCalendar = true;
+  bool minimalWallpaper = true;
   bool defaultsV5Applied = false;
   String heatmapRange = 'weeks';
   String alarmStyle = 'quiet';
@@ -222,6 +223,7 @@ mixin SettingsState on FitCore, ToolsState, LibraryState {
     bool? repRecords,
     bool? todayCalendar,
     bool? historyCalendar,
+    bool? wallpaper,
   }) {
     if (textSize != null && const ['normal', 'small', 'tiny'].contains(textSize)) {
       minimalTextSize = textSize;
@@ -241,9 +243,14 @@ mixin SettingsState on FitCore, ToolsState, LibraryState {
     if (repRecords != null) minimalRepRecords = repRecords;
     if (todayCalendar != null) minimalTodayCalendar = todayCalendar;
     if (historyCalendar != null) minimalHistoryCalendar = historyCalendar;
+    if (wallpaper != null) minimalWallpaper = wallpaper;
     _persist();
     notifyListeners();
   }
+
+  /// The wallpaper chosen in Appearance is drawn under the Minimal view too.
+  bool get minimalWallpaperOn =>
+      minimalMode && minimalWallpaper && bgPattern == 'photo' && bgPhotoPath != null;
 
   bool get heatmapYear => heatmapRange == 'year';
 
