@@ -85,6 +85,8 @@ void main() {
       'Month calendar on Today',
       'Calendar in History list',
       'Wallpaper',
+      'Workout view',
+      'Icons in bottom bar',
       'Expand exercises in workout',
       'Recent exercises first',
       'Animate exercise demo',

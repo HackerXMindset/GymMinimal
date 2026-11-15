@@ -39,6 +39,9 @@ mixin SettingsState on FitCore, ToolsState, LibraryState {
   bool minimalTodayCalendar = true;
   bool minimalHistoryCalendar = true;
   bool minimalWallpaper = true;
+  bool numberEntryKeyboard = true;
+  bool minimalWorkoutTable = true;
+  bool minimalNavIcons = true;
   bool defaultsV5Applied = false;
   String heatmapRange = 'weeks';
   String alarmStyle = 'quiet';
@@ -224,6 +227,8 @@ mixin SettingsState on FitCore, ToolsState, LibraryState {
     bool? todayCalendar,
     bool? historyCalendar,
     bool? wallpaper,
+    bool? workoutTable,
+    bool? navIcons,
   }) {
     if (textSize != null && const ['normal', 'small', 'tiny'].contains(textSize)) {
       minimalTextSize = textSize;
@@ -244,6 +249,8 @@ mixin SettingsState on FitCore, ToolsState, LibraryState {
     if (todayCalendar != null) minimalTodayCalendar = todayCalendar;
     if (historyCalendar != null) minimalHistoryCalendar = historyCalendar;
     if (wallpaper != null) minimalWallpaper = wallpaper;
+    if (workoutTable != null) minimalWorkoutTable = workoutTable;
+    if (navIcons != null) minimalNavIcons = navIcons;
     _persist();
     notifyListeners();
   }
@@ -251,6 +258,18 @@ mixin SettingsState on FitCore, ToolsState, LibraryState {
   /// The wallpaper chosen in Appearance is drawn under the Minimal view too.
   bool get minimalWallpaperOn =>
       minimalMode && minimalWallpaper && bgPattern == 'photo' && bgPhotoPath != null;
+
+  /// Minimal view with the table as the live workout (the Cards choice draws
+  /// the regular workout screen instead).
+  bool get minimalTable => minimalMode && minimalWorkoutTable;
+
+  /// Minimal view: number sheets open on the keyboard (true) or the scroller
+  /// (false). The small icon in the sheet flips it and the choice is kept.
+  void setNumberEntryKeyboard(bool value) {
+    if (numberEntryKeyboard == value) return;
+    numberEntryKeyboard = value;
+    _persist();
+  }
 
   bool get heatmapYear => heatmapRange == 'year';
 
