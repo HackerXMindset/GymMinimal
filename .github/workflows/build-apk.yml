@@ -2,10 +2,11 @@ name: Build & Release
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, v5]
   push:
     branches:
       - main
+      - v5
   workflow_dispatch:
     inputs:
       tag:
