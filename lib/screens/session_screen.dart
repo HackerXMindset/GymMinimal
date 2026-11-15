@@ -39,7 +39,7 @@ class SessionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gc = context.gc;
-    if (fit.minimalMode && !fit.isSessionComplete && fit.session != null) {
+    if (fit.minimalTable && !fit.isSessionComplete && fit.session != null) {
       final minimal = gc.copyWith(
         pageBg: const Color(0xFF0E0E0D),
         bg: const Color(0xFF141413),
@@ -81,7 +81,9 @@ class SessionScreen extends StatelessWidget {
         data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(textScale)),
         child: Theme(
           data: theme,
-          child: ColoredBox(color: minimal.bg, child: _minimalScreen(context, minimal)),
+          child: ColoredBox(
+              color: fit.minimalWallpaperOn ? Colors.transparent : minimal.bg,
+              child: _minimalScreen(context, minimal)),
         ),
       );
     }
@@ -386,7 +388,7 @@ class SessionScreen extends StatelessWidget {
               child: NotificationListener<ScrollNotification>(
                 onNotification: (_) => true,
                 child: SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(12, 0, 12, 24 + bottom + (docked ? 84 : 0)),
+                  padding: EdgeInsets.fromLTRB(0, 0, 0, 24 + bottom + (docked ? 84 : 0)),
                   child: _minimalActive(context, gc, s, locked),
                 ),
               ),
@@ -573,7 +575,7 @@ class SessionScreen extends StatelessWidget {
   Widget _minimalPinnedHeader(GymColors gc, WorkoutSession s) {
     final first = s.exercises.first;
     return Container(
-      padding: const EdgeInsets.fromLTRB(18, 2, 18, 4),
+      padding: const EdgeInsets.fromLTRB(16, 2, 16, 4),
       decoration: BoxDecoration(border: Border(bottom: BorderSide(color: gc.border))),
       child: _setsHeader(
         gc,
@@ -591,16 +593,16 @@ class SessionScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (fit.minimalShowTotals) _minimalStats(gc),
+        if (fit.minimalShowTotals) Padding(padding: const EdgeInsets.symmetric(horizontal: 12), child: _minimalStats(gc)),
         if (s.deload) ...[
           const SizedBox(height: 8),
-          _deloadNote(gc),
+          Padding(padding: const EdgeInsets.symmetric(horizontal: 12), child: _deloadNote(gc)),
         ],
         for (var i = 0; i < s.exercises.length; i++)
           _minimalExercise(context, gc, s, i, locked,
               sharedHeader: sameColumns, showPrevious: fit.minimalShowPrevious),
-        const SizedBox(height: 4),
-        Row(children: [
+        const SizedBox(height: 8),
+        Padding(padding: const EdgeInsets.symmetric(horizontal: 12), child: Row(children: [
           Expanded(
             child: _guard(
               locked,
@@ -630,7 +632,7 @@ class SessionScreen extends StatelessWidget {
                 style: AppTheme.f(11.5, weight: FontWeight.w600,
                     color: locked ? gc.textTertiary : gc.textSecondary)),
           ),
-        ]),
+        ])),
       ],
     );
   }
@@ -660,6 +662,9 @@ class SessionScreen extends StatelessWidget {
     );
   }
 
+  /// One exercise in the table: a full-width band (caret, name, muscle, then
+  /// ? note + ⋯) with the set rows under it. The caret sits over the # column
+  /// and the set rows share one grid with the pinned column header.
   Widget _minimalExercise(
       BuildContext context, GymColors gc, WorkoutSession s, int i, bool locked,
       {required bool sharedHeader, required bool showPrevious}) {
@@ -672,86 +677,108 @@ class SessionScreen extends StatelessWidget {
     final linked = linkedIn || (ex.linkedNext && i < s.exercises.length - 1);
     final done = ex.sets.isNotEmpty && ex.sets.every((st) => st.done);
     final doneSets = ex.sets.where((st) => st.done).length;
-    return Column(children: [
-      ExpansionTile(
-        key: PageStorageKey('minimal-exercise-$i-${ex.id}'),
-        initiallyExpanded: fit.minimalExpandExercises,
-        tilePadding: const EdgeInsets.symmetric(horizontal: 4),
-        childrenPadding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
-        backgroundColor: Colors.transparent,
-        collapsedBackgroundColor: Colors.transparent,
-        iconColor: gc.textSecondary,
-        collapsedIconColor: gc.textTertiary,
-        visualDensity: VisualDensity.compact,
-        title: Row(children: [
-          if (fit.minimalShowExerciseIcons && def != null) ...[
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: SizedBox(
-                width: 28,
-                height: 28,
-                child: ExerciseMedia(ex: def, height: 28, radius: 6, live: false),
+
+    Widget control(String tip, Widget child, VoidCallback? onPressed, {double minWidth = 30}) => IconButton(
+          tooltip: tip,
+          visualDensity: VisualDensity.compact,
+          constraints: BoxConstraints(minWidth: minWidth, minHeight: 36),
+          padding: EdgeInsets.zero,
+          onPressed: onPressed,
+          icon: child,
+        );
+    final controlStyle = AppTheme.f(12.5, weight: FontWeight.w500, color: gc.textSecondary);
+
+    Widget header(bool open, VoidCallback toggle) => Container(
+          decoration: BoxDecoration(
+            color: gc.bgRaised,
+            border: Border(
+              top: BorderSide(color: gc.border),
+              bottom: BorderSide(color: gc.border),
+            ),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Row(children: [
+            Expanded(
+              child: Semantics(
+                button: true,
+                expanded: open,
+                label: t.catalogName(ex.id, ex.name),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: toggle,
+                  child: SizedBox(
+                    height: 40,
+                    child: Row(children: [
+                      const SizedBox(width: 4),
+                      SizedBox(
+                        width: 22,
+                        child: Center(
+                          child: Icon(
+                              open ? PhosphorIconsBold.caretDown : PhosphorIconsBold.caretRight,
+                              size: 10,
+                              color: gc.textTertiary),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      if (fit.minimalShowExerciseIcons && def != null) ...[
+                        SizedBox(
+                          width: 26,
+                          height: 26,
+                          child: ExerciseMedia(ex: def, height: 26, radius: 6, live: false),
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      Expanded(
+                        child: Text.rich(
+                          TextSpan(children: [
+                            TextSpan(
+                              text: t.catalogName(ex.id, ex.name),
+                              style: AppTheme.f(13, weight: FontWeight.w700, color: done ? gc.sage : gc.text),
+                            ),
+                            TextSpan(
+                              text: '  ${muscleLabel(ex.primary)}'
+                                  '${linked ? ' · ${t.superset}' : ''}'
+                                  '${open ? '' : ', $doneSets/${ex.sets.length}'}',
+                              style: AppTheme.f(11.5,
+                                  weight: FontWeight.w500, color: linked ? gc.brass : gc.textTertiary),
+                            ),
+                          ]),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ]),
+                  ),
+                ),
               ),
             ),
-          ],
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(t.catalogName(ex.id, ex.name),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTheme.f(13, weight: FontWeight.w700, color: done ? gc.sage : gc.text)),
-              const SizedBox(height: 2),
-              Text('${muscleLabel(ex.primary)}${linked ? '  ·  ${t.superset}' : ''}  ·  $doneSets/${ex.sets.length}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTheme.f(10.5, weight: FontWeight.w500, color: linked ? gc.brass : gc.textTertiary)),
-            ]),
-          ),
-          if (def != null && fit.minimalShowHowTo)
-            IconButton(
-              tooltip: t.howTo,
-              visualDensity: VisualDensity.compact,
-              constraints: const BoxConstraints(minWidth: 30, minHeight: 34),
-              padding: EdgeInsets.zero,
-              onPressed: () => showExercisePreview(context, def),
-              icon: Text('?', style: AppTheme.f(15, weight: FontWeight.w700, color: gc.textSecondary)),
-            ),
-          if (fit.minimalShowNotes)
-            IconButton(
-              tooltip: t.addNote,
-              visualDensity: VisualDensity.compact,
-              constraints: const BoxConstraints(minWidth: 30, minHeight: 34),
-              padding: EdgeInsets.zero,
-              onPressed: locked ? null : () => showWorkoutNoteEditor(context, ex.id),
-              icon: Icon(PhosphorIconsRegular.notePencil, size: 15, color: gc.textSecondary),
-            ),
-          _guard(
-            locked,
-            IconButton(
-              tooltip: t.addSet,
-              visualDensity: VisualDensity.compact,
-              constraints: const BoxConstraints(minWidth: 30, minHeight: 34),
-              padding: EdgeInsets.zero,
-              onPressed: () => fit.addSet(i),
-              icon: Icon(PhosphorIconsRegular.plus, size: 16, color: gc.textSecondary),
-            ),
-          ),
-          _guard(
-            locked,
-            IconButton(
-              tooltip: t.moreOptions,
-              visualDensity: VisualDensity.compact,
-              constraints: const BoxConstraints(minWidth: 30, minHeight: 34),
-              padding: EdgeInsets.zero,
-              onPressed: () => _listExerciseMenu(context, i),
-              icon: Icon(PhosphorIconsBold.dotsThree, size: 18, color: gc.textSecondary),
-            ),
-          ),
-        ]),
-        children: [
+            if (def != null && fit.minimalShowHowTo)
+              control(t.howTo, Text('?', style: controlStyle.copyWith(fontSize: 14, fontWeight: FontWeight.w700)),
+                  () => showExercisePreview(context, def)),
+            if (fit.minimalShowNotes)
+              control(t.addNote, Text('note', style: controlStyle),
+                  locked ? null : () => showWorkoutNoteEditor(context, ex.id),
+                  minWidth: 40),
+            _guard(locked,
+                control(t.addSet, Text('+', style: controlStyle.copyWith(fontSize: 17, fontWeight: FontWeight.w600)),
+                    () => fit.addSet(i))),
+            _guard(locked,
+                control(t.moreOptions, Icon(PhosphorIconsBold.dotsThree, size: 18, color: gc.textSecondary),
+                    () => _listExerciseMenu(context, i))),
+          ]),
+        );
+
+    return _TableBlock(
+      key: PageStorageKey('minimal-exercise-$i-${ex.id}'),
+      storageId: 'minimal-exercise-$i-${ex.id}',
+      initiallyExpanded: fit.minimalExpandExercises,
+      header: header,
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           if (!sharedHeader)
             Padding(
-              padding: const EdgeInsets.fromLTRB(6, 0, 6, 4),
+              padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
               child: _setsHeader(
                 gc,
                 mode,
@@ -763,12 +790,12 @@ class SessionScreen extends StatelessWidget {
             ),
           if (fit.minimalShowNotes && WorkoutNoteStrip.offers(ex.id))
             Padding(
-              padding: const EdgeInsets.fromLTRB(8, 2, 8, 6),
+              padding: const EdgeInsets.fromLTRB(4, 4, 4, 6),
               child: _guard(locked, WorkoutNoteStrip(exerciseId: ex.id, onDark: true)),
             ),
           if (fit.minimalShowNotes && !locked && fit.lastSetNotes(ex.id).isNotEmpty)
             Padding(
-              padding: const EdgeInsets.fromLTRB(8, 0, 8, 6),
+              padding: const EdgeInsets.fromLTRB(4, 0, 4, 6),
               child: LastSetNotes(exerciseId: ex.id),
             ),
           for (var j = 0; j < ex.sets.length; j++)
@@ -782,11 +809,9 @@ class SessionScreen extends StatelessWidget {
               _setRow(gc, i, j, ex.sets[j], repsOnly, locked,
                   list: showPrevious, prev: showPrevious && j < prev.length ? prev[j] : null),
             ),
-
-        ],
+        ]),
       ),
-      Divider(height: 1, thickness: 0.7, color: gc.border.withValues(alpha: 0.7)),
-    ]);
+    );
   }
 
   Widget _listActive(BuildContext context, GymColors gc, WorkoutSession s) {
@@ -1086,20 +1111,20 @@ class SessionScreen extends StatelessWidget {
           behavior: HitTestBehavior.opaque,
           onTap: () => onEdit(context),
           child: SizedBox(
-            height: fit.minimalMode ? _minimalSetRowHeight : 44,
+            height: fit.minimalTable ? _minimalSetRowHeight : 44,
             child: Center(
               child: Container(
-                height: fit.minimalMode ? _minimalSetRowHeight - 5 : 34,
+                height: fit.minimalTable ? _minimalSetRowHeight - 5 : 34,
                 alignment: Alignment.center,
-                padding: EdgeInsets.symmetric(horizontal: fit.minimalMode ? 4 : 6),
+                padding: EdgeInsets.symmetric(horizontal: fit.minimalTable ? 4 : 6),
                 decoration: BoxDecoration(
                   color: gc.bgRaised2,
-                  borderRadius: BorderRadius.circular(fit.minimalMode ? 6 : 10),
+                  borderRadius: BorderRadius.circular(fit.minimalTable ? 6 : 10),
                 ),
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: RollingText(value,
-                      style: AppTheme.f(fit.minimalMode ? 12.5 : 15,
+                      style: AppTheme.f(fit.minimalTable ? 12.5 : 15,
                           weight: FontWeight.w700, color: gc.text)),
                 ),
               ),
@@ -1115,7 +1140,7 @@ class SessionScreen extends StatelessWidget {
   }
 
   Widget _prevCell(GymColors gc, int exIdx, int j, LoggedSet? prev, bool locked) {
-    final compact = fit.minimalMode;
+    final compact = fit.minimalTable;
     final text = Text(
       prev == null ? '—' : _prevLabel(prev, exIdx),
       maxLines: 1,
@@ -1176,12 +1201,12 @@ class SessionScreen extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         onTap: live ? fit.stopHold : () => fit.startHoldAt(exIdx, j),
         child: SizedBox(
-          width: fit.minimalMode ? 28 : 44,
-          height: fit.minimalMode ? _minimalSetRowHeight : 44,
+          width: fit.minimalTable ? 28 : 44,
+          height: fit.minimalTable ? _minimalSetRowHeight : 44,
           child: Center(
             child: Container(
-              width: fit.minimalMode ? 18 : 30,
-              height: fit.minimalMode ? 18 : 30,
+              width: fit.minimalTable ? 18 : 30,
+              height: fit.minimalTable ? 18 : 30,
               decoration: BoxDecoration(color: live ? gc.bgRaised2 : gc.ember, shape: BoxShape.circle),
               child: Icon(live ? PhosphorIconsFill.stop : PhosphorIconsFill.play,
                   size: 13, color: live ? gc.text : gc.onEmber),
@@ -1665,7 +1690,7 @@ class SessionScreen extends StatelessWidget {
       };
 
   Widget _setsHeader(GymColors gc, String mode, bool repsOnly, bool sided, {bool list = false, String? exId}) {
-    final compact = fit.minimalMode;
+    final compact = fit.minimalTable;
     final s = AppTheme.f(compact ? 9.5 : 11,
         weight: FontWeight.w600, color: gc.textSecondary, letterSpacing: compact ? 0.3 : 0.4);
 
@@ -2050,16 +2075,16 @@ class SessionScreen extends StatelessWidget {
 
   Widget _setRowBody(GymColors gc, int exIdx, int j, SessionSet st, bool repsOnly, bool locked, String mode,
       {bool list = false, LoggedSet? prev}) {
-    final compact = fit.minimalMode;
+    final compact = fit.minimalTable;
     final effort = _showsEffort(mode);
     final gap = compact ? 6.0 : (effort ? _tightGap : _gap);
     final rowHeight = compact ? _minimalSetRowHeight : 44.0;
     return Container(
-      margin: EdgeInsets.only(bottom: compact ? 1 : 2),
+      margin: EdgeInsets.only(bottom: compact ? 0 : 2),
       padding: EdgeInsets.symmetric(
         horizontal: list ? (compact ? 4 : 8) : _rowPad,
         vertical: list
-            ? (compact ? 0.0 : (fit.minimalMode
+            ? (compact ? 0.0 : (fit.minimalTable
                 ? switch (fit.minimalRowHeight) {
                     'roomy' => 6.0,
                     'tight' => 1.0,
@@ -2070,7 +2095,10 @@ class SessionScreen extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: st.done ? gc.sageSoft : Colors.transparent,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: compact ? null : BorderRadius.circular(14),
+        border: compact
+            ? Border(bottom: BorderSide(color: gc.border.withValues(alpha: 0.55), width: 0.5))
+            : null,
       ),
       child: Row(children: [
         SizedBox(
@@ -2125,7 +2153,7 @@ class SessionScreen extends StatelessWidget {
                       border: Border.all(color: st.done || st.half ? gc.sage : gc.textTertiary, width: 2),
                     ),
                     child: st.done
-                        ? Center(child: SvgPathIcon(Ic.checkBold, size: compact ? 9 : 14, color: Colors.white))
+                        ? Center(child: SvgPathIcon(Ic.checkBold, size: compact ? 9 : 14, color: compact ? gc.onEmber : Colors.white))
                         : st.half
                             ? Padding(
                                 padding: const EdgeInsets.all(2),
@@ -2171,12 +2199,12 @@ class SessionScreen extends StatelessWidget {
           behavior: HitTestBehavior.opaque,
           onTap: locked ? null : () => _editEffort(ctx, exIdx, j, rpe),
           child: SizedBox(
-            height: fit.minimalMode ? _minimalSetRowHeight : 44,
+            height: fit.minimalTable ? _minimalSetRowHeight : 44,
             child: Center(
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 220),
                 curve: Curves.easeOutCubic,
-                height: fit.minimalMode ? _minimalSetRowHeight - 6 : 30,
+                height: fit.minimalTable ? _minimalSetRowHeight - 6 : 30,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: rpe == null ? Colors.transparent : gc.bgRaised2,
@@ -2188,7 +2216,7 @@ class SessionScreen extends StatelessWidget {
                 ),
                 child: Text(
                   rpe == null ? '–' : fmt(fit.usesRir ? 10 - rpe : rpe),
-                  style: AppTheme.f(fit.minimalMode ? 11.5 : 14,
+                  style: AppTheme.f(fit.minimalTable ? 11.5 : 14,
                       weight: FontWeight.w700, color: rpe == null ? gc.textTertiary : gc.text),
                 ),
               ),
@@ -2289,7 +2317,7 @@ class SessionScreen extends StatelessWidget {
       child: Text(text,
           maxLines: 1,
           softWrap: false,
-          style: AppTheme.f(fit.minimalMode ? 12 : 16,
+          style: AppTheme.f(fit.minimalTable ? 12 : 16,
               weight: FontWeight.w700, color: _kindColor(gc, st.kind))),
     );
     if (st.note.trim().isEmpty) return label;
@@ -4079,4 +4107,51 @@ void showSessionMusclesSheet(BuildContext context) {
       },
     ),
   );
+}
+
+
+/// A collapsible block for the workout table. Unlike ExpansionTile the header
+/// is ours, so the caret can sit over the # column and the band can run edge
+/// to edge. Open or closed is remembered while the screen is away.
+class _TableBlock extends StatefulWidget {
+  const _TableBlock({
+    super.key,
+    required this.storageId,
+    required this.initiallyExpanded,
+    required this.header,
+    required this.body,
+  });
+
+  final String storageId;
+  final bool initiallyExpanded;
+  final Widget Function(bool open, VoidCallback toggle) header;
+  final Widget body;
+
+  @override
+  State<_TableBlock> createState() => _TableBlockState();
+}
+
+class _TableBlockState extends State<_TableBlock> {
+  late bool _open;
+
+  @override
+  void initState() {
+    super.initState();
+    final saved = PageStorage.maybeOf(context)?.readState(context, identifier: widget.storageId);
+    _open = saved is bool ? saved : widget.initiallyExpanded;
+  }
+
+  void _toggle() {
+    setState(() => _open = !_open);
+    PageStorage.maybeOf(context)?.writeState(context, _open, identifier: widget.storageId);
+  }
+
+  @override
+  Widget build(BuildContext context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          widget.header(_open, _toggle),
+          if (_open) widget.body,
+        ],
+      );
 }

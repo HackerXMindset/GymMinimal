@@ -120,7 +120,7 @@ class HistoryScreen extends StatelessWidget {
     return Theme(
       data: theme,
       child: ColoredBox(
-        color: gc.bg,
+        color: fit.minimalWallpaperOn ? Colors.transparent : gc.bg,
         child: SafeArea(
           bottom: false,
           child: _MinimalHistoryContent(allSessions: allSessions),

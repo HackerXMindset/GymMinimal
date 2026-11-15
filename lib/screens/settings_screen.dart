@@ -275,6 +275,13 @@ class SettingsScreen extends StatelessWidget {
                   (value) => fit.updateMinimalOptions(rowHeight: value),
                   'minimal-row',
                 ),
+                picker(
+                  'Workout view',
+                  fit.minimalWorkoutTable ? 'table' : 'cards',
+                  const [('table', 'Table'), ('cards', 'Cards')],
+                  (value) => fit.updateMinimalOptions(workoutTable: value == 'table'),
+                  'minimal-workout-view',
+                ),
                 row(
                   'Previous column',
                   TinySwitch(on: fit.minimalShowPrevious),
@@ -317,6 +324,19 @@ class SettingsScreen extends StatelessWidget {
                   TinySwitch(on: fit.minimalHistoryCalendar),
                   key: 'minimal-toggle-history-calendar',
                   onTap: () => fit.updateMinimalOptions(historyCalendar: !fit.minimalHistoryCalendar),
+                ),
+                row(
+                  'Wallpaper',
+                  TinySwitch(on: fit.minimalWallpaper),
+                  key: 'minimal-toggle-wallpaper',
+                  hint: 'Shows the wallpaper you set in Appearance.',
+                  onTap: () => fit.updateMinimalOptions(wallpaper: !fit.minimalWallpaper),
+                ),
+                row(
+                  'Icons in bottom bar',
+                  TinySwitch(on: fit.minimalNavIcons),
+                  key: 'minimal-toggle-nav-icons',
+                  onTap: () => fit.updateMinimalOptions(navIcons: !fit.minimalNavIcons),
                 ),
                 row(
                   'Expand exercises in workout',
@@ -864,6 +884,18 @@ class SettingsScreen extends StatelessWidget {
                         () => fit.minimalRowHeight,
                         (v) => fit.updateMinimalOptions(rowHeight: v),
                       ),
+                      _choiceRow(
+                        context,
+                        gc,
+                        PhosphorIconsRegular.listBullets,
+                        'Minimal workout view',
+                        [
+                          ('table', 'Table', PhosphorIconsRegular.listBullets),
+                          ('cards', 'Cards', PhosphorIconsRegular.rows),
+                        ],
+                        () => fit.minimalWorkoutTable ? 'table' : 'cards',
+                        (v) => fit.updateMinimalOptions(workoutTable: v == 'table'),
+                      ),
                       GestureDetector(
                         behavior: HitTestBehavior.opaque,
                         onTap: () => fit.updateMinimalOptions(showPrevious: !fit.minimalShowPrevious),
@@ -905,6 +937,18 @@ class SettingsScreen extends StatelessWidget {
                         onTap: () => fit.updateMinimalOptions(historyCalendar: !fit.minimalHistoryCalendar),
                         child: _prefRow(gc, PhosphorIconsRegular.calendarDots, 'Calendar in History list',
                             TinySwitch(on: fit.minimalHistoryCalendar)),
+                      ),
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => fit.updateMinimalOptions(wallpaper: !fit.minimalWallpaper),
+                        child: _prefRow(gc, PhosphorIconsRegular.image, 'Wallpaper in Minimal view',
+                            TinySwitch(on: fit.minimalWallpaper)),
+                      ),
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => fit.updateMinimalOptions(navIcons: !fit.minimalNavIcons),
+                        child: _prefRow(gc, PhosphorIconsRegular.house, 'Icons in bottom bar',
+                            TinySwitch(on: fit.minimalNavIcons)),
                       ),
                       GestureDetector(
                         behavior: HitTestBehavior.opaque,

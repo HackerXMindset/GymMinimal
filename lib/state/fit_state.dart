@@ -256,6 +256,10 @@ class FitState extends FitCore
     minimalDefaultApplied = data['minimalDefaultV4'] == true;
     minimalTodayCalendar = data['minimalTodayCalendar'] as bool? ?? true;
     minimalHistoryCalendar = data['minimalHistoryCalendar'] as bool? ?? true;
+    minimalWallpaper = data['minimalWallpaper'] as bool? ?? true;
+    numberEntryKeyboard = data['numberEntryKeyboard'] as bool? ?? true;
+    minimalWorkoutTable = data['minimalWorkoutTable'] as bool? ?? true;
+    minimalNavIcons = data['minimalNavIcons'] as bool? ?? true;
     defaultsV5Applied = data['defaultsV5'] == true;
     heatmapRange = data['heatRange'] == 'year' ? 'year' : 'weeks';
     alarmStyle = data['alarmStyle'] as String? ?? 'quiet';
@@ -638,6 +642,10 @@ class FitState extends FitCore
         'minimalDefaultV4': minimalDefaultApplied,
         'minimalTodayCalendar': minimalTodayCalendar,
         'minimalHistoryCalendar': minimalHistoryCalendar,
+        'minimalWallpaper': minimalWallpaper,
+        'numberEntryKeyboard': numberEntryKeyboard,
+        'minimalWorkoutTable': minimalWorkoutTable,
+        'minimalNavIcons': minimalNavIcons,
         'defaultsV5': defaultsV5Applied,
         'heatRange': heatmapRange,
         'alarmStyle': alarmStyle,
@@ -851,6 +859,10 @@ class FitState extends FitCore
     minimalRepRecords = true;
     minimalTodayCalendar = true;
     minimalHistoryCalendar = true;
+    minimalWallpaper = true;
+    numberEntryKeyboard = true;
+    minimalWorkoutTable = true;
+    minimalNavIcons = true;
     heatmapRange = 'weeks';
     MediaStore.clearAll();
     favorites.clear();

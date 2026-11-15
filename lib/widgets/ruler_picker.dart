@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../l10n/l10n.dart';
+import '../state/fit_state.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import 'dialogs.dart';
@@ -248,6 +249,10 @@ class _SnapPhysics extends ScrollPhysics {
 
 const rulerCleared = double.nan;
 
+/// Number entry sheet. In Minimal view it opens on the keyboard and the small
+/// icon in the corner swaps to the scroller (and back); the last choice is
+/// remembered. Everywhere else it opens on the scroller as before, and the
+/// keyboard icon opens the typing box.
 Future<double?> askRuler(
   BuildContext context, {
   required String title,
@@ -262,9 +267,14 @@ Future<double?> askRuler(
   bool vertical = false,
   String? hint,
   String? clearLabel,
-}) {
+}) async {
   var current = value.clamp(min, max).toDouble();
   final decimals = step == step.roundToDouble() ? 0 : (step < 0.1 || step * 10 != (step * 10).roundToDouble() ? 2 : 1);
+  final decimalOk = step != step.roundToDouble();
+  final minimal = fit.minimalMode;
+  var keyboard = minimal && fit.numberEntryKeyboard;
+  final controller = TextEditingController();
+
   String show(double v) {
     if (format != null) return format(v);
     final exact = (v * 100).round() / 100;
@@ -274,7 +284,30 @@ Future<double?> askRuler(
     if (text.endsWith('0')) text = text.substring(0, text.length - 1);
     return decimalText(text);
   }
-  return showAppSheet<double>(
+
+  // The plain number, without the ruler's fixed decimals ("20", not "20.0").
+  String plain(double v) {
+    var text = ((v * 100).round() / 100).toString();
+    if (text.endsWith('.0')) text = text.substring(0, text.length - 2);
+    return decimalText(text);
+  }
+
+  double? parse(String text) => double.tryParse(text.trim().replaceAll(',', '.'));
+  double fit2(double v) => (v.clamp(min, max) * 100).round() / 100;
+
+  void fill() {
+    final text = plain(current);
+    controller.value = TextEditingValue(
+      text: text,
+      selection: TextSelection(baseOffset: 0, extentOffset: text.length),
+    );
+  }
+
+  double result() => keyboard ? fit2(parse(controller.text) ?? current) : current;
+
+  if (keyboard) fill();
+
+  final picked = await showAppSheet<double>(
     context: context,
     isScrollControlled: true,
     builder: (sheet) => StatefulBuilder(
@@ -292,6 +325,48 @@ Future<double?> askRuler(
             ],
           ],
         ));
+        final typedField = Ltr(child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              SizedBox(
+                width: 190,
+                child: TextField(
+                  key: const ValueKey('number-entry-field'),
+                  controller: controller,
+                  autofocus: true,
+                  textAlign: TextAlign.center,
+                  keyboardType: TextInputType.numberWithOptions(decimal: decimalOk, signed: min < 0),
+                  textInputAction: TextInputAction.done,
+                  inputFormatters: [FilteringTextInputFormatter.allow(RegExp(min < 0 ? r'[0-9.,\-]' : r'[0-9.,]'))],
+                  cursorColor: gc.accent,
+                  style: AppTheme.f(50, weight: FontWeight.w800, color: gc.text, height: 1.1),
+                  decoration: InputDecoration(
+                    isDense: true,
+                    contentPadding: const EdgeInsets.only(bottom: 4),
+                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: gc.border)),
+                    focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: gc.accent, width: 1.5)),
+                  ),
+                  onChanged: (text) {
+                    final v = parse(text);
+                    if (v != null) setSheet(() => current = fit2(v));
+                  },
+                  onSubmitted: (_) => Navigator.of(sheet).pop(result()),
+                ),
+              ),
+              if (unit.isNotEmpty) ...[
+                const SizedBox(width: 8),
+                Text(unit, style: AppTheme.f(18, weight: FontWeight.w700, color: gc.textSecondary)),
+              ],
+            ],
+          ),
+          if (format != null) ...[
+            const SizedBox(height: 8),
+            Text('= ${format(current)}', style: AppTheme.f(15, weight: FontWeight.w600, color: gc.textSecondary)),
+          ],
+        ]));
         final ruler = RulerPicker(
           value: current,
           min: min,
@@ -303,73 +378,93 @@ Future<double?> askRuler(
           height: vertical ? 300 : 86,
           onChanged: (v) => setSheet(() => current = v),
         );
-        return Container(
-          padding: sheetPad(sheet),
-          decoration: sheetDecoration(gc),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SheetHandle(),
-              const SizedBox(height: 14),
-              Row(children: [
-                Expanded(
-                  child: Text(titleCase(title),
-                      style: AppTheme.f(15, weight: FontWeight.w700, color: gc.textSecondary)),
-                ),
-                Semantics(
-                  button: true,
-                  label: title,
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () async {
-                      final typed = await askNumber(sheet,
-                          title: title, initial: show(current), decimal: step != step.roundToDouble());
-                      if (typed == null) return;
-                      setSheet(() => current = (typed.clamp(min, max) * 100).round() / 100);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(PhosphorIconsRegular.keyboard, size: 20, color: gc.textSecondary),
-                    ),
-                  ),
-                ),
-              ]),
-              const SizedBox(height: 10),
-              if (vertical)
-                Row(children: [
-                  Expanded(child: Center(child: reading)),
-                  SizedBox(width: 130, child: ruler),
-                ])
-              else ...[
-                Center(child: reading),
-                const SizedBox(height: 18),
-                ruler,
-              ],
-              if (hint != null) ...[
+        final swapIcon = minimal && keyboard ? PhosphorIconsRegular.ruler : PhosphorIconsRegular.keyboard;
+        return Padding(
+          padding: EdgeInsets.only(bottom: keyboard ? MediaQuery.viewInsetsOf(sheet).bottom : 0),
+          child: Container(
+            padding: sheetPad(sheet),
+            decoration: sheetDecoration(gc),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SheetHandle(),
                 const SizedBox(height: 14),
-                Text(hint,
-                    textAlign: TextAlign.center,
-                    style: AppTheme.f(12, weight: FontWeight.w500, color: gc.textTertiary, height: 1.4)),
-              ],
-              const SizedBox(height: 18),
-              PrimaryButton(label: t.set, onTap: () => Navigator.of(sheet).pop(current)),
-              if (clearLabel != null)
-                GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => Navigator.of(sheet).pop(rulerCleared),
-                  child: SizedBox(
-                    height: 48,
-                    child: Center(
-                      child: Text(clearLabel,
-                          style: AppTheme.f(14, weight: FontWeight.w600, color: gc.textSecondary)),
+                Row(children: [
+                  Expanded(
+                    child: Text(titleCase(title),
+                        style: AppTheme.f(15, weight: FontWeight.w700, color: gc.textSecondary)),
+                  ),
+                  Semantics(
+                    button: true,
+                    label: title,
+                    child: GestureDetector(
+                      key: const ValueKey('number-entry-swap'),
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () async {
+                        if (minimal) {
+                          if (keyboard) {
+                            final v = parse(controller.text);
+                            if (v != null) current = fit2(v);
+                          }
+                          keyboard = !keyboard;
+                          if (keyboard) fill();
+                          fit.setNumberEntryKeyboard(keyboard);
+                          setSheet(() {});
+                          return;
+                        }
+                        final typed = await askNumber(sheet,
+                            title: title, initial: show(current), decimal: decimalOk);
+                        if (typed == null) return;
+                        setSheet(() => current = (typed.clamp(min, max) * 100).round() / 100);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Icon(swapIcon, size: 20, color: gc.textSecondary),
+                      ),
                     ),
                   ),
-                ),
-            ],
+                ]),
+                const SizedBox(height: 10),
+                if (keyboard)
+                  Center(child: typedField)
+                else if (vertical)
+                  Row(children: [
+                    Expanded(child: Center(child: reading)),
+                    SizedBox(width: 130, child: ruler),
+                  ])
+                else ...[
+                  Center(child: reading),
+                  const SizedBox(height: 18),
+                  ruler,
+                ],
+                if (hint != null) ...[
+                  const SizedBox(height: 14),
+                  Text(hint,
+                      textAlign: TextAlign.center,
+                      style: AppTheme.f(12, weight: FontWeight.w500, color: gc.textTertiary, height: 1.4)),
+                ],
+                const SizedBox(height: 18),
+                PrimaryButton(label: t.set, onTap: () => Navigator.of(sheet).pop(result())),
+                if (clearLabel != null)
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => Navigator.of(sheet).pop(rulerCleared),
+                    child: SizedBox(
+                      height: 48,
+                      child: Center(
+                        child: Text(clearLabel,
+                            style: AppTheme.f(14, weight: FontWeight.w600, color: gc.textSecondary)),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         );
       },
     ),
   );
+  Future<void>.delayed(const Duration(milliseconds: 600), controller.dispose);
+  return picked;
 }

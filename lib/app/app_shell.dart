@@ -452,12 +452,13 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver, Single
                           color: fit.minimalMode ? const Color(0xFF141413) : context.gc.bg,
                         ),
                       ),
-                      if (!fit.minimalMode)
+                      if (!fit.minimalMode || fit.minimalWallpaperOn)
                         Positioned.fill(
                           child: AppBackground(
                             pattern: fit.bgPattern,
                             photo: fit.bgPhotoPath,
                             dim: fit.bgDim,
+                            tint: fit.minimalMode ? const Color(0xFF141413) : null,
                           ),
                         ),
                       Scaffold(
@@ -932,13 +933,20 @@ class _MinimalNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = _minimalPalette(context.gc);
-    final items = <({String label, VoidCallback action})>[
-      (label: sentenceCase(t.today), action: fit.goHome),
-      (label: sentenceCase(t.exercises), action: fit.goExercises),
-      (label: sentenceCase(t.historyTitle), action: fit.goHistoryTab),
-      (label: MinimalInsights.statsLabel(), action: fit.goProgress),
-      (label: sentenceCase(t.settings), action: fit.goMinimalSettingsTab),
+    final icons = fit.minimalNavIcons;
+    final items = <({String label, VoidCallback action, IconData icon, IconData iconFill})>[
+      (label: sentenceCase(t.today), action: fit.goHome,
+          icon: PhosphorIconsRegular.house, iconFill: PhosphorIconsFill.house),
+      (label: sentenceCase(t.exercises), action: fit.goExercises,
+          icon: PhosphorIconsRegular.barbell, iconFill: PhosphorIconsFill.barbell),
+      (label: sentenceCase(t.historyTitle), action: fit.goHistoryTab,
+          icon: PhosphorIconsRegular.chartBar, iconFill: PhosphorIconsFill.chartBar),
+      (label: MinimalInsights.statsLabel(), action: fit.goProgress,
+          icon: PhosphorIconsRegular.chartPie, iconFill: PhosphorIconsFill.chartPie),
+      (label: sentenceCase(t.settings), action: fit.goMinimalSettingsTab,
+          icon: PhosphorIconsRegular.gearSix, iconFill: PhosphorIconsFill.gearSix),
     ];
+    final barHeight = icons ? 52.0 : 36.0;
 
     var selected = -1;
     if (fit.route == 'home') selected = 0;
@@ -962,7 +970,7 @@ class _MinimalNavBar extends StatelessWidget {
         left: false,
         right: false,
         child: SizedBox(
-          height: 36,
+          height: barHeight,
           child: Row(
             children: [
               for (var i = 0; i < items.length; i++)
@@ -971,7 +979,7 @@ class _MinimalNavBar extends StatelessWidget {
                     behavior: HitTestBehavior.opaque,
                     onTap: items[i].action,
                     child: Container(
-                      height: 36,
+                      height: barHeight,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         border: Border(
@@ -981,16 +989,35 @@ class _MinimalNavBar extends StatelessWidget {
                           ),
                         ),
                       ),
-                      child: Text(
-                        items[i].label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTheme.f(
-                          12.5,
-                          weight: selected == i ? FontWeight.w600 : FontWeight.w500,
-                          color: selected == i ? colors.text : colors.textTertiary,
-                        ).copyWith(decoration: TextDecoration.none),
-                      ),
+                      child: icons
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(selected == i ? items[i].iconFill : items[i].icon,
+                                    size: 20, color: selected == i ? colors.accent : colors.textTertiary),
+                                const SizedBox(height: 2),
+                                Text(
+                                  items[i].label,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppTheme.f(
+                                    10.5,
+                                    weight: selected == i ? FontWeight.w700 : FontWeight.w500,
+                                    color: selected == i ? colors.accent : colors.textTertiary,
+                                  ).copyWith(decoration: TextDecoration.none),
+                                ),
+                              ],
+                            )
+                          : Text(
+                              items[i].label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTheme.f(
+                                12.5,
+                                weight: selected == i ? FontWeight.w600 : FontWeight.w500,
+                                color: selected == i ? colors.text : colors.textTertiary,
+                              ).copyWith(decoration: TextDecoration.none),
+                            ),
                     ),
                   ),
                 ),
