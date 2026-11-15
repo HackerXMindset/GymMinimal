@@ -103,6 +103,29 @@ jobs:
         if: success() && steps.dependencies.outcome == 'success'
         run: flutter build apk --release --target-platform android-arm64 --build-number "${{ steps.android-build-number.outputs.value }}"
 
+      - name: Verify APK signature matches the persistent Life Tracker signing key
+        id: verify-apk-signature
+        if: success() && steps.build-apk.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          KEYSTORE="android/keystore/lifetracker.p12"
+          APK="build/app/outputs/flutter-apk/app-release.apk"
+
+          # Fingerprint of the certificate in the persistent PKCS12 key.
+          KEY_SHA256="$(keytool -exportcert -storetype PKCS12 -keystore "$KEYSTORE" -storepass lifetracker -alias lifetracker | sha256sum | awk '{print tolower($1)}')"
+
+          # Fingerprint of the certificate actually embedded in the generated APK.
+          APK_SHA256="$( "$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -n1)/apksigner" verify --print-certs "$APK" | awk -F': ' '/Signer #1 certificate SHA-256 digest/ {print tolower($2)}' | tr -d ':')"
+
+          echo "Keystore certificate SHA-256: $KEY_SHA256"
+          echo "APK signer SHA-256:           $APK_SHA256"
+          if [[ -z "$APK_SHA256" || "$KEY_SHA256" != "$APK_SHA256" ]]; then
+            echo "::error::APK signer does not match the persistent signing key. Refusing to publish."
+            exit 1
+          fi
+          echo "verified=true" >> "$GITHUB_OUTPUT"
+
       - name: Rename APK
         id: rename-apk
         if: success() && steps.build-apk.outcome == 'success'
