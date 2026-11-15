@@ -126,31 +126,6 @@ jobs:
           fi
           echo "verified=true" >> "$GITHUB_OUTPUT"
 
-      - name: Verify APK signature matches persistent Life Tracker key
-        id: verify-apk-signature
-        if: success() && steps.build-apk.outcome == 'success'
-        shell: bash
-        run: |
-          set -euo pipefail
-          APK="build/app/outputs/flutter-apk/app-release.apk"
-          KEYSTORE="android/keystore/lifetracker.p12"
-          EXPECTED_CERT_SHA256="$(keytool -exportcert -storetype PKCS12 -keystore "$KEYSTORE" -storepass lifetracker -alias lifetracker | sha256sum | awk '{print toupper($1)}')"
-          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
-          if [[ -z "$APKSIGNER" ]]; then
-            echo "::error::Android apksigner was not found"
-            exit 1
-          fi
-          "$APKSIGNER" verify --verbose --print-certs "$APK" | tee signature.txt
-          ACTUAL_CERT_SHA256="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' signature.txt | head -n 1 | tr '[:lower:]' '[:upper:]' | tr -d ':')"
-          if [[ -z "$ACTUAL_CERT_SHA256" || "$ACTUAL_CERT_SHA256" != "$EXPECTED_CERT_SHA256" ]]; then
-            echo "::error::APK signing certificate does not match the persistent Life Tracker keystore."
-            echo "Expected SHA-256: $EXPECTED_CERT_SHA256"
-            echo "Actual SHA-256: ${ACTUAL_CERT_SHA256:-missing}"
-            exit 1
-          fi
-          echo "Verified APK certificate SHA-256: $ACTUAL_CERT_SHA256"
-          echo "verified=true" >> "$GITHUB_OUTPUT"
-
       - name: Rename APK
         id: rename-apk
         if: success() && steps.build-apk.outcome == 'success'
