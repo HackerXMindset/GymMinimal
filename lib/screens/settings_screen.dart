@@ -306,6 +306,19 @@ class SettingsScreen extends StatelessWidget {
                   onTap: () => fit.updateMinimalOptions(showTotals: !fit.minimalShowTotals),
                 ),
                 row(
+                  'Month calendar on Today',
+                  TinySwitch(on: fit.minimalTodayCalendar),
+                  key: 'minimal-toggle-today-calendar',
+                  hint: 'Off: Today shows the week strip only.',
+                  onTap: () => fit.updateMinimalOptions(todayCalendar: !fit.minimalTodayCalendar),
+                ),
+                row(
+                  'Calendar in History list',
+                  TinySwitch(on: fit.minimalHistoryCalendar),
+                  key: 'minimal-toggle-history-calendar',
+                  onTap: () => fit.updateMinimalOptions(historyCalendar: !fit.minimalHistoryCalendar),
+                ),
+                row(
                   'Expand exercises in workout',
                   TinySwitch(on: fit.minimalExpandExercises),
                   key: 'minimal-toggle-expand',
@@ -880,6 +893,18 @@ class SettingsScreen extends StatelessWidget {
                         onTap: () => fit.updateMinimalOptions(showTotals: !fit.minimalShowTotals),
                         child: _prefRow(gc, PhosphorIconsRegular.chartBar, 'Totals strip',
                             TinySwitch(on: fit.minimalShowTotals)),
+                      ),
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => fit.updateMinimalOptions(todayCalendar: !fit.minimalTodayCalendar),
+                        child: _prefRow(gc, PhosphorIconsRegular.calendarBlank, 'Month calendar on Today',
+                            TinySwitch(on: fit.minimalTodayCalendar)),
+                      ),
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => fit.updateMinimalOptions(historyCalendar: !fit.minimalHistoryCalendar),
+                        child: _prefRow(gc, PhosphorIconsRegular.calendarDots, 'Calendar in History list',
+                            TinySwitch(on: fit.minimalHistoryCalendar)),
                       ),
                       GestureDetector(
                         behavior: HitTestBehavior.opaque,

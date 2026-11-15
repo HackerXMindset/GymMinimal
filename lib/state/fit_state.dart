@@ -254,6 +254,9 @@ class FitState extends FitCore
     minimalAnimateDemo = data['minimalAnimateDemo'] as bool? ?? true;
     minimalRepRecords = data['minimalRepRecords'] as bool? ?? true;
     minimalDefaultApplied = data['minimalDefaultV4'] == true;
+    minimalTodayCalendar = data['minimalTodayCalendar'] as bool? ?? true;
+    minimalHistoryCalendar = data['minimalHistoryCalendar'] as bool? ?? true;
+    defaultsV5Applied = data['defaultsV5'] == true;
     heatmapRange = data['heatRange'] == 'year' ? 'year' : 'weeks';
     alarmStyle = data['alarmStyle'] as String? ?? 'quiet';
     RestAlarm.instance.style = alarmStyle;
@@ -633,6 +636,9 @@ class FitState extends FitCore
         'minimalAnimateDemo': minimalAnimateDemo,
         'minimalRepRecords': minimalRepRecords,
         'minimalDefaultV4': minimalDefaultApplied,
+        'minimalTodayCalendar': minimalTodayCalendar,
+        'minimalHistoryCalendar': minimalHistoryCalendar,
+        'defaultsV5': defaultsV5Applied,
         'heatRange': heatmapRange,
         'alarmStyle': alarmStyle,
         'noSuggest': noSuggest.toList(),
@@ -737,6 +743,20 @@ class FitState extends FitCore
     notifyListeners();
   }
 
+  /// One-time defaults for this version: Achievements start switched off. Like
+  /// the Minimal default it runs from main() only, so tests and backup
+  /// restores are untouched, and afterwards the switch is the person's choice.
+  void applyV5DefaultsOnce() {
+    if (defaultsV5Applied) return;
+    defaultsV5Applied = true;
+    if (gamification) {
+      toggleGamification();
+    } else {
+      _persist();
+      notifyListeners();
+    }
+  }
+
   void resetAllData() {
     _saveDebounce?.cancel();
     _sessionTimer?.cancel();
@@ -829,6 +849,8 @@ class FitState extends FitCore
     minimalShowRecent = true;
     minimalAnimateDemo = true;
     minimalRepRecords = true;
+    minimalTodayCalendar = true;
+    minimalHistoryCalendar = true;
     heatmapRange = 'weeks';
     MediaStore.clearAll();
     favorites.clear();

@@ -36,6 +36,9 @@ mixin SettingsState on FitCore, ToolsState, LibraryState {
   bool minimalAnimateDemo = true;
   bool minimalRepRecords = true;
   bool minimalDefaultApplied = false;
+  bool minimalTodayCalendar = true;
+  bool minimalHistoryCalendar = true;
+  bool defaultsV5Applied = false;
   String heatmapRange = 'weeks';
   String alarmStyle = 'quiet';
   int restSeconds = 90;
@@ -217,6 +220,8 @@ mixin SettingsState on FitCore, ToolsState, LibraryState {
     bool? showRecent,
     bool? animateDemo,
     bool? repRecords,
+    bool? todayCalendar,
+    bool? historyCalendar,
   }) {
     if (textSize != null && const ['normal', 'small', 'tiny'].contains(textSize)) {
       minimalTextSize = textSize;
@@ -234,6 +239,8 @@ mixin SettingsState on FitCore, ToolsState, LibraryState {
     if (showRecent != null) minimalShowRecent = showRecent;
     if (animateDemo != null) minimalAnimateDemo = animateDemo;
     if (repRecords != null) minimalRepRecords = repRecords;
+    if (todayCalendar != null) minimalTodayCalendar = todayCalendar;
+    if (historyCalendar != null) minimalHistoryCalendar = historyCalendar;
     _persist();
     notifyListeners();
   }

@@ -19,6 +19,7 @@ import '../widgets/entrance.dart';
 import '../widgets/exercise_media.dart';
 import '../widgets/glass.dart';
 import '../widgets/home_folder.dart';
+import '../widgets/minimal_calendar.dart';
 import '../widgets/routine_folder.dart';
 import '../widgets/scroll_away.dart';
 import '../widgets/steps_card.dart';
@@ -282,13 +283,14 @@ class HomeScreen extends StatelessWidget {
               child: Text(sentenceCase(t.today),
                   style: AppTheme.f(17, weight: FontWeight.w700, color: gc.text)),
             ),
-            Text(t.longDate(now),
-                style: AppTheme.f(10.5, weight: FontWeight.w500, color: gc.textSecondary)),
           ]),
           const SizedBox(height: 10),
           heroCard(),
           const SizedBox(height: 12),
-          Row(children: [
+          if (fit.minimalTodayCalendar)
+            const MinimalCalendar()
+          else
+            Row(children: [
             for (var i = 0; i < dates.length; i++) ...[
               if (i > 0) const SizedBox(width: 5),
               Expanded(
@@ -311,7 +313,7 @@ class HomeScreen extends StatelessWidget {
                 ]),
               ),
             ],
-          ]),
+            ]),
           Padding(
             padding: const EdgeInsets.fromLTRB(2, 8, 2, 0),
             child: Row(children: [

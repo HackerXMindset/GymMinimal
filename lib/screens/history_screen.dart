@@ -12,6 +12,7 @@ import '../state/fit_state.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import '../widgets/entrance.dart';
+import '../widgets/minimal_calendar.dart';
 import '../widgets/sheet_page.dart';
 import '../widgets/set_kind.dart';
 import '../widgets/ui_kit.dart';
@@ -245,6 +246,11 @@ class _MinimalHistoryContentState extends State<_MinimalHistoryContent> {
           const SizedBox(height: 8),
           _viewSwitcher(gc),
           const SizedBox(height: 4),
+          if (_view == _MinimalHistoryView.list && fit.minimalHistoryCalendar) ...[
+            const SizedBox(height: 8),
+            const MinimalCalendar(),
+            const SizedBox(height: 10),
+          ],
           if (_view == _MinimalHistoryView.list) _listView(gc) else _tableView(gc),
         ],
       ),

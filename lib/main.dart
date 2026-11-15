@@ -37,6 +37,7 @@ Future<void> main() async {
   GraphicsMode.load();
   fit.loadFromStore();
   fit.applyMinimalDefaultOnce();
+  fit.applyV5DefaultsOnce();
   fit.syncPhotoReminder();
   fit.syncMeasureReminder();
   fit.syncTrainReminder();
