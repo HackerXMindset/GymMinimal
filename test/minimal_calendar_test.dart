@@ -138,4 +138,13 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(MinimalCalendar), findsOneWidget);
   });
+
+  test('the wallpaper switch is on by default and needs a photo wallpaper to show', () {
+    expect(fit.minimalWallpaper, isTrue);
+    expect(fit.minimalWallpaperOn, isFalse, reason: 'no photo set in Appearance');
+    fit.updateMinimalOptions(wallpaper: false);
+    expect(fit.minimalWallpaper, isFalse);
+    fit.resetAllData();
+    expect(fit.minimalWallpaper, isTrue);
+  });
 }

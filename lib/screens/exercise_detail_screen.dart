@@ -359,7 +359,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       id: 'exercise',
       once: false,
       child: ColoredBox(
-        color: minimal ? gc.bg : Colors.transparent,
+        color: minimal && !fit.minimalWallpaperOn ? gc.bg : Colors.transparent,
         child: SafeArea(
           bottom: false,
           child: SingleChildScrollView(
@@ -463,7 +463,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         id: 'exercise',
         once: false,
         child: ColoredBox(
-          color: gc.bg,
+          color: fit.minimalWallpaperOn ? Colors.transparent : gc.bg,
           child: SafeArea(
             bottom: false,
             child: SingleChildScrollView(

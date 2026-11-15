@@ -84,6 +84,7 @@ void main() {
       'Totals strip',
       'Month calendar on Today',
       'Calendar in History list',
+      'Wallpaper',
       'Expand exercises in workout',
       'Recent exercises first',
       'Animate exercise demo',

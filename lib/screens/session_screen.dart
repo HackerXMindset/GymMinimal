@@ -81,7 +81,9 @@ class SessionScreen extends StatelessWidget {
         data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(textScale)),
         child: Theme(
           data: theme,
-          child: ColoredBox(color: minimal.bg, child: _minimalScreen(context, minimal)),
+          child: ColoredBox(
+              color: fit.minimalWallpaperOn ? Colors.transparent : minimal.bg,
+              child: _minimalScreen(context, minimal)),
         ),
       );
     }

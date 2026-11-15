@@ -99,7 +99,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
     final contentTop = chipsTop + (compact ? 30 + 8 : 34 + 12);
 
     return ColoredBox(
-      color: compact ? gc.bg : Colors.transparent,
+      color: compact && !fit.minimalWallpaperOn ? gc.bg : Colors.transparent,
       child: Stack(children: [
               if (DesktopScope.of(context) && list.isNotEmpty && !compact)
                 Positioned.fill(child: _grid(gc, list, contentTop))
