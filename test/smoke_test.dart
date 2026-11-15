@@ -82,6 +82,8 @@ void main() {
       'Notes',
       'Exercise icons',
       'Totals strip',
+      'Month calendar on Today',
+      'Calendar in History list',
       'Expand exercises in workout',
       'Recent exercises first',
       'Animate exercise demo',
