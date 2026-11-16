@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
+import 'dart:typed_data';
 import 'dart:ui' show PlatformDispatcher;
 
 import 'package:app_settings/app_settings.dart';
@@ -28,9 +29,11 @@ import '../services/alarm_store.dart';
 import '../services/beeper.dart';
 import '../services/device_kind.dart';
 import '../services/exercise_match.dart';
+import '../services/fit_decoder.dart';
 import '../services/food_library.dart';
 import '../services/health_metrics.dart';
 import '../services/health_steps.dart';
+import '../services/hr_sets.dart';
 import '../services/local_store.dart';
 import '../services/media_store.dart';
 import '../services/merged_ids.dart';
@@ -46,6 +49,7 @@ import '../services/workout_import.dart';
 part 'awards_state.dart';
 part 'circuit_state.dart';
 part 'fit_core.dart';
+part 'garmin_state.dart';
 part 'gym_pass_state.dart';
 part 'health_state.dart';
 part 'library_state.dart';
@@ -57,6 +61,7 @@ part 'places_state.dart';
 part 'report_state.dart';
 part 'routines_state.dart';
 part 'settings_state.dart';
+part 'stats_more.dart';
 part 'stats_plus.dart';
 part 'stats_state.dart';
 part 'steps_state.dart';
@@ -65,7 +70,7 @@ part 'tools_state.dart';
 part 'workout_state.dart';
 
 class FitState extends FitCore
-    with ToolsState, LibraryState, SettingsState, NotesState, PlacesState, GymPassState, MeasuresState, MomentsState, TimelineState, StatsState, StepsState, HealthState, CircuitState, NutritionState, StatsPlus, ReportState, AwardsState, RoutinesState, WorkoutState {
+    with ToolsState, LibraryState, SettingsState, NotesState, PlacesState, GymPassState, MeasuresState, MomentsState, TimelineState, StatsState, StepsState, HealthState, CircuitState, NutritionState, StatsPlus, GarminState, StatsMore, ReportState, AwardsState, RoutinesState, WorkoutState {
   final Map<SoundGroup, String> notifSoundNames = {};
 
   void _loadNotifSounds(Object? raw) {
@@ -259,6 +264,7 @@ class FitState extends FitCore
     statsOff
       ..clear()
       ..addAll(((data['statsOff'] as List?) ?? const []).whereType<String>());
+    loadGarmin(data['garmin'] as Map<String, dynamic>?);
     musclePriority
       ..clear()
       ..addEntries([
@@ -653,6 +659,7 @@ class FitState extends FitCore
         'minimalDefaultV4': minimalDefaultApplied,
         'minimalTodayCalendar': minimalTodayCalendar,
         'statsOff': statsOff.toList(),
+        'garmin': garminJson(),
         'musclePriority': musclePriority,
         'minimalHistoryCalendar': minimalHistoryCalendar,
         'minimalWallpaper': minimalWallpaper,
@@ -872,6 +879,7 @@ class FitState extends FitCore
     minimalRepRecords = true;
     minimalTodayCalendar = true;
     statsOff.clear();
+    loadGarmin(null);
     musclePriority.clear();
     minimalHistoryCalendar = true;
     minimalWallpaper = true;

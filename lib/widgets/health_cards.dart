@@ -110,7 +110,10 @@ String healthWhen(DateTime day) {
 }
 
 class HealthCard extends StatelessWidget {
-  const HealthCard({super.key});
+  const HealthCard({super.key, this.flat = false});
+
+  /// The Minimal look: no raised card, just a hairline underneath.
+  final bool flat;
 
   @override
   Widget build(BuildContext context) {
@@ -120,8 +123,10 @@ class HealthCard extends StatelessWidget {
       onTap: () => fit.pushRoute('health'),
       scale: 0.98,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
-        decoration: BoxDecoration(color: gc.bgRaised, borderRadius: BorderRadius.circular(26)),
+        padding: flat ? const EdgeInsets.symmetric(vertical: 12) : const EdgeInsets.fromLTRB(20, 18, 20, 16),
+        decoration: flat
+            ? BoxDecoration(border: Border(bottom: BorderSide(color: gc.border)))
+            : BoxDecoration(color: gc.bgRaised, borderRadius: BorderRadius.circular(26)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

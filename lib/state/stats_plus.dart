@@ -2,12 +2,24 @@ part of 'fit_state.dart';
 
 /// Every card on the Stats screens that is switchable from Settings.
 /// [group] is the section it sits in, on both the main and the Minimal Stats.
+/// What "Essentials" keeps on. Everything else is switched off by that preset.
+const kEssentialStats = {
+  'score', 'trends', 'stalled', 'zones', 'tonnage', 'load', 'weekReport', 'deload',
+  'x_level', 'x_trend', 'x_prs', 't_ready', 't_miles', 't_load', 't_weekly',
+  'm_insights', 'm_recovery', 'm_balance', 'm_totals', 'm_week', 'm_heat',
+  'g_ready', 'g_zones', 'g_rhr', 'g_sleep8',
+};
+
 class StatCardInfo {
   const StatCardInfo(this.id, this.group, this.title, this.hint);
   final String id;
   final String group;
   final String title;
   final String hint;
+
+  /// True for the cards that read Garmin data. They exist only while the
+  /// Garmin switch is on.
+  bool get garmin => group.startsWith('g_');
 }
 
 const kStatGroups = <(String, String)>[
@@ -19,6 +31,11 @@ const kStatGroups = <(String, String)>[
   ('summary', 'Summaries'),
   ('exercise', 'On each exercise'),
   ('minimal', 'Also in Minimal'),
+  ('g_before', 'Garmin · before you lift'),
+  ('g_during', 'Garmin · during the workout'),
+  ('g_ex', 'Garmin · by exercise'),
+  ('g_after', 'Garmin · after the workout'),
+  ('g_months', 'Garmin · over months'),
 ];
 
 const kStatCards = <StatCardInfo>[
@@ -36,16 +53,39 @@ const kStatCards = <StatCardInfo>[
   StatCardInfo('load', 'load', 'Training load and readiness', 'Load ratio, readiness score and deload or plateau alerts.'),
   StatCardInfo('effort', 'load', 'Effort check', 'How close to failure your sets are. Needs RPE or RIR logged.'),
   StatCardInfo('rest', 'load', 'Rest between sets', 'Your real rest time. Counts only sessions logged from now on.'),
+  StatCardInfo('restReps', 'load', 'Rest against reps', 'How the length of your rest changes the reps on the next set. Needs sets ticked off live.'),
+  StatCardInfo('deload', 'load', 'Deload signal', 'Signs that a lighter week would help: load, stalled lifts, effort and, with Garmin on, heart and sleep.'),
   StatCardInfo('food', 'body', 'Food on training and rest days', 'Calories and protein on both kinds of day. Needs food logged.'),
   StatCardInfo('cardio', 'body', 'Lifting and cardio', 'Cardio minutes next to lifting minutes. Needs cardio logged.'),
   StatCardInfo('fourWeeks', 'summary', 'This 4 weeks vs the last 4', 'Sessions, volume, sets, session length and records.'),
   StatCardInfo('weekReport', 'summary', 'Weekly report card', 'A summary of this week you can share.'),
+  StatCardInfo('x_level', 'exercise', 'Strength level', 'Your level on the main barbell lifts, from your estimated 1RM against bodyweight.'),
+  StatCardInfo('x_volume', 'exercise', 'Sets and frequency', 'Sets per week on this lift and how often you train it.'),
   StatCardInfo('x_trend', 'exercise', 'Trend and stall tag', 'Change over 90 days, and a tag when a lift is stalled.'),
   StatCardInfo('x_prs', 'exercise', 'PR history', 'The dates you set records on an exercise.'),
   StatCardInfo('x_ranges', 'exercise', 'Best weight by rep range', 'The heaviest weight you have done for each rep count.'),
   StatCardInfo('x_effort', 'exercise', 'Effort on this lift', 'How close to failure this lift usually is.'),
   StatCardInfo('x_rest', 'exercise', 'Rest on this lift', 'Your real rest between sets on this lift.'),
   StatCardInfo('x_pace', 'exercise', 'Pace', 'Pace per session on rowing, running and other distance work.'),
+  StatCardInfo('t_ready', 'exercise', 'Ready for more?', 'Whether you hit your target reps (or hold time) on every set. The target is set in Stats cards.'),
+  StatCardInfo('t_easier', 'exercise', 'Same load, easier', 'RPE at the same weight, session by session. Needs RPE logged.'),
+  StatCardInfo('t_rm', 'exercise', 'Estimated rep maxes', 'Your 3 and 10 rep max, and the change over 8 weeks.'),
+  StatCardInfo('t_rhythm', 'exercise', 'PR rhythm', 'Days since the last record, records a month and the usual jump.'),
+  StatCardInfo('t_miles', 'exercise', 'Milestones', 'Rep, hold, distance or assist milestones and the next one.'),
+  StatCardInfo('t_load', 'exercise', 'Effective load', 'What you really move, counting bodyweight and assist.'),
+  StatCardInfo('t_drop', 'exercise', 'Rep drop-off', 'How much your reps or holds fall from the first set to the last.'),
+  StatCardInfo('t_weekly', 'exercise', 'Per week', 'Reps, minutes, distance or hours per week, whatever fits the exercise.'),
+  StatCardInfo('t_next', 'exercise', 'Next step', 'When a bodyweight move is ready for weight, or how a weighted move compares with your bodyweight.'),
+  StatCardInfo('t_typical', 'exercise', 'Typical set', 'The band or load and the reps you usually do.'),
+  StatCardInfo('t_freq', 'exercise', 'Frequency', 'How often you do it, the longest gap and the week streak.'),
+  StatCardInfo('t_forecast', 'exercise', 'Forecast', 'When you reach the next milestone at your current pace.'),
+  StatCardInfo('t_hold', 'exercise', 'Hold quality', 'Average hold, longest hold and how it fades over the sets.'),
+  StatCardInfo('t_sides', 'exercise', 'Left and right', 'Whether one side is behind the other.'),
+  StatCardInfo('t_bests', 'exercise', 'Best efforts', 'Your fastest time at 1, 3, 5, 10 and 21.1 km.'),
+  StatCardInfo('t_eff', 'exercise', 'Efficiency and pace', 'Distance per heartbeat, average heart rate or reps a minute. Needs heart rate or timed sets.'),
+  StatCardInfo('t_totals', 'exercise', 'Lifetime totals', 'Sessions, sets and the total reps, time, distance or volume.'),
+  StatCardInfo('t_sleep', 'exercise', 'Sleep and energy', 'Your sleep and energy ratings on days you do this exercise.'),
+  StatCardInfo('t_time', 'exercise', 'Best time', 'Your best weekday and time of day for this exercise.'),
   StatCardInfo('m_insights', 'minimal', 'Insights', 'Plain-English notes about your week, as in the main Stats.'),
   StatCardInfo('m_recovery', 'minimal', 'Recovery by muscle', 'Which muscles are still recovering.'),
   StatCardInfo('m_level', 'minimal', 'Strength level', 'Your level for the lift picked in Estimated strength trend.'),
@@ -53,6 +93,30 @@ const kStatCards = <StatCardInfo>[
   StatCardInfo('m_readiness', 'minimal', 'Sleep and energy', 'Your average sleep and energy ratings.'),
   StatCardInfo('m_bodyweight', 'minimal', 'Bodyweight', 'Trend and latest weight.'),
   StatCardInfo('m_measures', 'minimal', 'Measurements', 'Your latest body measurements.'),
+  StatCardInfo('m_heat', 'minimal', 'Body heat map', 'A body map of which muscles you trained lately, and the ones you have not.'),
+  StatCardInfo('m_radar', 'minimal', 'Muscle radar', 'Your muscle balance as a radar chart.'),
+  StatCardInfo('m_health', 'minimal', 'Health', 'Sleep, resting heart rate and the other Health Connect numbers you picked.'),
+  StatCardInfo('m_week', 'minimal', 'This week', 'A bar for each day of this week.'),
+  StatCardInfo('m_effect', 'minimal', 'Sleep and energy effect', 'How your sleep and energy ratings change your sessions.'),
+  StatCardInfo('m_totals', 'minimal', 'Streak and all-time totals', 'Your day streak, and sessions, sets and volume since day one.'),
+  StatCardInfo('g_ready', 'g_before', 'Readiness', 'A score from sleep, HRV and resting heart rate against your own average.'),
+  StatCardInfo('g_rhr', 'g_before', 'Resting heart rate', 'The last 12 days.'),
+  StatCardInfo('g_hrv', 'g_before', 'HRV', 'The last 14 nights. Shows only if your watch shares HRV with Health Connect.'),
+  StatCardInfo('g_sleeplift', 'g_before', 'Sleep against your lifts', 'How you lift after longer and after shorter sleep.'),
+  StatCardInfo('g_hrset', 'g_during', 'Heart rate by set', 'The heart rate of each set in your last session.'),
+  StatCardInfo('g_hrdrop', 'g_during', 'Heart rate drop after a set', 'How far your heart rate falls in the minute after a set.'),
+  StatCardInfo('g_zones', 'g_during', 'Time in heart rate zones', 'Zones 1 to 5 over 30 days and in the last session.'),
+  StatCardInfo('g_hrex', 'g_ex', 'Heart rate per exercise', 'Which exercises raise your heart rate most.'),
+  StatCardInfo('g_hrsame', 'g_ex', 'Same weight, lower heart rate', 'Lifts where the same weight now costs your heart less (or more).'),
+  StatCardInfo('g_watch', 'g_ex', 'Watch count against your log', 'Reps your watch counted against the reps you logged. Needs a FIT file.'),
+  StatCardInfo('g_energy', 'g_ex', 'Heart load by exercise', 'How your heart\'s work splits between exercises.'),
+  StatCardInfo('g_recover', 'g_after', 'Recovery with sleep', 'Muscle recovery time, stretched or shortened by last night\'s sleep.'),
+  StatCardInfo('g_rhrnext', 'g_after', 'Resting heart rate next morning', 'Whether heavy sessions raise your resting heart rate the next day.'),
+  StatCardInfo('g_hreffort', 'g_after', 'Heart effort against your RPE', 'Sessions that felt easy but your heart worked hard, or the reverse.'),
+  StatCardInfo('g_burn', 'g_after', 'Burned and eaten', 'Calories burned from Health Connect against calories eaten in the food log.'),
+  StatCardInfo('g_calm', 'g_months', 'Stronger, calmer heart', 'Strength and resting heart rate, week by week.'),
+  StatCardInfo('g_sleep8', 'g_months', 'Sleep, 8 nights', 'Hours slept over the last 8 nights.'),
+  StatCardInfo('g_z45', 'g_months', 'Hard minutes a week', 'Minutes a week in zones 4 and 5.'),
 ];
 
 mixin StatsPlus on FitCore, ToolsState, LibraryState, SettingsState, TimelineState, StatsState, NutritionState {
@@ -71,6 +135,16 @@ mixin StatsPlus on FitCore, ToolsState, LibraryState, SettingsState, TimelineSta
       statsOff.remove(id);
     } else {
       statsOff.add(id);
+    }
+    _persist();
+    notifyListeners();
+  }
+
+  /// All cards on, or only the essential ones.
+  void applyStatPreset({required bool essentials}) {
+    statsOff.clear();
+    if (essentials) {
+      statsOff.addAll([for (final c in kStatCards) if (!kEssentialStats.contains(c.id)) c.id]);
     }
     _persist();
     notifyListeners();
@@ -565,6 +639,26 @@ mixin StatsPlus on FitCore, ToolsState, LibraryState, SettingsState, TimelineSta
     per.sort((a, b) => a.$1.compareTo(b.$1));
     final tail = per.length > 8 ? per.sublist(per.length - 8) : per;
     return (avg: (all.reduce((a, b) => a + b) / all.length).round(), series: [for (final p in tail) p.$2], sessions: per.length);
+  }
+
+  /// Working sets of one exercise per week, oldest first, the current week last.
+  List<int> exerciseWeeklySets(String id, int weeks) {
+    final first = shiftDays(weekStartDate, -7 * (weeks - 1));
+    final out = List<int>.filled(weeks, 0);
+    for (final h in _allHistory[id] ?? const <({DateTime date, LoggedExercise ex})>[]) {
+      final day = _dayKey(h.date);
+      final i = day.difference(first).inDays ~/ 7;
+      if (day.isBefore(first) || i < 0 || i >= weeks) continue;
+      out[i] += h.ex.workingSets.length;
+    }
+    return out;
+  }
+
+  /// Sessions per week that included [id], over the last 4 weeks.
+  double exerciseFrequency(String id) {
+    final from = _today.subtract(const Duration(days: 27));
+    final n = (_allHistory[id] ?? const <({DateTime date, LoggedExercise ex})>[]).where((h) => !_dayKey(h.date).isBefore(from)).length;
+    return n / 4;
   }
 
   // ---- Body, cardio and food ----------------------------------------------

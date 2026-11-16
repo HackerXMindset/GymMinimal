@@ -31,7 +31,10 @@ const _axes = [
 const _backView = {'trapezius', 'back', 'triceps', 'glutes', 'hamstrings', 'calves'};
 
 class MuscleRadarCard extends StatefulWidget {
-  const MuscleRadarCard({super.key});
+  const MuscleRadarCard({super.key, this.flat = false});
+
+  /// The Minimal look: no raised card.
+  final bool flat;
 
   @override
   State<MuscleRadarCard> createState() => _MuscleRadarCardState();
@@ -63,7 +66,8 @@ class _MuscleRadarCardState extends State<MuscleRadarCard> {
     return SoftCard(
       radius: 22,
       borderColor: Colors.transparent,
-      padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+      color: widget.flat ? Colors.transparent : null,
+      padding: widget.flat ? const EdgeInsets.symmetric(vertical: 12) : const EdgeInsets.fromLTRB(18, 18, 18, 18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

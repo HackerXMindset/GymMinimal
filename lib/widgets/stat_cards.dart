@@ -1,10 +1,11 @@
 import 'dart:math' as math;
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
 import '../models/exercise.dart';
-import '../screens/progress_screen.dart' show showBodyweightSheet;
+import '../screens/progress_screen.dart' show MinimalBodyMap, showBodyweightSheet;
 import '../screens/share_sheet.dart';
 import '../state/fit_state.dart';
 import '../theme/app_colors.dart';
@@ -12,7 +13,11 @@ import '../theme/app_theme.dart';
 import 'charts.dart';
 import 'check_in.dart' show checkInWord;
 import 'glass.dart';
+import 'health_cards.dart' show HealthCard;
+import 'muscle_radar.dart' show MuscleRadarCard;
 import 'ui_kit.dart';
+
+part 'stat_cards_more.dart';
 
 /// The cards added to the Stats screens. Both the main Stats and the Minimal
 /// Stats draw them from here, so each statistic exists once. [flat] is the
@@ -29,6 +34,7 @@ class StatCards {
     final out = <Widget>[];
     for (final info in kStatCards) {
       if (info.group != group || !fit.statOn(info.id) || skip.contains(info.id)) continue;
+      if (info.garmin && !fit.garminOn) continue;
       final card = _build(info.id, flat);
       if (card != null) out.add(card);
     }
@@ -36,7 +42,27 @@ class StatCards {
   }
 
   /// One card by id, or null when it is switched off or has nothing to show.
-  static Widget? one(String id, {required bool flat}) => fit.statOn(id) ? _build(id, flat) : null;
+  static Widget? one(String id, {required bool flat}) {
+    if (!fit.statOn(id)) return null;
+    final info = kStatCards.where((c) => c.id == id);
+    if (info.isNotEmpty && info.first.garmin && !fit.garminOn) return null;
+    return _build(id, flat);
+  }
+
+  /// The five Garmin sections, each with its heading, or nothing while the
+  /// Garmin switch is off. [head] makes the heading for a section.
+  static List<Widget> garmin({required bool flat, required Widget Function(String label) head}) {
+    if (!fit.garminOn) return const [];
+    final out = <Widget>[];
+    for (final g in kStatGroups) {
+      if (!g.$1.startsWith('g_')) continue;
+      final cards = group(g.$1, flat: flat);
+      if (cards.isEmpty) continue;
+      out.add(head(g.$2));
+      out.addAll(cards);
+    }
+    return out;
+  }
 
   /// The stacked weekly volume (push, pull, legs, core) with its legend, for a
   /// screen that already has its own frame. [back] steps whole windows back.
@@ -61,6 +87,15 @@ class StatCards {
     });
   }
 
+  /// Whether the card would show right now, ignoring its switch. Null for the
+  /// cards of the exercise page, which depend on which exercise is open.
+  static bool? hasData(String id) {
+    final info = kStatCards.where((c) => c.id == id);
+    if (info.isEmpty || info.first.group == 'exercise') return null;
+    if (info.first.garmin && !fit.garminOn) return null;
+    return _build(id, true) != null;
+  }
+
   /// The label of a section.
   static String groupLabel(String group) => kStatGroups.firstWhere((g) => g.$1 == group).$2;
 
@@ -72,9 +107,17 @@ class StatCards {
       if (fit.statOn(key) && w != null) out.add(w);
     }
 
+    // The six stats of this kind of exercise first, then the ones every
+    // exercise has. A stat that is in the first list is not drawn twice.
+    final typed = kTypeStats[fit.exerciseType(id)] ?? const <String>[];
+    for (final key in typed) {
+      add(key, _typeCard(key, id, flat));
+    }
+    final type = fit.exerciseType(id);
+    final loadedKind = type == ExType.loaded || type == ExType.weighted || type == ExType.band;
     add('x_trend', _xTrend(id, flat));
     add('x_prs', _xPrs(id, flat));
-    if (standard) add('x_ranges', _xRanges(id, flat));
+    if (standard && loadedKind) add('x_ranges', _xRanges(id, flat));
     add('x_effort', _xEffort(id, flat));
     add('x_rest', _xRest(id, flat));
     add('x_pace', _xPace(id, flat));
@@ -106,6 +149,32 @@ class StatCards {
         'm_readiness' => _mReadiness(flat),
         'm_bodyweight' => _mBodyweight(flat),
         'm_measures' => _mMeasures(flat),
+        'm_heat' => _mHeat(flat),
+        'm_radar' => _mRadar(flat),
+        'm_health' => _mHealth(flat),
+        'm_week' => _mWeek(flat),
+        'm_effect' => _mEffect(flat),
+        'm_totals' => _mTotals(flat),
+        'restReps' => _restReps(flat),
+        'deload' => _deload(flat),
+        'g_ready' => _gReady(flat),
+        'g_rhr' => _gSeries(flat, key: 'restingHr', days: 12, title: 'Resting heart rate', unit: 'bpm', lowerBetter: true),
+        'g_hrv' => _gSeries(flat, key: 'hrv', days: 14, title: 'HRV', unit: 'ms', lowerBetter: false),
+        'g_sleeplift' => _gSleepLift(flat),
+        'g_hrset' => _gHrSet(flat),
+        'g_hrdrop' => _gHrDrop(flat),
+        'g_zones' => _gZones(flat),
+        'g_hrex' => _gHrEx(flat),
+        'g_hrsame' => _gHrSame(flat),
+        'g_watch' => _gWatch(flat),
+        'g_energy' => _gEnergy(flat),
+        'g_recover' => _gRecover(flat),
+        'g_rhrnext' => _gRhrNext(flat),
+        'g_hreffort' => _gHrEffort(flat),
+        'g_burn' => _gBurn(flat),
+        'g_calm' => _gCalm(flat),
+        'g_sleep8' => _gSleep8(flat),
+        'g_z45' => _gZ45(flat),
         _ => null,
       };
 }
@@ -1074,6 +1143,48 @@ class _WeekCard extends StatelessWidget {
 // ---------------------------------------------------------------------------
 // On each exercise
 
+Widget? _xLevel(String id, bool flat) {
+  final rel = fit.relativeStrength(id);
+  if (rel == null) return null;
+  return Builder(builder: (context) {
+    final gc = context.gc;
+    return _Shell(
+      flat: flat,
+      title: 'Strength level',
+      trailing: _side(gc, '${rel.ratio.toStringAsFixed(2)}× bodyweight'),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        _big(gc, t.dotsLevelName(rel.level), size: 20),
+        const SizedBox(height: 10),
+        Row(children: [
+          for (var i = 0; i < 5; i++) ...[
+            if (i > 0) const SizedBox(width: 3),
+            Expanded(
+              child: _HBar(value: i < rel.level ? 1 : (i == rel.level ? rel.toNext : 0), max: 1, color: gc.brass, height: 4),
+            ),
+          ],
+        ]),
+      ]),
+    );
+  });
+}
+
+Widget? _xVolume(String id, bool flat) {
+  final weeks = fit.exerciseWeeklySets(id, 8);
+  if (weeks.where((w) => w > 0).length < 2) return null;
+  final freq = fit.exerciseFrequency(id);
+  final avg = weeks.fold(0, (a, b) => a + b) / 8;
+  return Builder(builder: (context) {
+    final gc = context.gc;
+    return _Shell(
+      flat: flat,
+      title: 'Sets and frequency',
+      trailing: _side(gc, '${freq.toStringAsFixed(1)}× a week'),
+      foot: _note(gc, 'Working sets per week over 8 weeks, about ${avg.toStringAsFixed(avg >= 10 ? 0 : 1)} a week.'),
+      child: _MiniBars(values: [for (final w in weeks) w.toDouble()], height: 40, first: '8 weeks ago', last: 'This week'),
+    );
+  });
+}
+
 Widget? _xTrend(String id, bool flat) {
   if (!fit.goalFits(id)) return null;
   final points = fit.exerciseTrend(id, days: 90);
@@ -1344,47 +1455,145 @@ Widget? _mMeasures(bool flat) {
 // ---------------------------------------------------------------------------
 // Settings
 
-/// One switch for every card on the Stats screens and the exercise pages.
+/// One switch for every card on the Stats screens and the exercise pages,
+/// the Garmin switch with its settings, and two presets.
 Future<void> showStatCardsSheet(BuildContext context) {
+  final open = <String>{};
   return showAppSheet<void>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (sheet) => AnimatedBuilder(
-      animation: fit,
-      builder: (context, _) {
-        final gc = context.gc;
-        return AppSheet(children: [
-          const SheetTitle('Stats cards', subtitle: 'Every card is on by default. A card with nothing to show stays hidden anyway.'),
-          const SizedBox(height: 8),
-          for (final (group, label) in kStatGroups) ...[
-            Padding(
-              padding: const EdgeInsets.only(top: 14, bottom: 4),
-              child: Text(label.toUpperCase(),
-                  style: AppTheme.f(10.5, weight: FontWeight.w700, color: gc.textTertiary, letterSpacing: 1.4)),
-            ),
-            for (final info in kStatCards.where((c) => c.group == group))
-              InkWell(
-                key: ValueKey('stat-card-${info.id}'),
-                onTap: () => fit.setStatOn(info.id, !fit.statOn(info.id)),
+    builder: (sheet) => StatefulBuilder(
+      builder: (sheet, setOpen) => AnimatedBuilder(
+        animation: fit,
+        builder: (context, _) {
+          final gc = context.gc;
+          Widget action(String label, VoidCallback onTap, {Color? color, Key? key}) => GestureDetector(
+                key: key,
+                behavior: HitTestBehavior.opaque,
+                onTap: onTap,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Row(children: [
-                    Expanded(
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(info.title, style: AppTheme.f(13, weight: FontWeight.w600, color: gc.text)),
-                        const SizedBox(height: 2),
-                        Text(info.hint, style: AppTheme.s(11, color: gc.textSecondary, height: 1.3)),
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+                  child: Text(label, style: AppTheme.f(12.5, weight: FontWeight.w700, color: color ?? gc.accent)),
+                ),
+              );
+          Widget stepper(String label, String value, VoidCallback less, VoidCallback more) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(children: [
+                  Expanded(child: Text(label, style: AppTheme.f(13, weight: FontWeight.w600, color: gc.text))),
+                  GestureDetector(onTap: less, child: Padding(padding: const EdgeInsets.all(8), child: Icon(Icons.remove, size: 18, color: gc.textSecondary))),
+                  SizedBox(width: 62, child: Text(value, textAlign: TextAlign.center, style: AppTheme.f(13, weight: FontWeight.w700, color: gc.text))),
+                  GestureDetector(onTap: more, child: Padding(padding: const EdgeInsets.all(8), child: Icon(Icons.add, size: 18, color: gc.textSecondary))),
+                ]),
+              );
+          final synced = fit.garminSynced;
+          final ago = synced == null
+              ? 'not read yet'
+              : (DateTime.now().difference(synced).inMinutes < 2 ? 'just now' : (DateTime.now().difference(synced).inHours < 1 ? '${DateTime.now().difference(synced).inMinutes} min ago' : '${DateTime.now().difference(synced).inHours} h ago'));
+          return AppSheet(children: [
+            const SheetTitle('Stats cards', subtitle: 'Every card is on by default. A card with nothing to show stays hidden anyway.'),
+            const SizedBox(height: 8),
+            Row(children: [
+              action('Essentials only', () => fit.applyStatPreset(essentials: true), key: const ValueKey('stats-preset-essentials')),
+              const SizedBox(width: 14),
+              action('All on', () => fit.applyStatPreset(essentials: false), key: const ValueKey('stats-preset-all')),
+            ]),
+            Divider(height: 18, color: gc.border),
+            InkWell(
+              key: const ValueKey('garmin-master'),
+              onTap: () => fit.setGarminOn(!fit.garminOn),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(children: [
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text('Garmin data', style: AppTheme.f(14, weight: FontWeight.w700, color: gc.text)),
+                      const SizedBox(height: 2),
+                      Text('Adds heart rate, sleep and recovery cards from your watch. Off, nothing from Garmin is asked for, read or shown.',
+                          style: AppTheme.s(11, color: gc.textSecondary, height: 1.3)),
+                    ]),
+                  ),
+                  const SizedBox(width: 12),
+                  TinySwitch(on: fit.garminOn),
+                ]),
+              ),
+            ),
+            if (fit.garminOn) ...[
+              const SizedBox(height: 4),
+              Text(fit.garminNote.isNotEmpty ? fit.garminNote : 'Health Connect: read $ago.', style: AppTheme.s(11.5, color: gc.textTertiary, height: 1.35)),
+              Row(children: [
+                action('Allow Health Connect', () => fit.askGarminPermissions()),
+                const SizedBox(width: 14),
+                action('Import FIT file', () async {
+                  final res = await FilePicker.platform.pickFiles(type: FileType.any, withData: true);
+                  final bytes = res == null || res.files.isEmpty ? null : res.files.first.bytes;
+                  if (bytes != null) fit.importFit(bytes);
+                }, key: const ValueKey('garmin-import')),
+              ]),
+              stepper(
+                'Max heart rate',
+                fit.maxHrAuto ? 'auto ${fit.maxHr}' : '${fit.maxHr}',
+                () => fit.setMaxHr(fit.maxHr - 1),
+                () => fit.setMaxHr(fit.maxHr + 1),
+              ),
+              if (!fit.maxHrAuto) Align(alignment: Alignment.centerRight, child: action('Back to auto', () => fit.setMaxHr(0))),
+              action('Delete Garmin data', () => fit.clearGarmin(), color: gc.danger),
+            ],
+            Divider(height: 18, color: gc.border),
+            stepper('Ready for more: reps', '${fit.readyReps}', () => fit.setReadyReps(fit.readyReps - 1), () => fit.setReadyReps(fit.readyReps + 1)),
+            stepper('Ready for more: hold', '${fit.readySeconds} s', () => fit.setReadySeconds(fit.readySeconds - 5), () => fit.setReadySeconds(fit.readySeconds + 5)),
+            for (final (group, label) in kStatGroups)
+              if (!group.startsWith('g_') || fit.garminOn) ...[
+                Builder(builder: (context) {
+                  final cards = kStatCards.where((c) => c.group == group).toList();
+                  final on = cards.where((c) => fit.statOn(c.id)).length;
+                  final isOpen = open.contains(group);
+                  return InkWell(
+                    key: ValueKey('stat-group-$group'),
+                    onTap: () => setOpen(() => isOpen ? open.remove(group) : open.add(group)),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 14, bottom: 6),
+                      child: Row(children: [
+                        Expanded(
+                          child: Text(label.toUpperCase(),
+                              style: AppTheme.f(10.5, weight: FontWeight.w700, color: gc.textTertiary, letterSpacing: 1.4)),
+                        ),
+                        Text('$on of ${cards.length}', style: AppTheme.f(11, weight: FontWeight.w600, color: gc.textTertiary)),
+                        const SizedBox(width: 6),
+                        Icon(isOpen ? Icons.expand_less : Icons.expand_more, size: 18, color: gc.textTertiary),
                       ]),
                     ),
-                    const SizedBox(width: 12),
-                    TinySwitch(on: fit.statOn(info.id)),
-                  ]),
-                ),
-              ),
-          ],
-        ]);
-      },
+                  );
+                }),
+                if (open.contains(group))
+                  for (final info in kStatCards.where((c) => c.group == group))
+                    InkWell(
+                      key: ValueKey('stat-card-${info.id}'),
+                      onTap: () => fit.setStatOn(info.id, !fit.statOn(info.id)),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Row(children: [
+                          Expanded(
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text(info.title, style: AppTheme.f(13, weight: FontWeight.w600, color: gc.text)),
+                              const SizedBox(height: 2),
+                              Text(info.hint, style: AppTheme.s(11, color: gc.textSecondary, height: 1.3)),
+                              if (fit.statOn(info.id) && group != 'exercise' && StatCards.hasData(info.id) == false)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 3),
+                                  child: Text('No data yet, so it is hidden', style: AppTheme.f(10.5, weight: FontWeight.w600, color: gc.warn)),
+                                ),
+                            ]),
+                          ),
+                          const SizedBox(width: 12),
+                          TinySwitch(on: fit.statOn(info.id)),
+                        ]),
+                      ),
+                    ),
+              ],
+          ]);
+        },
+      ),
     ),
   );
 }
