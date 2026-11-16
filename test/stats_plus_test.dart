@@ -296,6 +296,8 @@ void main() {
       await pumpApp(tester);
       showStatCardsSheet(tester.element(find.byType(Scaffold).first));
       await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('stat-group-progress')));
+      await tester.pumpAndSettle();
       expect(find.text('Strength score'), findsOneWidget);
       await tester.tap(find.byKey(const ValueKey('stat-card-score')));
       await tester.pumpAndSettle();

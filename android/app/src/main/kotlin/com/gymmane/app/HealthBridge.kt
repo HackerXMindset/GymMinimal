@@ -32,6 +32,7 @@ import android.health.connect.datatypes.Record
 import android.health.connect.datatypes.RespiratoryRateRecord
 import android.health.connect.datatypes.RestingHeartRateRecord
 import android.health.connect.datatypes.SleepSessionRecord
+import android.health.connect.datatypes.TotalCaloriesBurnedRecord
 import android.health.connect.datatypes.StepsRecord
 import android.health.connect.datatypes.WeightRecord
 import android.os.Build
@@ -69,6 +70,7 @@ object HealthBridge {
         "elevation" to "android.permission.health.READ_ELEVATION_GAINED",
         "activeKcal" to "android.permission.health.READ_ACTIVE_CALORIES_BURNED",
         "workoutHr" to "android.permission.health.READ_HEART_RATE",
+        "totalKcal" to "android.permission.health.READ_TOTAL_CALORIES_BURNED",
         "weight" to "android.permission.health.READ_WEIGHT",
         "writeWorkouts" to "android.permission.health.WRITE_EXERCISE",
         "steps" to "android.permission.health.READ_STEPS",
@@ -281,6 +283,7 @@ object HealthBridge {
             "floors" -> reader.daily(FloorsClimbedRecord.FLOORS_CLIMBED_TOTAL) { it }
             "elevation" -> reader.daily(ElevationGainedRecord.ELEVATION_GAINED_TOTAL) { it.inMeters }
             "activeKcal" -> reader.daily(ActiveCaloriesBurnedRecord.ACTIVE_CALORIES_TOTAL) { it.inCalories / 1000 }
+            "totalKcal" -> reader.daily(TotalCaloriesBurnedRecord.ENERGY_TOTAL) { it.inCalories / 1000 }
             "hrv" -> reader.records(HeartRateVariabilityRmssdRecord::class.java) {
                 listOf(it.time.toEpochMilli().toDouble(), it.heartRateVariabilityMillis)
             }

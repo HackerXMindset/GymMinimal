@@ -151,6 +151,9 @@ mixin HealthState on FitCore {
     return true;
   }
 
+  /// Filled in by the Garmin state; does nothing while Garmin data is off.
+  Future<void> syncGarmin() async {}
+
   Future<void> syncHealthExtras() async {
     if (!hcWeights && !hcHeart) return;
     final keys = await HealthMetrics.grantedKeys();
@@ -272,6 +275,7 @@ mixin HealthState on FitCore {
   Future<void> refreshHealth() => _healthRunning ??= () async {
         await _syncHealth();
         await syncHealthExtras();
+        await syncGarmin();
       }()
           .whenComplete(() => _healthRunning = null);
 

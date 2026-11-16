@@ -491,6 +491,10 @@ mixin StatsState on FitCore, ToolsState, LibraryState, SettingsState, TimelineSt
       left: l,
       right: r,
       at: old.at,
+      hr: old.hr,
+      hrPeak: old.hrPeak,
+      hrDrop: old.hrDrop,
+      watch: old.watch,
     );
     persistNow();
     _refreshWidgets();

@@ -18,7 +18,18 @@ double? rpePercent(int reps, double? rpe) {
 
 class LoggedSet {
   LoggedSet(this.reps, this.weight,
-      {this.kind = SetKind.normal, this.rpe, this.sec, this.km, this.note = '', this.left, this.right, this.at});
+      {this.kind = SetKind.normal,
+      this.rpe,
+      this.sec,
+      this.km,
+      this.note = '',
+      this.left,
+      this.right,
+      this.at,
+      this.hr,
+      this.hrPeak,
+      this.hrDrop,
+      this.watch});
   final int reps;
   final int? left;
   final int? right;
@@ -32,6 +43,14 @@ class LoggedSet {
   /// When the set was ticked off, in seconds since the epoch. Only sets logged
   /// live carry it; it is what the rest-between-sets stat is worked out from.
   final int? at;
+
+  /// From a Garmin watch (Health Connect or a FIT file), only when Garmin data
+  /// is on: average and peak heart rate during the set, how far the rate fell
+  /// in the minute after it, and the reps the watch counted.
+  int? hr;
+  int? hrPeak;
+  int? hrDrop;
+  int? watch;
 
   bool get counts => kind != SetKind.warmup;
   bool get sided => left != null && right != null;
@@ -55,6 +74,10 @@ class LoggedSet {
         if (km != null) 'km': km,
         if (note.isNotEmpty) 'n': note,
         if (at != null) 'at': at,
+        if (hr != null) 'hr': hr,
+        if (hrPeak != null) 'hp': hrPeak,
+        if (hrDrop != null) 'hd': hrDrop,
+        if (watch != null) 'wr': watch,
       };
   factory LoggedSet.fromJson(Map<String, dynamic> j) => LoggedSet(
         (j['r'] as num).toInt(),
@@ -67,6 +90,10 @@ class LoggedSet {
         left: (j['rl'] as num?)?.toInt(),
         right: (j['rr'] as num?)?.toInt(),
         at: (j['at'] as num?)?.toInt(),
+        hr: (j['hr'] as num?)?.toInt(),
+        hrPeak: (j['hp'] as num?)?.toInt(),
+        hrDrop: (j['hd'] as num?)?.toInt(),
+        watch: (j['wr'] as num?)?.toInt(),
       );
 }
 
@@ -127,7 +154,7 @@ class LoggedExercise {
 }
 
 class LoggedSession {
-  LoggedSession(this.date, this.durationSec, this.exercises, {this.routineId, this.name, this.hrAvg, this.hrMax, this.sleep, this.energy, this.deload = false});
+  LoggedSession(this.date, this.durationSec, this.exercises, {this.routineId, this.name, this.hrAvg, this.hrMax, this.sleep, this.energy, this.deload = false, this.kcal, this.hrHist});
   final DateTime date;
   int durationSec;
   final List<LoggedExercise> exercises;
@@ -138,6 +165,14 @@ class LoggedSession {
   int? sleep;
   int? energy;
   final bool deload;
+
+  /// Total calories burned in the session, from Health Connect or a FIT file.
+  int? kcal;
+
+  /// Seconds spent at each heart rate, in buckets of 5 bpm from 40 (the first
+  /// bucket is 40 to 44). Zones are worked out from this, so a change of max
+  /// heart rate recomputes them.
+  List<int>? hrHist;
 
   DateTime get day => date.subtract(Duration(seconds: durationSec));
   double get volume => exercises.fold(0.0, (s, e) => s + e.volume);
@@ -154,6 +189,8 @@ class LoggedSession {
         if (sleep != null) 'sl': sleep,
         if (energy != null) 'en': energy,
         if (deload) 'dl': true,
+        if (kcal != null) 'kcal': kcal,
+        if (hrHist != null) 'hh': hrHist,
       };
   factory LoggedSession.fromJson(Map<String, dynamic> j) => LoggedSession(
         DateTime.parse(j['d'] as String),
@@ -166,6 +203,8 @@ class LoggedSession {
         sleep: (j['sl'] as num?)?.toInt().clamp(1, 5),
         energy: (j['en'] as num?)?.toInt().clamp(1, 5),
         deload: j['dl'] == true,
+        kcal: (j['kcal'] as num?)?.toInt(),
+        hrHist: (j['hh'] as List?)?.map((e) => (e as num).toInt()).toList(),
       );
 }
 

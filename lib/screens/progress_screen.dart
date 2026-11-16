@@ -151,6 +151,7 @@ class ProgressScreen extends StatelessWidget {
       if (fit.healthShown.isNotEmpty) const HealthCard(),
       ...StatCards.group('body', flat: false),
     ]);
+    out.addAll(StatCards.garmin(flat: false, head: (label) => headers ? _sectionHead(gc, label) : const SizedBox.shrink()));
     if (has && _missing.isNotEmpty) section(null, [_setupCard(context, gc)]);
     return out;
   }
@@ -1331,8 +1332,20 @@ class _BodyweightSheetState extends State<_BodyweightSheet> {
   }
 }
 
+/// The body map, for the Minimal Stats (flat, no raised card).
+class MinimalBodyMap extends StatelessWidget {
+  const MinimalBodyMap({super.key, this.flat = true});
+
+  final bool flat;
+
+  @override
+  Widget build(BuildContext context) => _MuscleMapCard(flat: flat);
+}
+
 class _MuscleMapCard extends StatefulWidget {
-  const _MuscleMapCard();
+  const _MuscleMapCard({this.flat = false});
+
+  final bool flat;
 
   @override
   State<_MuscleMapCard> createState() => _MuscleMapCardState();
@@ -1362,6 +1375,8 @@ class _MuscleMapCardState extends State<_MuscleMapCard> {
     return SoftCard(
       radius: 22,
       borderColor: Colors.transparent,
+      color: widget.flat ? Colors.transparent : null,
+      padding: widget.flat ? const EdgeInsets.symmetric(vertical: 12) : const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1522,6 +1537,8 @@ class _MuscleMapCardState extends State<_MuscleMapCard> {
     return SoftCard(
       radius: 22,
       borderColor: Colors.transparent,
+      color: widget.flat ? Colors.transparent : null,
+      padding: widget.flat ? const EdgeInsets.symmetric(vertical: 12) : const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1592,6 +1609,8 @@ class _MuscleMapCardState extends State<_MuscleMapCard> {
     return SoftCard(
       radius: 22,
       borderColor: Colors.transparent,
+      color: widget.flat ? Colors.transparent : null,
+      padding: widget.flat ? const EdgeInsets.symmetric(vertical: 12) : const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -3640,12 +3659,15 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
     final loadCards = [
       ...StatCards.group('load', flat: true),
       ?StatCards.one('m_readiness', flat: true),
+      ?StatCards.one('m_effect', flat: true),
     ];
     final bodyCards = [
       ?StatCards.one('m_bodyweight', flat: true),
       ?StatCards.one('m_measures', flat: true),
+      ?StatCards.one('m_health', flat: true),
       ...StatCards.group('body', flat: true),
     ];
+    final garminCards = StatCards.garmin(flat: true, head: (label) => _groupHead(gc, label));
 
     return Theme(
       data: theme,
@@ -3685,6 +3707,8 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
               const SizedBox(height: 6),
               _summary(gc, sessions),
               ?StatCards.one('m_insights', flat: true),
+              ?StatCards.one('m_totals', flat: true),
+              ?StatCards.one('m_week', flat: true),
               ?StatCards.one('weekReport', flat: true),
               _groupHead(gc, 'Progress'),
               ...StatCards.group('progress', flat: true),
@@ -3784,6 +3808,8 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
               ),
               ?StatCards.one('m_balance', flat: true),
               _groupHead(gc, 'Muscles'),
+              ?StatCards.one('m_heat', flat: true),
+              ?StatCards.one('m_radar', flat: true),
               ...StatCards.group('muscles', flat: true, skip: const {'tonnage'}),
               _flatSection(gc, 'Weekly volume · ${fit.volumeUnit}', [
                 stackedVolume ?? _weeklyChart(gc, sessions, value: (session) => session.volume, caption: 'Weekly total'),
@@ -3852,6 +3878,7 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
               ...loadCards,
               if (bodyCards.isNotEmpty) _groupHead(gc, 'Body and food'),
               ...bodyCards,
+              ...garminCards,
             ]),
           ),
         ),
