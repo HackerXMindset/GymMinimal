@@ -57,6 +57,7 @@ part 'places_state.dart';
 part 'report_state.dart';
 part 'routines_state.dart';
 part 'settings_state.dart';
+part 'stats_plus.dart';
 part 'stats_state.dart';
 part 'steps_state.dart';
 part 'timeline_state.dart';
@@ -64,7 +65,7 @@ part 'tools_state.dart';
 part 'workout_state.dart';
 
 class FitState extends FitCore
-    with ToolsState, LibraryState, SettingsState, NotesState, PlacesState, GymPassState, MeasuresState, MomentsState, TimelineState, StatsState, StepsState, HealthState, CircuitState, NutritionState, ReportState, AwardsState, RoutinesState, WorkoutState {
+    with ToolsState, LibraryState, SettingsState, NotesState, PlacesState, GymPassState, MeasuresState, MomentsState, TimelineState, StatsState, StepsState, HealthState, CircuitState, NutritionState, StatsPlus, ReportState, AwardsState, RoutinesState, WorkoutState {
   final Map<SoundGroup, String> notifSoundNames = {};
 
   void _loadNotifSounds(Object? raw) {
@@ -255,6 +256,16 @@ class FitState extends FitCore
     minimalRepRecords = data['minimalRepRecords'] as bool? ?? true;
     minimalDefaultApplied = data['minimalDefaultV4'] == true;
     minimalTodayCalendar = data['minimalTodayCalendar'] as bool? ?? true;
+    statsOff
+      ..clear()
+      ..addAll(((data['statsOff'] as List?) ?? const []).whereType<String>());
+    musclePriority
+      ..clear()
+      ..addEntries([
+        for (final e in ((data['musclePriority'] as Map?) ?? const {}).entries)
+          if (e.key is String && e.value is num && (e.value as num) != 0)
+            MapEntry(e.key as String, (e.value as num).toInt().clamp(-1, 1)),
+      ]);
     minimalHistoryCalendar = data['minimalHistoryCalendar'] as bool? ?? true;
     minimalWallpaper = data['minimalWallpaper'] as bool? ?? true;
     numberEntryKeyboard = data['numberEntryKeyboard'] as bool? ?? true;
@@ -641,6 +652,8 @@ class FitState extends FitCore
         'minimalRepRecords': minimalRepRecords,
         'minimalDefaultV4': minimalDefaultApplied,
         'minimalTodayCalendar': minimalTodayCalendar,
+        'statsOff': statsOff.toList(),
+        'musclePriority': musclePriority,
         'minimalHistoryCalendar': minimalHistoryCalendar,
         'minimalWallpaper': minimalWallpaper,
         'numberEntryKeyboard': numberEntryKeyboard,
@@ -858,6 +871,8 @@ class FitState extends FitCore
     minimalAnimateDemo = true;
     minimalRepRecords = true;
     minimalTodayCalendar = true;
+    statsOff.clear();
+    musclePriority.clear();
     minimalHistoryCalendar = true;
     minimalWallpaper = true;
     numberEntryKeyboard = true;

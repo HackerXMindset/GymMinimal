@@ -18,7 +18,7 @@ double? rpePercent(int reps, double? rpe) {
 
 class LoggedSet {
   LoggedSet(this.reps, this.weight,
-      {this.kind = SetKind.normal, this.rpe, this.sec, this.km, this.note = '', this.left, this.right});
+      {this.kind = SetKind.normal, this.rpe, this.sec, this.km, this.note = '', this.left, this.right, this.at});
   final int reps;
   final int? left;
   final int? right;
@@ -28,6 +28,10 @@ class LoggedSet {
   final double? rpe;
   final int? sec;
   final double? km;
+
+  /// When the set was ticked off, in seconds since the epoch. Only sets logged
+  /// live carry it; it is what the rest-between-sets stat is worked out from.
+  final int? at;
 
   bool get counts => kind != SetKind.warmup;
   bool get sided => left != null && right != null;
@@ -50,6 +54,7 @@ class LoggedSet {
         if (sec != null) 't': sec,
         if (km != null) 'km': km,
         if (note.isNotEmpty) 'n': note,
+        if (at != null) 'at': at,
       };
   factory LoggedSet.fromJson(Map<String, dynamic> j) => LoggedSet(
         (j['r'] as num).toInt(),
@@ -61,6 +66,7 @@ class LoggedSet {
         note: j['n'] as String? ?? '',
         left: (j['rl'] as num?)?.toInt(),
         right: (j['rr'] as num?)?.toInt(),
+        at: (j['at'] as num?)?.toInt(),
       );
 }
 

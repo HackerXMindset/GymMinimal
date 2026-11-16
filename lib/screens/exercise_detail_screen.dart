@@ -23,6 +23,7 @@ import '../widgets/ruler_picker.dart';
 import '../widgets/glass.dart';
 import '../widgets/liquid_notch.dart';
 import '../widgets/progression_sheet.dart';
+import '../widgets/stat_cards.dart';
 import '../widgets/stopwatch_card.dart';
 import '../widgets/svg_icon.dart';
 import '../widgets/timer_panel.dart';
@@ -256,6 +257,11 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         _nextCard(gc, ex.id),
         const SizedBox(height: 20),
       ],
+      if (history.isNotEmpty)
+        for (final card in StatCards.forExercise(ex.id, flat: false, standard: true)) ...[
+          card,
+          const SizedBox(height: 12),
+        ],
       _section(gc, t.history),
       SizedBox(height: minimal ? 4 : 6),
       if (history.isEmpty)
@@ -510,6 +516,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                           if (pr != null) _miniRecords(gc, ex, history, pr),
                           if (fit.minimalRepRecords) _miniRepRecords(gc, ex),
                           if (pr != null) _miniChart(gc, ex, history, pr),
+                          ...StatCards.forExercise(ex.id, flat: true),
                         ],
                         if (fit.goalFits(ex.id) && fit.exerciseGoals[ex.id] != null) ...[
                           const SizedBox(height: 14),

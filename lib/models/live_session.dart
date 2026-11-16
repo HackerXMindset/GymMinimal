@@ -15,6 +15,7 @@ class SessionSet {
   double? rpe;
   int? sec;
   double? km;
+  int? at;
 
   bool get counts => kind != SetKind.warmup;
 
@@ -24,7 +25,7 @@ class SessionSet {
   }
 
   LoggedSet get logged => LoggedSet(weakReps, weight,
-      kind: kind, rpe: rpe, sec: sec, km: km, note: note.trim(), left: repsR == null ? null : reps, right: repsR);
+      kind: kind, rpe: rpe, sec: sec, km: km, note: note.trim(), left: repsR == null ? null : reps, right: repsR, at: at);
 
   SessionSet copy({bool done = false}) =>
       SessionSet(reps, weight, done, kind: kind, rpe: rpe, sec: sec, km: km, repsR: repsR, goal: goal);
@@ -41,6 +42,7 @@ class SessionSet {
         if (sec != null) 't': sec,
         if (km != null) 'km': km,
         if (rest != null) 'rs': rest,
+        if (at != null && done) 'at': at,
         if (note.isNotEmpty) 'n': note,
       };
   factory SessionSet.fromJson(Map<String, dynamic> j) => SessionSet(
@@ -55,7 +57,9 @@ class SessionSet {
         note: j['n'] as String? ?? '',
         repsR: (j['rr'] as num?)?.toInt(),
         goal: j['g'] as String?,
-      )..half = j['h'] as bool? ?? false;
+      )
+        ..half = j['h'] as bool? ?? false
+        ..at = (j['at'] as num?)?.toInt();
 }
 
 class SessionExercise {

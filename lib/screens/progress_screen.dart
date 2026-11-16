@@ -32,6 +32,7 @@ import '../widgets/nutrition_art.dart' show ValueLineChart;
 import '../widgets/rolling_text.dart';
 import '../widgets/ruler_picker.dart';
 import '../widgets/set_kind.dart';
+import '../widgets/stat_cards.dart';
 import '../widgets/ui_kit.dart';
 import 'session_photos.dart';
 import 'share_sheet.dart';
@@ -45,7 +46,6 @@ class ProgressScreen extends StatelessWidget {
     if (fit.minimalMode) return const _MinimalProgressScreen();
     final gc = context.gc;
     final change = fit.volumeChangePct;
-    final split = fit.muscleSplit;
     final prs = fit.personalRecords;
     final bw = fit.bodyweightSeries;
     final header = Row(
@@ -60,17 +60,8 @@ class ProgressScreen extends StatelessWidget {
         _headerActions(context, gc),
       ],
     );
-    final cards = <Widget>[
-      if (fit.sessions.isEmpty) _setupCard(context, gc),
-      _heroRow(context, gc, change, bw),
-      _consistency(context, gc),
-      _totals(gc),
-      const _MuscleMapCard(),
-      if (fit.sessions.isNotEmpty) const MuscleRadarCard(),
-      ..._blocks(context, gc, bw, split, prs),
-      if (fit.sessions.isNotEmpty && _missing.isNotEmpty) _setupCard(context, gc),
-    ];
     if (DesktopScope.of(context)) {
+      final cards = _layout(context, gc, change, bw, prs, headers: false);
       return RiseScope(
         id: 'progress',
         child: SingleChildScrollView(
@@ -85,58 +76,90 @@ class ProgressScreen extends StatelessWidget {
       );
     }
 
+    final cards = _layout(context, gc, change, bw, prs, headers: true);
     return RiseScope(
       id: 'progress',
       child: SafeArea(
-      bottom: false,
-      child: SingleChildScrollView(
-        clipBehavior: Clip.none,
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 110),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: riseAll([
-            Row(
-              children: [
-                Expanded(
-                  child: Text(t.progressTitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTheme.f(30, weight: FontWeight.w800, color: gc.text, letterSpacing: -0.8, height: 1.1)),
-                ),
-                const SizedBox(width: 12),
-                _headerActions(context, gc),
+        bottom: false,
+        child: SingleChildScrollView(
+          clipBehavior: Clip.none,
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 110),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: riseAll([
+              header,
+              const SizedBox(height: 20),
+              for (final (i, card) in cards.indexed) ...[
+                if (i > 0) const SizedBox(height: 12),
+                card,
               ],
-            ),
-            const SizedBox(height: 20),
-            if (fit.sessions.isEmpty) ...[
-              _setupCard(context, gc),
-              const SizedBox(height: 12),
-            ],
-            _heroRow(context, gc, change, bw),
-            const SizedBox(height: 12),
-            _consistency(context, gc),
-            const SizedBox(height: 12),
-            _totals(gc),
-            const SizedBox(height: 12),
-            const _MuscleMapCard(),
-            if (fit.sessions.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              const MuscleRadarCard(),
-            ],
-            for (final block in _blocks(context, gc, bw, split, prs)) ...[
-              const SizedBox(height: 12),
-              block,
-            ],
-            if (fit.sessions.isNotEmpty && _missing.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              _setupCard(context, gc),
-            ],
-          ]),
+            ]),
+          ),
         ),
-      ),
       ),
     );
   }
+
+  /// The Stats screen in sections. Each new card sits in the section it belongs
+  /// to, next to the cards that were already there, and each section only
+  /// appears when it has something to show.
+  List<Widget> _layout(
+    BuildContext context,
+    GymColors gc,
+    int? change,
+    List<double> bw,
+    List<PersonalRecord> prs, {
+    required bool headers,
+  }) {
+    final out = <Widget>[];
+    void section(String? group, List<Widget> items) {
+      if (items.isEmpty) return;
+      if (headers && group != null) out.add(_sectionHead(gc, StatCards.groupLabel(group)));
+      out.addAll(items);
+    }
+
+    final has = fit.sessions.isNotEmpty;
+    section(null, [
+      if (!has) _setupCard(context, gc),
+      _heroRow(context, gc, change, bw),
+      _totals(gc),
+    ]);
+    section('summary', StatCards.group('summary', flat: false));
+    section('progress', [
+      if (fit.trackedExercises.isNotEmpty) _StrengthCard(),
+      ...StatCards.group('progress', flat: false),
+      if (prs.isNotEmpty) _PrCard(prs),
+      if (fit.structuralBalance != null) const _BalanceCard(),
+    ]);
+    section('muscles', [
+      const _MuscleMapCard(),
+      if (has) const MuscleRadarCard(),
+      ...StatCards.group('muscles', flat: false),
+    ]);
+    section('consistency', [
+      _consistency(context, gc),
+      if (has) _thisWeek(gc),
+      ...StatCards.group('consistency', flat: false),
+    ]);
+    section('load', [
+      if (fit.readinessRecent.rated > 0) _ReadinessCard(),
+      ...StatCards.group('load', flat: false),
+    ]);
+    section('body', [
+      if (fit.shotCount > 0) _timelineCard(gc),
+      if (fit.measures.isNotEmpty) _measuresCard(gc),
+      if (fit.healthShown.isNotEmpty) const HealthCard(),
+      ...StatCards.group('body', flat: false),
+    ]);
+    if (has && _missing.isNotEmpty) section(null, [_setupCard(context, gc)]);
+    return out;
+  }
+
+  Widget _sectionHead(GymColors gc, String label) => Padding(
+        padding: const EdgeInsets.only(left: 4, top: 12),
+        child: Text(label.toUpperCase(),
+            style: AppTheme.f(10.5, weight: FontWeight.w700, color: gc.textTertiary, letterSpacing: 1.4)),
+      );
 
   Widget _headerActions(BuildContext context, GymColors gc) {
     Widget half(String label, VoidCallback onTap, List<Widget> children, EdgeInsets pad) => Semantics(
@@ -585,25 +608,6 @@ class ProgressScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  List<Widget> _blocks(
-    BuildContext context,
-    GymColors gc,
-    List<double> bw,
-    List<({String name, int pct})> split,
-    List<PersonalRecord> prs,
-  ) {
-    return [
-      if (fit.sessions.isNotEmpty) _thisWeek(gc),
-      if (fit.trackedExercises.isNotEmpty) _StrengthCard(),
-      if (fit.structuralBalance != null) const _BalanceCard(),
-      if (fit.readinessRecent.rated > 0) _ReadinessCard(),
-      if (prs.isNotEmpty) _PrCard(prs),
-      if (fit.shotCount > 0) _timelineCard(gc),
-      if (fit.measures.isNotEmpty) _measuresCard(gc),
-      if (fit.healthShown.isNotEmpty) const HealthCard(),
-    ];
   }
 
   Widget _timelineCard(GymColors gc) {
@@ -3462,6 +3466,12 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
         ),
       );
 
+  Widget _groupHead(GymColors gc, String label) => Padding(
+        padding: const EdgeInsets.only(top: 18, bottom: 2),
+        child: Text(label.toUpperCase(),
+            style: AppTheme.f(9.5, weight: FontWeight.w700, color: gc.textTertiary, letterSpacing: 1.4)),
+      );
+
   Widget _flatSection(GymColors gc, String label, List<Widget> children, {Widget? trailing}) => Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(border: Border(bottom: BorderSide(color: gc.border))),
@@ -3498,6 +3508,7 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
     List<LoggedSession> sessions, {
     required double Function(LoggedSession) value,
     required String caption,
+    double? goal,
   }) {
     final window = _window();
     final now = DateUtils.dateOnly(DateTime.now());
@@ -3517,20 +3528,36 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
     }
     final maxValue = values.reduce((a, b) => a > b ? a : b);
     if (maxValue <= 0) return Text(t.noHistory, style: AppTheme.f(11.5, color: gc.textTertiary));
+    final top = math.max(maxValue, goal ?? 0.0).toDouble();
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-        for (final v in values)
-          Expanded(child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 1.5),
-            child: Container(
-              height: math.max(2.0, 54 * v / maxValue).toDouble(),
-              decoration: BoxDecoration(
-                color: gc.accent.withValues(alpha: v == 0 ? 0.12 : 0.82),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(2)),
-              ),
+      SizedBox(
+        height: 54,
+        child: Stack(children: [
+          Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            for (final v in values)
+              Expanded(child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 1.5),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    height: math.max(2.0, 54 * v / top).toDouble(),
+                    decoration: BoxDecoration(
+                      color: gc.accent.withValues(alpha: v == 0 ? 0.12 : 0.82),
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(2)),
+                    ),
+                  ),
+                ),
+              )),
+          ]),
+          if (goal != null && goal > 0)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: (54 * goal / top).clamp(0.0, 53.0),
+              child: Container(height: 1, color: gc.textTertiary.withValues(alpha: 0.8)),
             ),
-          )),
-      ]),
+        ]),
+      ),
       const SizedBox(height: 5),
       Row(children: [
         Text(_dm(start), style: AppTheme.f(9, color: gc.textTertiary)),
@@ -3604,6 +3631,21 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
     final records = fit.personalRecords;
     final heatLevels = fit.heatmapWeeksFor(16);
     final heatStart = fit.heatmapWeekDate(0, weeks: 16);
+    final zonesShown = fit.statOn('zones') && fit.muscleZones.any((z) => z.perWeek > 0);
+    final stackedVolume = fit.statOn('tonnage')
+        ? StatCards.tonnageBars(weeks: _rangeWeeks == 0 ? 26 : _rangeWeeks, back: _offset)
+        : null;
+    final level = id == null || !fit.statOn('m_level') ? null : fit.relativeStrength(id);
+    final levelName = level == null ? null : t.dotsLevelName(level.level);
+    final loadCards = [
+      ...StatCards.group('load', flat: true),
+      ?StatCards.one('m_readiness', flat: true),
+    ];
+    final bodyCards = [
+      ?StatCards.one('m_bodyweight', flat: true),
+      ?StatCards.one('m_measures', flat: true),
+      ...StatCards.group('body', flat: true),
+    ];
 
     return Theme(
       data: theme,
@@ -3642,12 +3684,10 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
               _rangeBar(gc, sessions),
               const SizedBox(height: 6),
               _summary(gc, sessions),
-              _flatSection(gc, 'Weekly volume · ${fit.volumeUnit}', [
-                _weeklyChart(gc, sessions, value: (session) => session.volume, caption: 'Weekly total'),
-              ]),
-              _flatSection(gc, 'Sessions per week', [
-                _weeklyChart(gc, sessions, value: (_) => 1.0, caption: 'Sessions'),
-              ]),
+              ?StatCards.one('m_insights', flat: true),
+              ?StatCards.one('weekReport', flat: true),
+              _groupHead(gc, 'Progress'),
+              ...StatCards.group('progress', flat: true),
               _flatSection(
                 gc,
                 t.personalRecords,
@@ -3736,11 +3776,57 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
                             .whereType<DateTime>().fold<DateTime?>(null, (best, date) =>
                                 best == null || date.isAfter(best) ? date : best))),
                         _metric(gc, 'Sessions', '${trend.length}'),
+                        if (fit.statOn('m_level') && levelName != null) _metric(gc, 'Level', levelName),
                       ]),
                     ],
                   ],
                 ],
               ),
+              ?StatCards.one('m_balance', flat: true),
+              _groupHead(gc, 'Muscles'),
+              ...StatCards.group('muscles', flat: true, skip: const {'tonnage'}),
+              _flatSection(gc, 'Weekly volume · ${fit.volumeUnit}', [
+                stackedVolume ?? _weeklyChart(gc, sessions, value: (session) => session.volume, caption: 'Weekly total'),
+              ]),
+              if (!zonesShown)
+                _flatSection(gc, 'Sets per muscle · 30 days', [
+                  if (muscleSets.isEmpty)
+                    Text(t.noHistory, style: AppTheme.f(11.5, color: gc.textTertiary))
+                  else
+                    for (final item in muscleSets.take(8))
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(children: [
+                          SizedBox(
+                            width: 78,
+                            child: Text(t.muscle(item.key),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTheme.f(10.5, weight: FontWeight.w600, color: gc.textSecondary)),
+                          ),
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(2),
+                              child: LinearProgressIndicator(
+                                value: maxMuscleSets <= 0 ? 0 : (item.value / maxMuscleSets).clamp(0.0, 1.0),
+                                minHeight: 5,
+                                backgroundColor: gc.bgRaised2,
+                                color: gc.accent,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          SizedBox(
+                            width: 25,
+                            child: Text(item.value.toStringAsFixed(item.value % 1 == 0 ? 0 : 1),
+                                textAlign: TextAlign.end,
+                                style: AppTheme.f(10, weight: FontWeight.w700, color: gc.text)),
+                          ),
+                        ]),
+                      ),
+                ]),
+              ?StatCards.one('m_recovery', flat: true),
+              _groupHead(gc, 'Consistency'),
               _flatSection(gc, t.consistency, [
                 Heatmap(
                   levels: heatLevels,
@@ -3753,42 +3839,19 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
                   },
                 ),
               ]),
-              _flatSection(gc, 'Sets per muscle · 30 days', [
-                if (muscleSets.isEmpty)
-                  Text(t.noHistory, style: AppTheme.f(11.5, color: gc.textTertiary))
-                else
-                  for (final item in muscleSets.take(8))
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Row(children: [
-                        SizedBox(
-                          width: 78,
-                          child: Text(t.muscle(item.key),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTheme.f(10.5, weight: FontWeight.w600, color: gc.textSecondary)),
-                        ),
-                        Expanded(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(2),
-                            child: LinearProgressIndicator(
-                              value: maxMuscleSets <= 0 ? 0 : (item.value / maxMuscleSets).clamp(0.0, 1.0),
-                              minHeight: 5,
-                              backgroundColor: gc.bgRaised2,
-                              color: gc.accent,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        SizedBox(
-                          width: 25,
-                          child: Text(item.value.toStringAsFixed(item.value % 1 == 0 ? 0 : 1),
-                              textAlign: TextAlign.end,
-                              style: AppTheme.f(10, weight: FontWeight.w700, color: gc.text)),
-                        ),
-                      ]),
-                    ),
+              _flatSection(gc, 'Sessions per week', [
+                _weeklyChart(gc, sessions,
+                    value: (_) => 1.0,
+                    caption: fit.statOn('weeks')
+                        ? 'Sessions · goal ${fit.weeklyTarget} a week · ${fit.weekStreak} ${fit.weekStreak == 1 ? 'week' : 'weeks'} in a row'
+                        : 'Sessions',
+                    goal: fit.statOn('weeks') ? fit.weeklyTarget.toDouble() : null),
               ]),
+              ...StatCards.group('consistency', flat: true, skip: const {'weeks'}),
+              if (loadCards.isNotEmpty) _groupHead(gc, 'Load and recovery'),
+              ...loadCards,
+              if (bodyCards.isNotEmpty) _groupHead(gc, 'Body and food'),
+              ...bodyCards,
             ]),
           ),
         ),

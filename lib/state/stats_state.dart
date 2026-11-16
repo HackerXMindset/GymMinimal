@@ -490,6 +490,7 @@ mixin StatsState on FitCore, ToolsState, LibraryState, SettingsState, TimelineSt
       note: old.note,
       left: l,
       right: r,
+      at: old.at,
     );
     persistNow();
     _refreshWidgets();
