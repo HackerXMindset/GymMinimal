@@ -230,6 +230,16 @@ void main() {
       expect(fit.longestGap!.days, 23);
     });
 
+    test('sets per week and frequency on one exercise', () {
+      for (final d in [1, 8, 15]) {
+        fit.sessions.add(_bench1(d, 80));
+      }
+      final weeks = fit.exerciseWeeklySets(_bench, 8);
+      expect(weeks.length, 8);
+      expect(weeks.fold(0, (a, b) => a + b), 9);
+      expect(fit.exerciseFrequency(_bench), closeTo(0.75, 0.001));
+    });
+
     test('pace is per 500 m on a rowing machine and per km elsewhere', () {
       expect(fit.paceText(125), '2:05');
     });

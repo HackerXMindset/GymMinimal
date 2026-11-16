@@ -72,7 +72,9 @@ class StatCards {
       if (fit.statOn(key) && w != null) out.add(w);
     }
 
+    add('x_level', _xLevel(id, flat));
     add('x_trend', _xTrend(id, flat));
+    add('x_volume', _xVolume(id, flat));
     add('x_prs', _xPrs(id, flat));
     if (standard) add('x_ranges', _xRanges(id, flat));
     add('x_effort', _xEffort(id, flat));
@@ -1073,6 +1075,48 @@ class _WeekCard extends StatelessWidget {
 
 // ---------------------------------------------------------------------------
 // On each exercise
+
+Widget? _xLevel(String id, bool flat) {
+  final rel = fit.relativeStrength(id);
+  if (rel == null) return null;
+  return Builder(builder: (context) {
+    final gc = context.gc;
+    return _Shell(
+      flat: flat,
+      title: 'Strength level',
+      trailing: _side(gc, '${rel.ratio.toStringAsFixed(2)}× bodyweight'),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        _big(gc, t.dotsLevelName(rel.level), size: 20),
+        const SizedBox(height: 10),
+        Row(children: [
+          for (var i = 0; i < 5; i++) ...[
+            if (i > 0) const SizedBox(width: 3),
+            Expanded(
+              child: _HBar(value: i < rel.level ? 1 : (i == rel.level ? rel.toNext : 0), max: 1, color: gc.brass, height: 4),
+            ),
+          ],
+        ]),
+      ]),
+    );
+  });
+}
+
+Widget? _xVolume(String id, bool flat) {
+  final weeks = fit.exerciseWeeklySets(id, 8);
+  if (weeks.where((w) => w > 0).length < 2) return null;
+  final freq = fit.exerciseFrequency(id);
+  final avg = weeks.fold(0, (a, b) => a + b) / 8;
+  return Builder(builder: (context) {
+    final gc = context.gc;
+    return _Shell(
+      flat: flat,
+      title: 'Sets and frequency',
+      trailing: _side(gc, '${freq.toStringAsFixed(1)}× a week'),
+      foot: _note(gc, 'Working sets per week over 8 weeks, about ${avg.toStringAsFixed(avg >= 10 ? 0 : 1)} a week.'),
+      child: _MiniBars(values: [for (final w in weeks) w.toDouble()], height: 40, first: '8 weeks ago', last: 'This week'),
+    );
+  });
+}
 
 Widget? _xTrend(String id, bool flat) {
   if (!fit.goalFits(id)) return null;

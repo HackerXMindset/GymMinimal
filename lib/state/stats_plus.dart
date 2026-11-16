@@ -40,6 +40,8 @@ const kStatCards = <StatCardInfo>[
   StatCardInfo('cardio', 'body', 'Lifting and cardio', 'Cardio minutes next to lifting minutes. Needs cardio logged.'),
   StatCardInfo('fourWeeks', 'summary', 'This 4 weeks vs the last 4', 'Sessions, volume, sets, session length and records.'),
   StatCardInfo('weekReport', 'summary', 'Weekly report card', 'A summary of this week you can share.'),
+  StatCardInfo('x_level', 'exercise', 'Strength level', 'Your level on the main barbell lifts, from your estimated 1RM against bodyweight.'),
+  StatCardInfo('x_volume', 'exercise', 'Sets and frequency', 'Sets per week on this lift and how often you train it.'),
   StatCardInfo('x_trend', 'exercise', 'Trend and stall tag', 'Change over 90 days, and a tag when a lift is stalled.'),
   StatCardInfo('x_prs', 'exercise', 'PR history', 'The dates you set records on an exercise.'),
   StatCardInfo('x_ranges', 'exercise', 'Best weight by rep range', 'The heaviest weight you have done for each rep count.'),
@@ -565,6 +567,26 @@ mixin StatsPlus on FitCore, ToolsState, LibraryState, SettingsState, TimelineSta
     per.sort((a, b) => a.$1.compareTo(b.$1));
     final tail = per.length > 8 ? per.sublist(per.length - 8) : per;
     return (avg: (all.reduce((a, b) => a + b) / all.length).round(), series: [for (final p in tail) p.$2], sessions: per.length);
+  }
+
+  /// Working sets of one exercise per week, oldest first, the current week last.
+  List<int> exerciseWeeklySets(String id, int weeks) {
+    final first = shiftDays(weekStartDate, -7 * (weeks - 1));
+    final out = List<int>.filled(weeks, 0);
+    for (final h in _allHistory[id] ?? const <({DateTime date, LoggedExercise ex})>[]) {
+      final day = _dayKey(h.date);
+      final i = day.difference(first).inDays ~/ 7;
+      if (day.isBefore(first) || i < 0 || i >= weeks) continue;
+      out[i] += h.ex.workingSets.length;
+    }
+    return out;
+  }
+
+  /// Sessions per week that included [id], over the last 4 weeks.
+  double exerciseFrequency(String id) {
+    final from = _today.subtract(const Duration(days: 27));
+    final n = (_allHistory[id] ?? const <({DateTime date, LoggedExercise ex})>[]).where((h) => !_dayKey(h.date).isBefore(from)).length;
+    return n / 4;
   }
 
   // ---- Body, cardio and food ----------------------------------------------
