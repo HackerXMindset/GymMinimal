@@ -47,6 +47,7 @@ import '../widgets/ruler_picker.dart';
 import '../widgets/settings_showcase.dart';
 import '../widgets/sheet_page.dart';
 import '../widgets/steps_card.dart';
+import '../widgets/stat_cards.dart';
 import '../widgets/svg_icon.dart';
 import '../widgets/timer_panel.dart';
 import '../widgets/ui_kit.dart';
@@ -337,6 +338,13 @@ class SettingsScreen extends StatelessWidget {
                   TinySwitch(on: fit.minimalNavIcons),
                   key: 'minimal-toggle-nav-icons',
                   onTap: () => fit.updateMinimalOptions(navIcons: !fit.minimalNavIcons),
+                ),
+                row(
+                  'Stats cards',
+                  Icon(PhosphorIconsRegular.caretRight, size: 14, color: gc.textTertiary),
+                  key: 'minimal-stats-cards',
+                  hint: 'Choose which cards show on Stats and on each exercise.',
+                  onTap: () => showStatCardsSheet(context),
                 ),
                 row(
                   'Expand exercises in workout',
@@ -949,6 +957,13 @@ class SettingsScreen extends StatelessWidget {
                         onTap: () => fit.updateMinimalOptions(navIcons: !fit.minimalNavIcons),
                         child: _prefRow(gc, PhosphorIconsRegular.house, 'Icons in bottom bar',
                             TinySwitch(on: fit.minimalNavIcons)),
+                      ),
+                      GestureDetector(
+                        key: const ValueKey('stats-cards'),
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => showStatCardsSheet(context),
+                        child: _prefRow(gc, PhosphorIconsRegular.chartBar, 'Stats cards',
+                            Icon(PhosphorIconsRegular.caretRight, size: 16, color: gc.textTertiary)),
                       ),
                       GestureDetector(
                         behavior: HitTestBehavior.opaque,

@@ -800,6 +800,7 @@ mixin WorkoutState on FitCore, SettingsState, LibraryState, PlacesState, StatsSt
     }
     st.half = false;
     st.done = !st.done;
+    st.at = st.done ? DateTime.now().millisecondsSinceEpoch ~/ 1000 : null;
     _persist();
     notifyListeners();
     if (!st.done) return;
