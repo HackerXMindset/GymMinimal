@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../l10n/l10n.dart';
 import '../models/exercise.dart';
 import '../screens/progress_screen.dart' show showBodyweightSheet;
 import '../screens/share_sheet.dart';
