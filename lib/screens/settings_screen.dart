@@ -61,6 +61,7 @@ import '../services/host.dart';
 import '../services/file_share.dart';
 import '../services/server/server_link.dart';
 import '../widgets/server_card.dart';
+import '../widgets/mini_food.dart' show showMiniFoodSettings;
 import 'about_screen.dart';
 
 const _kRepoUrl = 'https://github.com/InlitX/GymMane';
@@ -363,6 +364,22 @@ class SettingsScreen extends StatelessWidget {
                   hint: 'Choose which cards show on Stats and on each exercise.',
                   onTap: () => showStatCardsSheet(context),
                 ),
+                if (fit.nutritionBeta)
+                  row(
+                    'Food on Today',
+                    TinySwitch(on: fit.miniFood),
+                    key: 'minimal-toggle-food',
+                    hint: 'A small food tracker under the workout card.',
+                    onTap: () => fit.setMiniFood(!fit.miniFood),
+                  ),
+                if (fit.nutritionBeta)
+                  row(
+                    'Food tracker settings',
+                    Icon(PhosphorIconsRegular.caretRight, size: 14, color: gc.textTertiary),
+                    key: 'minimal-food-settings',
+                    hint: 'Numbers, targets, meals, quick add and cards.',
+                    onTap: () => showMiniFoodSettings(context),
+                  ),
                 row(
                   'Expand exercises in workout',
                   TinySwitch(on: fit.minimalExpandExercises),

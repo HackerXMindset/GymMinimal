@@ -24,6 +24,7 @@ import '../widgets/routine_folder.dart';
 import '../widgets/scroll_away.dart';
 import '../widgets/steps_card.dart';
 import '../widgets/svg_icon.dart';
+import '../widgets/mini_food.dart';
 import '../widgets/ui_kit.dart';
 import 'progress_screen.dart';
 import 'routines_screen.dart';
@@ -287,6 +288,10 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 10),
           heroCard(),
           const SizedBox(height: 12),
+          if (fit.miniFoodOn) ...[
+            const MiniFoodStrip(),
+            const SizedBox(height: 12),
+          ],
           if (fit.minimalTodayCalendar)
             const MinimalCalendar()
           else

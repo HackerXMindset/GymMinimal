@@ -3668,6 +3668,7 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
       ...StatCards.group('body', flat: true),
     ];
     final garminCards = StatCards.garmin(flat: true, head: (label) => _groupHead(gc, label));
+    final foodCards = StatCards.food(flat: true, head: (label) => _groupHead(gc, label));
 
     return Theme(
       data: theme,
@@ -3879,6 +3880,7 @@ class _MinimalProgressScreenState extends State<_MinimalProgressScreen> {
               if (bodyCards.isNotEmpty) _groupHead(gc, 'Body and food'),
               ...bodyCards,
               ...garminCards,
+              ...foodCards,
             ]),
           ),
         ),

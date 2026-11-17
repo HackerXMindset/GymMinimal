@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
 import '../models/exercise.dart';
+import '../screens/nutrition_screen.dart' show mealName;
 import '../screens/progress_screen.dart' show MinimalBodyMap, showBodyweightSheet;
 import '../screens/share_sheet.dart';
 import '../state/fit_state.dart';
@@ -19,6 +20,7 @@ import 'past_swipe.dart';
 import 'ui_kit.dart';
 
 part 'stat_cards_more.dart';
+part 'stat_cards_food.dart';
 
 /// The cards added to the Stats screens. Both the main Stats and the Minimal
 /// Stats draw them from here, so each statistic exists once. [flat] is the
@@ -35,7 +37,7 @@ class StatCards {
     final out = <Widget>[];
     for (final info in kStatCards) {
       if (info.group != group || !fit.statOn(info.id) || skip.contains(info.id)) continue;
-      if (info.garmin && !fit.garminOn) continue;
+      if (!fit.statGroupAvailable(info.group)) continue;
       final card = _build(info.id, flat);
       if (card != null) out.add(card);
     }
@@ -46,7 +48,7 @@ class StatCards {
   static Widget? one(String id, {required bool flat}) {
     if (!fit.statOn(id)) return null;
     final info = kStatCards.where((c) => c.id == id);
-    if (info.isNotEmpty && info.first.garmin && !fit.garminOn) return null;
+    if (info.isNotEmpty && !fit.statGroupAvailable(info.first.group)) return null;
     return _build(id, flat);
   }
 
@@ -57,6 +59,21 @@ class StatCards {
     final out = <Widget>[];
     for (final g in kStatGroups) {
       if (!g.$1.startsWith('g_')) continue;
+      final cards = group(g.$1, flat: flat);
+      if (cards.isEmpty) continue;
+      out.add(head(g.$2));
+      out.addAll(cards);
+    }
+    return out;
+  }
+
+  /// The food sections, each with its heading, or nothing while the food
+  /// tracker is off.
+  static List<Widget> food({required bool flat, required Widget Function(String label) head}) {
+    if (!fit.miniFoodOn) return const [];
+    final out = <Widget>[];
+    for (final g in kStatGroups) {
+      if (!g.$1.startsWith('f_')) continue;
       final cards = group(g.$1, flat: flat);
       if (cards.isEmpty) continue;
       out.add(head(g.$2));
@@ -93,7 +110,7 @@ class StatCards {
   static bool? hasData(String id) {
     final info = kStatCards.where((c) => c.id == id);
     if (info.isEmpty || info.first.group == 'exercise') return null;
-    if (info.first.garmin && !fit.garminOn) return null;
+    if (!fit.statGroupAvailable(info.first.group)) return null;
     return _build(id, true) != null;
   }
 
@@ -176,6 +193,18 @@ class StatCards {
         'g_calm' => _gCalm(flat),
         'g_sleep8' => _gSleep8(flat),
         'g_z45' => _gZ45(flat),
+        'n_week' => _nWeek(flat),
+        'n_macros' => _nMacros(flat),
+        'n_trend' => _nTrend('kcal', flat),
+        'n_protein' => _nTrend('protein', flat),
+        'n_hit' => _nHit(flat),
+        'n_meals' => _nMeals(flat),
+        'n_times' => _nTimes(flat),
+        'n_top' => _nTop(flat),
+        'n_water' => _nWater(flat),
+        'n_lift' => _nLift(flat),
+        'n_weight' => _nWeight(flat),
+        'n_before' => _nBefore(flat),
         _ => null,
       };
 }
@@ -1587,7 +1616,7 @@ Future<void> showStatCardsSheet(BuildContext context) {
             stepper('Ready for more: reps', '${fit.readyReps}', () => fit.setReadyReps(fit.readyReps - 1), () => fit.setReadyReps(fit.readyReps + 1)),
             stepper('Ready for more: hold', '${fit.readySeconds} s', () => fit.setReadySeconds(fit.readySeconds - 5), () => fit.setReadySeconds(fit.readySeconds + 5)),
             for (final (group, label) in kStatGroups)
-              if (!group.startsWith('g_') || fit.garminOn) ...[
+              if (fit.statGroupAvailable(group)) ...[
                 Builder(builder: (context) {
                   final cards = kStatCards.where((c) => c.group == group).toList();
                   final on = cards.where((c) => fit.statOn(c.id)).length;
