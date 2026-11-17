@@ -1705,7 +1705,7 @@ mixin StatsState on FitCore, ToolsState, LibraryState, SettingsState, TimelineSt
               ? _round1(sets.map((s) => s.weight).reduce(math.min))
               : relative
                   ? (h.ex.bestOneRm / _weightOn(h.date) * 100).roundToDouble()
-                  : _round1(h.ex.bestOneRm);
+                  : _round1(repMaxOf(id, h.ex.bestOneRm));
       if (value > 0 || assisted) out.add((date: h.date, value: value));
     }
     return out;

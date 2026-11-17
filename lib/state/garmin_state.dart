@@ -228,14 +228,28 @@ mixin GarminState on FitCore, ToolsState, LibraryState, SettingsState, StatsStat
 
   /// The last [days] days of [key], oldest first, null where there is none.
   /// Everything is null while Garmin is off.
-  List<double?> garminSeries(String key, int days) {
+  List<double?> garminSeries(String key, int days, {int back = 0}) {
     if (!garminOn) return List<double?>.filled(days, null);
     final map = garminDays[key];
     final now = DateTime.now();
-    return [
-      for (var i = days - 1; i >= 0; i--)
-        map?[HealthMetrics.dayKey(DateTime(now.year, now.month, now.day - i))],
-    ];
+    final out = <double?>[];
+    for (var i = days - 1; i >= 0; i--) {
+      final day = HealthMetrics.dayKey(DateTime(now.year, now.month, now.day - i - back * days));
+      out.add(map == null ? null : map[day]);
+    }
+    return out;
+  }
+
+  /// How many days back the oldest Garmin number goes.
+  int get garminHistoryDays {
+    var first = '';
+    for (final m in garminDays.values) {
+      for (final k in m.keys) {
+        if (first.isEmpty || k.compareTo(first) < 0) first = k;
+      }
+    }
+    final d = DateTime.tryParse(first);
+    return d == null ? 0 : DateTime.now().difference(d).inDays;
   }
 
   double? garminValue(String key, DateTime day) {

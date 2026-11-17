@@ -230,7 +230,11 @@ class _ExerciseHistorySheetState extends State<ExerciseHistorySheet> {
     final lowerIsBetter = fit.isAssisted(_id);
     final up = lowerIsBetter ? delta <= 0 : delta >= 0;
     final shownDelta = _plain ? delta.round().toDouble() : fit.toShownFor(_id, delta);
-    final caption = _relative ? t.ofBodyweight : fit.isRepsOnly(_id) || lowerIsBetter ? null : t.estOneRm;
+    final caption = _relative
+        ? t.ofBodyweight
+        : fit.isRepsOnly(_id) || lowerIsBetter
+            ? null
+            : (fit.rmRepsOf(_id) > 1 ? 'est. ${fit.rmLabel(_id)}' : t.estOneRm);
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Center(
         child: SegToggle([
@@ -302,7 +306,13 @@ class _ExerciseHistorySheetState extends State<ExerciseHistorySheet> {
             ]),
             const SizedBox(height: 12),
             if (values.length >= 2)
-              TrendChart(values: values, height: 120, scale: (v) => _plain ? '${v.round()}' : fmt(v))
+              TrendChart(
+                values: values,
+                labels: [for (final p in points) t.shortDate(p.date)],
+                lowerBetter: lowerIsBetter,
+                height: 120,
+                scale: (v) => _plain ? '${v.round()}' : fmt(v),
+              )
             else
               SizedBox(
                 height: 120,

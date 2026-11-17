@@ -28,6 +28,7 @@ import '../services/sqlite_reader.dart';
 import '../services/workout_import.dart';
 import '../services/workout_history_xlsx.dart';
 import '../state/fit_state.dart';
+import '../widgets/charts.dart' show TrendChart;
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import '../widgets/auto_backup_sheet.dart';
@@ -261,6 +262,22 @@ class SettingsScreen extends StatelessWidget {
                 hint: 'Shrinks text and spacing, turns the workout into one table, and hides what you switch off below.',
                 onTap: () => fit.setMinimalMode(!fit.minimalMode),
               ),
+              picker(
+                'Chart style',
+                fit.chartStyle,
+                const [('classic', 'Classic'), ('trading', 'Trading'), ('bars', 'Bars'), ('dots', 'Dots')],
+                fit.setChartStyle,
+                'chart-style',
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+                child: TrendChart(
+                  values: const [24, 26, 25, 27, 26, 29, 28, 31, 30, 33, 32, 34],
+                  labels: const ['1 Sep', '8 Sep', '15 Sep', '22 Sep', '29 Sep', '6 Oct', '13 Oct', '20 Oct', '27 Oct', '3 Nov', '10 Nov', '17 Nov'],
+                  height: 72,
+                  scale: (v) => v.round().toString(),
+                ),
+              ),
               if (fit.minimalMode) ...[
                 picker(
                   'Text size',
@@ -460,6 +477,21 @@ class SettingsScreen extends StatelessWidget {
                     () => fit.themePref,
                     fit.setThemePref,
                     hint: t.themeAutoHint,
+                  ),
+                  _choiceRow(
+                    context,
+                    gc,
+                    PhosphorIconsRegular.chartLineUp,
+                    'Chart style',
+                    [
+                      ('classic', 'Classic', PhosphorIconsRegular.trendUp),
+                      ('trading', 'Trading', PhosphorIconsRegular.chartLineUp),
+                      ('bars', 'Bars', PhosphorIconsRegular.chartBar),
+                      ('dots', 'Line and dots', PhosphorIconsRegular.dotsNine),
+                    ],
+                    () => fit.chartStyle,
+                    fit.setChartStyle,
+                    hint: 'Trading draws a market chart: green or red by direction, a dotted start line, and a crosshair when you touch it.',
                   ),
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,

@@ -265,6 +265,12 @@ class FitState extends FitCore
       ..clear()
       ..addAll(((data['statsOff'] as List?) ?? const []).whereType<String>());
     loadGarmin(data['garmin'] as Map<String, dynamic>?);
+    chartStyle = const ['classic', 'trading', 'bars', 'dots'].contains(data['chartStyle']) ? data['chartStyle'] as String : 'classic';
+    rmReps.clear();
+    ((data['rmReps'] as Map?) ?? const {}).forEach((k, v) {
+      final n = (v as num?)?.toInt();
+      if (k is String && n != null && n > 1) rmReps[k] = n.clamp(2, 30);
+    });
     musclePriority
       ..clear()
       ..addEntries([
@@ -660,6 +666,8 @@ class FitState extends FitCore
         'minimalTodayCalendar': minimalTodayCalendar,
         'statsOff': statsOff.toList(),
         'garmin': garminJson(),
+        if (chartStyle != 'classic') 'chartStyle': chartStyle,
+        if (rmReps.isNotEmpty) 'rmReps': rmReps,
         'musclePriority': musclePriority,
         'minimalHistoryCalendar': minimalHistoryCalendar,
         'minimalWallpaper': minimalWallpaper,
@@ -880,6 +888,8 @@ class FitState extends FitCore
     minimalTodayCalendar = true;
     statsOff.clear();
     loadGarmin(null);
+    chartStyle = 'classic';
+    rmReps.clear();
     musclePriority.clear();
     minimalHistoryCalendar = true;
     minimalWallpaper = true;
