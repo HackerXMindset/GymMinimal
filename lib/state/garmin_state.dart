@@ -238,7 +238,11 @@ mixin GarminState on FitCore, ToolsState, LibraryState, SettingsState, StatsStat
     ];
   }
 
-  double? garminValue(String key, DateTime day) => garminOn ? garminDays[key]?[HealthMetrics.dayKey(day)] : null;
+  double? garminValue(String key, DateTime day) {
+    if (!garminOn) return null;
+    final map = garminDays[key];
+    return map == null ? null : map[HealthMetrics.dayKey(day)];
+  }
 
   /// The mean of [key] over the [days] days before today, null with fewer than 4 values.
   double? garminBaseline(String key, {int days = 28}) {
