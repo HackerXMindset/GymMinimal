@@ -40,9 +40,9 @@ void main() {
       fit.setRmReps(_bench, 8);
       expect(fit.rmLabel(_bench), '8RM');
       expect(fit.repMaxOf(_bench, 130), closeTo(130 / (1 + 8 / 30), 1e-9));
-      expect(fit.rmReps.length, 1);
+      expect(fit.exerciseRm.length, 1);
       fit.setRmReps(_bench, 1);
-      expect(fit.rmReps, isEmpty);
+      expect(fit.exerciseRm, isEmpty);
       fit.setRmReps(_bench, 99);
       expect(fit.rmRepsOf(_bench), 30);
     });
