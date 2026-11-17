@@ -3,7 +3,7 @@ part of 'fit_state.dart';
 mixin ToolsState on FitCore {
   String? activeToolId;
   double rmWeight = 100;
-  int rmReps = 5;
+  int rmCalcReps = 5;
   int rmPct = 75;
   double bmiHeight = 175;
   double bmiWeight = 75;
@@ -90,7 +90,7 @@ mixin ToolsState on FitCore {
 
   void backFromTools() => popRoute();
 
-  double get rmResult => _round1(rmWeight * (1 + rmReps / 30));
+  double get rmResult => _round1(rmWeight * (1 + rmCalcReps / 30));
 
   double get bmiVal => _round1(bmiWeight / math.pow(bmiHeight / 100, 2));
 
@@ -247,7 +247,7 @@ mixin ToolsState on FitCore {
     return target <= bar ? _roundTo(target, isLb ? 5.0 : 2.5) : loadableTotal(target, bar);
   }
 
-  void bumpRmReps(int d) { rmReps = _clamp(rmReps + d.toDouble(), 1, 20).round(); notifyListeners(); }
+  void bumpRmReps(int d) { rmCalcReps = _clamp(rmCalcReps + d.toDouble(), 1, 20).round(); notifyListeners(); }
 
   void bumpBmiHeight(double d) { bmiHeight = _clamp(bmiHeight + d, 100, 250); notifyListeners(); }
 
