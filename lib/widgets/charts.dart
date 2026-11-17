@@ -644,7 +644,7 @@ class _MarketPainter extends CustomPainter {
     final tail = showDelta
         ? _text('${up ? '▲' : '▼'} ${up ? '+' : '−'}$amount${pct == null ? '' : '  (${pct.abs().toStringAsFixed(1)}%)'}', 10, up ? good : bad, bold: true)
         : null;
-    final w = math.max(head.width, tail?.width ?? 0) + 16;
+    final w = math.max(head.width, tail?.width ?? 0.0) + 16;
     final h = head.height + (tail == null ? 0 : tail.height + 5) + 12;
     final left = pt.dx > size.width / 2 ? pt.dx - w - 12 : pt.dx + 12;
     final x = left.clamp(0.0, math.max(0.0, size.width - w));

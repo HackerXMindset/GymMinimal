@@ -74,12 +74,12 @@ abstract class FitCore extends ChangeNotifier {
 
   /// The rep max the exercise page charts and shows as "est.": 1 is the 1RM,
   /// 8 is the 8RM, and so on. Only exercises that were changed are listed.
-  final Map<String, int> rmReps = {};
+  final Map<String, int> exerciseRm = {};
 
   /// How charts are drawn: classic, trading, bars or dots.
   String chartStyle = 'classic';
 
-  int rmRepsOf(String id) => rmReps[id] ?? 1;
+  int rmRepsOf(String id) => exerciseRm[id] ?? 1;
   String rmLabel(String id) => '${rmRepsOf(id)}RM';
 
   /// The weight you could lift for the chosen number of reps, from an
@@ -91,9 +91,9 @@ abstract class FitCore extends ChangeNotifier {
 
   void setRmReps(String id, int n) {
     if (n <= 1) {
-      rmReps.remove(id);
+      exerciseRm.remove(id);
     } else {
-      rmReps[id] = n.clamp(2, 30);
+      exerciseRm[id] = n.clamp(2, 30);
     }
     _persist();
     notifyListeners();

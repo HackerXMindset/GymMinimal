@@ -268,10 +268,10 @@ class FitState extends FitCore
     loadGarmin(data['garmin'] as Map<String, dynamic>?);
     loadMiniFood(data['miniFood'] as Map<String, dynamic>?);
     chartStyle = const ['classic', 'trading', 'bars', 'dots'].contains(data['chartStyle']) ? data['chartStyle'] as String : 'classic';
-    rmReps.clear();
+    exerciseRm.clear();
     ((data['rmReps'] as Map?) ?? const {}).forEach((k, v) {
       final n = (v as num?)?.toInt();
-      if (k is String && n != null && n > 1) rmReps[k] = n.clamp(2, 30);
+      if (k is String && n != null && n > 1) exerciseRm[k] = n.clamp(2, 30);
     });
     musclePriority
       ..clear()
@@ -670,7 +670,7 @@ class FitState extends FitCore
         'garmin': garminJson(),
         'miniFood': miniFoodJson(),
         if (chartStyle != 'classic') 'chartStyle': chartStyle,
-        if (rmReps.isNotEmpty) 'rmReps': rmReps,
+        if (exerciseRm.isNotEmpty) 'rmReps': exerciseRm,
         'musclePriority': musclePriority,
         'minimalHistoryCalendar': minimalHistoryCalendar,
         'minimalWallpaper': minimalWallpaper,
@@ -893,7 +893,7 @@ class FitState extends FitCore
     loadGarmin(null);
     loadMiniFood(null);
     chartStyle = 'classic';
-    rmReps.clear();
+    exerciseRm.clear();
     musclePriority.clear();
     minimalHistoryCalendar = true;
     minimalWallpaper = true;

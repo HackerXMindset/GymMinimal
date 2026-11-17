@@ -217,7 +217,7 @@ Widget? _nWater(bool flat) {
       title: 'Water, 14 days',
       trailing: _side(gc, 'average ${fit.waterLabel(avg.round())}'),
       child: _MiniBars(
-        values: [for (final x in v) x ?? 0],
+        values: [for (final x in v) x ?? 0.0],
         goal: goal,
         height: 44,
         first: _dm(DateTime(today.year, today.month, today.day - 13)),
