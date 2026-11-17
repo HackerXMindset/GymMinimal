@@ -218,28 +218,41 @@ Widget? _tDrop(String id, bool flat) {
 }
 
 Widget? _tWeekly(String id, bool flat) {
-  final d = fit.weeklyAmount(id);
-  if (d == null) return null;
+  final first = fit.weeklyAmount(id);
+  if (first == null) return null;
   final type = fit.exerciseType(id);
-  if (d.unit == 'sets' && type != ExType.assisted) return null;
-  final title = switch (d.unit) {
+  if (first.unit == 'sets' && type != ExType.assisted) return null;
+  final title = switch (first.unit) {
     'reps' => 'Reps per week',
     'min' => 'Minutes per week',
     'km' => 'Km per week',
     'h' => 'Hours per week',
     _ => 'Sets per week',
   };
-  String fmtV(double v) => d.unit == 'km' || d.unit == 'h' ? v.toStringAsFixed(1) : v.round().toString();
-  return Builder(builder: (context) {
-    final gc = context.gc;
-    return _Shell(
-      flat: flat,
-      title: title,
-      trailing: _side(gc, 'this week ${fmtV(d.thisWeek)}'),
-      foot: _note(gc, 'About ${fmtV(d.avg)} ${d.unit} a week over 8 weeks.'),
-      child: _MiniBars(values: d.values, height: 40, first: '8 weeks ago', last: 'This week'),
-    );
-  });
+  final limit = fit.weeksOfHistory ~/ 8;
+  String fmtV(double v) => first.unit == 'km' || first.unit == 'h' ? v.toStringAsFixed(1) : v.round().toString();
+  return PastSwipe(
+    limit: limit,
+    builder: (context, back, go) {
+      final gc = context.gc;
+      final d = back == 0 ? first : fit.weeklyAmount(id, back: back);
+      final range = '${back * 8 + 1} to ${back * 8 + 8} weeks ago';
+      return _Shell(
+        flat: flat,
+        title: title,
+        trailing: _pager(gc, back, limit, go, _side(gc, back == 0 ? 'this week ${fmtV(first.thisWeek)}' : range)),
+        foot: _note(gc, d == null ? 'Nothing logged in these weeks.' : 'About ${fmtV(d.avg)} ${d.unit} a week over 8 weeks.'),
+        child: d == null
+            ? const SizedBox(height: 40)
+            : _MiniBars(
+                values: d.values,
+                height: 40,
+                first: '${back * 8 + 8} weeks ago',
+                last: back == 0 ? 'This week' : '${back * 8 + 1} weeks ago',
+              ),
+      );
+    },
+  );
 }
 
 Widget? _tForecast(String id, bool flat) {
@@ -772,35 +785,55 @@ Widget? _gCalm(bool flat) {
 
 Widget? _gSleep8(bool flat) {
   if (!fit.garminOn) return null;
-  final v = fit.garminSeries('sleep', 8);
-  final have = v.whereType<double>().toList();
-  if (have.length < 3) return null;
-  return Builder(builder: (context) {
-    final gc = context.gc;
-    final avg = have.reduce((a, b) => a + b) / have.length / 60;
-    return _Shell(
-      flat: flat,
-      title: 'Sleep, 8 nights',
-      trailing: _side(gc, 'average ${avg.toStringAsFixed(1)} h', color: avg < 6.5 ? gc.warn : null),
-      foot: _note(gc, 'The line is 7.5 hours.'),
-      child: _MiniBars(values: [for (final x in v) (x ?? 0) / 60], goal: 7.5, height: 48, first: '8 nights ago', last: 'Last night'),
-    );
-  });
+  if (fit.garminSeries('sleep', 8).whereType<double>().length < 3) return null;
+  final limit = fit.garminHistoryDays ~/ 8;
+  return PastSwipe(
+    limit: limit,
+    builder: (context, back, go) {
+      final gc = context.gc;
+      final v = fit.garminSeries('sleep', 8, back: back);
+      final have = v.whereType<double>().toList();
+      final avg = have.isEmpty ? 0.0 : have.reduce((a, b) => a + b) / have.length / 60;
+      return _Shell(
+        flat: flat,
+        title: 'Sleep, 8 nights',
+        trailing: _pager(
+          gc,
+          back,
+          limit,
+          go,
+          _side(gc, have.isEmpty ? (back == 0 ? 'no readings' : '${back * 8 + 1} to ${back * 8 + 8} nights ago') : 'average ${avg.toStringAsFixed(1)} h', color: avg > 0 && avg < 6.5 ? gc.warn : null),
+        ),
+        foot: _note(gc, have.isEmpty ? 'No sleep readings in these nights.' : 'The line is 7.5 hours.'),
+        child: _MiniBars(
+          values: [for (final x in v) (x ?? 0) / 60],
+          goal: 7.5,
+          height: 48,
+          first: back == 0 ? '8 nights ago' : '${back * 8 + 8} nights ago',
+          last: back == 0 ? 'Last night' : '${back * 8 + 1} nights ago',
+        ),
+      );
+    },
+  );
 }
 
 Widget? _gZ45(bool flat) {
-  final v = fit.zoneMinutesByWeek();
-  if (v == null) return null;
-  return Builder(builder: (context) {
-    final gc = context.gc;
-    return _Shell(
-      flat: flat,
-      title: 'Hard minutes a week',
-      trailing: _side(gc, 'this week ${v.last.round()} min'),
-      foot: _note(gc, 'Minutes in zones 4 and 5, where the heart works hardest.'),
-      child: _MiniBars(values: v, height: 40, first: '8 weeks ago', last: 'This week'),
-    );
-  });
+  if (fit.zoneMinutesByWeek() == null) return null;
+  final limit = fit.weeksOfHistory ~/ 8;
+  return PastSwipe(
+    limit: limit,
+    builder: (context, back, go) {
+      final gc = context.gc;
+      final v = fit.zoneMinutesByWeek(back: back);
+      return _Shell(
+        flat: flat,
+        title: 'Hard minutes a week',
+        trailing: _pager(gc, back, limit, go, _side(gc, back == 0 && v != null ? 'this week ${v.last.round()} min' : '${back * 8 + 1} to ${back * 8 + 8} weeks ago')),
+        foot: _note(gc, v == null ? 'No heart rate in these weeks.' : 'Minutes in zones 4 and 5, where the heart works hardest.'),
+        child: v == null ? const SizedBox(height: 40) : _MiniBars(values: v, height: 40, first: '${back * 8 + 8} weeks ago', last: back == 0 ? 'This week' : '${back * 8 + 1} weeks ago'),
+      );
+    },
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -814,57 +847,60 @@ Widget? _mHealth(bool flat) => fit.healthShown.isEmpty ? null : HealthCard(flat:
 
 Widget? _mWeek(bool flat) {
   if (fit.sessions.isEmpty) return null;
-  final start = fit.weekStartDate;
+  final limit = fit.weeksOfHistory;
+  return PastSwipe(limit: limit, builder: (context, back, go) => _weekBars(context, flat, back, limit, go));
+}
+
+Widget _weekBars(BuildContext context, bool flat, int back, int limit, void Function(int) go) {
+  final gc = context.gc;
+  final start = shiftDays(fit.weekStartDate, -7 * back);
   final sets = List<int>.filled(7, 0);
   for (final s in fit.sessions) {
     final i = DateTime(s.day.year, s.day.month, s.day.day).difference(start).inDays;
     if (i >= 0 && i < 7) sets[i] += s.setCount;
   }
   final total = sets.fold(0, (a, b) => a + b);
-  return Builder(builder: (context) {
-    final gc = context.gc;
-    final top = sets.fold(0, math.max);
-    final today = fit.todayIndex;
-    return _Shell(
-      flat: flat,
-      title: 'This week',
-      trailing: _side(gc, '$total sets'),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        SizedBox(
-          height: 64,
-          child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            for (var i = 0; i < 7; i++) ...[
-              if (i > 0) const SizedBox(width: 6),
-              Expanded(
-                child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-                  Text(sets[i] > 0 ? '${sets[i]}' : '', style: AppTheme.f(10.5, weight: FontWeight.w700, color: i == today ? gc.text : gc.textSecondary)),
-                  const SizedBox(height: 3),
-                  Container(
-                    height: top == 0 ? 4 : 4 + 36 * sets[i] / top,
-                    decoration: BoxDecoration(
-                      color: sets[i] == 0 ? gc.bgRaised2 : (i == today ? gc.text : gc.text.withValues(alpha: 0.32)),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ]),
-              ),
-            ],
-          ]),
-        ),
-        const SizedBox(height: 4),
-        Row(children: [
+  final top = sets.fold(0, math.max);
+  final today = back == 0 ? fit.todayIndex : -1;
+  return _Shell(
+    flat: flat,
+    title: _weekName(start, back),
+    trailing: _pager(gc, back, limit, go, _side(gc, '$total sets')),
+    child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      SizedBox(
+        height: 64,
+        child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
           for (var i = 0; i < 7; i++) ...[
             if (i > 0) const SizedBox(width: 6),
             Expanded(
-              child: Text(t.weekdayInitial(fit.weekdayAt(i)),
-                  textAlign: TextAlign.center,
-                  style: AppTheme.f(10.5, weight: i == today ? FontWeight.w700 : FontWeight.w500, color: i == today ? gc.text : gc.textTertiary)),
+              child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+                Text(sets[i] > 0 ? '${sets[i]}' : '', style: AppTheme.f(10.5, weight: FontWeight.w700, color: i == today ? gc.text : gc.textSecondary)),
+                const SizedBox(height: 3),
+                Container(
+                  height: top == 0 ? 4 : 4 + 36 * sets[i] / top,
+                  decoration: BoxDecoration(
+                    color: sets[i] == 0 ? gc.bgRaised2 : (i == today ? gc.text : gc.text.withValues(alpha: 0.32)),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ]),
             ),
           ],
         ]),
+      ),
+      const SizedBox(height: 4),
+      Row(children: [
+        for (var i = 0; i < 7; i++) ...[
+          if (i > 0) const SizedBox(width: 6),
+          Expanded(
+            child: Text(t.weekdayInitial(fit.weekdayAt(i)),
+                textAlign: TextAlign.center,
+                style: AppTheme.f(10.5, weight: i == today ? FontWeight.w700 : FontWeight.w500, color: i == today ? gc.text : gc.textTertiary)),
+          ),
+        ],
       ]),
-    );
-  });
+    ]),
+  );
 }
 
 Widget? _mEffect(bool flat) {

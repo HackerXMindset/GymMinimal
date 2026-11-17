@@ -1,9 +1,10 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
-import '../state/fit_state.dart' show shiftDays;
+import '../state/fit_state.dart' show fit, shiftDays;
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import 'body_map.dart';
@@ -322,27 +323,351 @@ class _SparkPainter extends CustomPainter {
   bool shouldRepaint(_SparkPainter o) => o.values != values || o.color != color || o.bounds != bounds;
 }
 
-class TrendChart extends StatelessWidget {
-  const TrendChart({super.key, required this.values, this.height = 90, this.color, this.scale});
+/// A trend line. How it is drawn follows the chart style in Settings: classic
+/// (a smooth area), trading (a market chart with a start line, green or red by
+/// direction and a crosshair), bars, or a line with dots. Touch a point to read
+/// it. [labels] are the dates shown with a touched point.
+class TrendChart extends StatefulWidget {
+  const TrendChart({
+    super.key,
+    required this.values,
+    this.height = 90,
+    this.color,
+    this.scale,
+    this.labels,
+    this.lowerBetter = false,
+    this.style,
+  });
   final List<double> values;
   final double height;
   final Color? color;
   final String Function(double)? scale;
+  final List<String>? labels;
+
+  /// A fall is the good direction, so the trading style colours it green.
+  final bool lowerBetter;
+
+  /// Overrides the chart style from Settings, for the previews.
+  final String? style;
+
+  @override
+  State<TrendChart> createState() => _TrendChartState();
+}
+
+class _TrendChartState extends State<TrendChart> {
+  int? _sel;
+  Timer? _clear;
+
+  @override
+  void didUpdateWidget(TrendChart old) {
+    super.didUpdateWidget(old);
+    if (old.values.length != widget.values.length) _sel = null;
+  }
+
+  @override
+  void dispose() {
+    _clear?.cancel();
+    super.dispose();
+  }
+
+  void _later() {
+    _clear?.cancel();
+    _clear = Timer(const Duration(milliseconds: 2500), () {
+      if (mounted) setState(() => _sel = null);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final gc = context.gc;
-    final label = scale;
+    final values = widget.values;
+    final label = widget.scale;
+    final style = widget.style ?? fit.chartStyle;
     final bounds = label == null || values.length < 2 ? null : niceBounds(values);
-    final chart = CustomPaint(painter: _TrendPainter(values, color ?? gc.accent, gc.bgRaised, gc.border, bounds));
+    final Widget chart;
+    if (style == 'classic' || values.length < 2) {
+      chart = CustomPaint(painter: _TrendPainter(values, widget.color ?? gc.accent, gc.bgRaised, gc.border, bounds));
+    } else {
+      final good = widget.lowerBetter ? values.last <= values.first : values.last >= values.first;
+      final color = widget.color ?? (style == 'trading' ? (good ? gc.sage : gc.danger) : gc.accent);
+      chart = LayoutBuilder(
+        builder: (context, box) {
+          final size = Size(box.maxWidth, widget.height);
+          void pick(double dx) {
+            final i = _Plot(values, size, bounds, style == 'bars').indexAt(dx);
+            if (i != _sel) setState(() => _sel = i);
+          }
+
+          return GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTapDown: (d) {
+              _clear?.cancel();
+              pick(d.localPosition.dx);
+            },
+            onTapUp: (_) => _later(),
+            onTapCancel: _later,
+            onHorizontalDragStart: (d) {
+              _clear?.cancel();
+              pick(d.localPosition.dx);
+            },
+            onHorizontalDragUpdate: (d) => pick(d.localPosition.dx),
+            onHorizontalDragEnd: (_) => _later(),
+            child: CustomPaint(
+              size: size,
+              painter: _MarketPainter(
+                style: style,
+                values: values,
+                color: color,
+                grid: gc.border,
+                muted: gc.textTertiary,
+                ink: gc.text,
+                surface: gc.bgRaised2,
+                good: gc.sage,
+                bad: gc.danger,
+                bounds: bounds,
+                selected: _sel,
+                labels: widget.labels,
+                scale: label,
+              ),
+            ),
+          );
+        },
+      );
+    }
     return SizedBox(
-      height: height,
+      height: widget.height,
       width: double.infinity,
       child: label == null || bounds == null
           ? chart
           : ChartScale(bounds: bounds, stops: (0.12, 0.88), label: label, child: chart),
     );
   }
+}
+
+/// Maps values to points the way the right-hand scale expects: the top mark is
+/// 12% down and the bottom mark 88% down.
+class _Plot {
+  _Plot(this.values, this.size, (double, double)? bounds, this.slots)
+      : minV = bounds?.$1 ?? values.reduce(math.min),
+        maxV = bounds?.$2 ?? values.reduce(math.max);
+
+  final List<double> values;
+  final Size size;
+  final bool slots;
+  final double minV;
+  final double maxV;
+
+  static const inset = 6.0;
+
+  double get range => (maxV - minV).abs() < 1e-6 ? 1.0 : (maxV - minV);
+  double get span => size.width - inset * 2;
+  double yOf(double v) => size.height * (0.88 - (v - minV) / range * 0.76);
+
+  double xOf(int i) {
+    final n = values.length;
+    if (n < 2) return size.width / 2;
+    return slots ? inset + span * (i + 0.5) / n : inset + span * i / (n - 1);
+  }
+
+  Offset at(int i) => Offset(xOf(i), yOf(values[i]));
+
+  int indexAt(double dx) {
+    final n = values.length;
+    if (n < 2 || span <= 0) return 0;
+    final f = slots ? (dx - inset) / span * n - 0.5 : (dx - inset) / span * (n - 1);
+    return f.round().clamp(0, n - 1);
+  }
+}
+
+class _MarketPainter extends CustomPainter {
+  _MarketPainter({
+    required this.style,
+    required this.values,
+    required this.color,
+    required this.grid,
+    required this.muted,
+    required this.ink,
+    required this.surface,
+    required this.good,
+    required this.bad,
+    required this.bounds,
+    required this.selected,
+    required this.labels,
+    required this.scale,
+  });
+
+  final String style;
+  final List<double> values;
+  final Color color;
+  final Color grid;
+  final Color muted;
+  final Color ink;
+  final Color surface;
+  final Color good;
+  final Color bad;
+  final (double, double)? bounds;
+  final int? selected;
+  final List<String>? labels;
+  final String Function(double)? scale;
+
+  TextPainter _text(String s, double size, Color c, {bool bold = false}) => TextPainter(
+        text: TextSpan(text: s, style: AppTheme.f(size, weight: bold ? FontWeight.w700 : FontWeight.w500, color: c, height: 1)),
+        textDirection: TextDirection.ltr,
+        maxLines: 1,
+      )..layout();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final gridPaint = Paint()
+      ..color = grid.withValues(alpha: 0.45)
+      ..strokeWidth = 1;
+    for (final f in const [0.12, 0.5, 0.88]) {
+      canvas.drawLine(Offset(0, size.height * f), Offset(size.width, size.height * f), gridPaint);
+    }
+    if (values.length < 2) return;
+    final plot = _Plot(values, size, bounds, style == 'bars');
+    if (style == 'bars') {
+      _bars(canvas, plot);
+    } else {
+      _line(canvas, plot);
+    }
+    final i = selected;
+    if (i != null && i < values.length) _cursor(canvas, plot, i);
+  }
+
+  void _bars(Canvas canvas, _Plot p) {
+    final n = values.length;
+    final slot = p.span / n;
+    final w = math.max(1.0, slot * 0.62);
+    final base = p.yOf(p.minV);
+    for (var i = 0; i < n; i++) {
+      final x = p.xOf(i);
+      final top = math.min(p.yOf(values[i]), base - 1);
+      final on = i == n - 1 || i == selected;
+      canvas.drawRRect(
+        RRect.fromRectAndCorners(
+          Rect.fromLTRB(x - w / 2, top, x + w / 2, base),
+          topLeft: Radius.circular(math.min(3, w / 2)),
+          topRight: Radius.circular(math.min(3, w / 2)),
+        ),
+        Paint()..color = on ? color : color.withValues(alpha: 0.42),
+      );
+    }
+  }
+
+  void _line(Canvas canvas, _Plot p) {
+    final size = p.size;
+    final pts = [for (var i = 0; i < values.length; i++) p.at(i)];
+    final trading = style == 'trading';
+    if (trading) {
+      final y = pts.first.dy;
+      final dash = Paint()
+        ..color = muted.withValues(alpha: 0.85)
+        ..strokeWidth = 1;
+      for (var x = 0.0; x < size.width; x += 6) {
+        canvas.drawLine(Offset(x, y), Offset(math.min(x + 2.5, size.width), y), dash);
+      }
+      final tag = _text('start', 9, muted);
+      tag.paint(canvas, Offset(size.width - tag.width - 2, y - tag.height - 3));
+    }
+    final path = Path()..moveTo(pts.first.dx, pts.first.dy);
+    for (final q in pts.skip(1)) {
+      path.lineTo(q.dx, q.dy);
+    }
+    if (trading) {
+      final area = Path.from(path)
+        ..lineTo(pts.last.dx, size.height)
+        ..lineTo(pts.first.dx, size.height)
+        ..close();
+      canvas.drawPath(
+        area,
+        Paint()
+          ..shader = LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [color.withValues(alpha: 0.32), color.withValues(alpha: 0)],
+          ).createShader(Offset.zero & size),
+      );
+    }
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = trading ? 1.8 : 2
+        ..strokeJoin = StrokeJoin.round
+        ..strokeCap = StrokeCap.round,
+    );
+    if (style == 'dots') {
+      final every = pts.length > 60 ? pts.length ~/ 30 : 1;
+      for (var i = 0; i < pts.length; i += every) {
+        canvas.drawCircle(pts[i], 2.6, Paint()..color = color);
+      }
+    }
+    final end = pts.last;
+    canvas.drawCircle(end, 4.5, Paint()..color = color.withValues(alpha: 0.25));
+    canvas.drawCircle(end, 2.8, Paint()..color = color);
+  }
+
+  void _cursor(Canvas canvas, _Plot p, int i) {
+    final size = p.size;
+    final pt = p.at(i);
+    if (style != 'bars') {
+      final dash = Paint()
+        ..color = muted.withValues(alpha: 0.9)
+        ..strokeWidth = 1;
+      for (var y = 0.0; y < size.height; y += 5) {
+        canvas.drawLine(Offset(pt.dx, y), Offset(pt.dx, math.min(y + 2.5, size.height)), dash);
+      }
+      canvas.drawCircle(pt, 5.5, Paint()..color = surface);
+      canvas.drawCircle(pt, 5.5, Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2);
+    }
+    final v = values[i];
+    final shown = scale == null ? v.toStringAsFixed(1) : scale!(v);
+    final when = labels != null && i < labels!.length ? labels![i] : '';
+    final delta = v - values.first;
+    final up = delta >= 0;
+    final pct = values.first.abs() < 1e-9 ? null : delta / values.first.abs() * 100;
+    final amount = scale == null ? delta.abs().toStringAsFixed(1) : scale!(delta.abs());
+    final head = TextPainter(
+      text: TextSpan(children: [
+        TextSpan(text: shown, style: AppTheme.f(11.5, weight: FontWeight.w800, color: ink, height: 1)),
+        if (when.isNotEmpty) TextSpan(text: '   $when', style: AppTheme.f(10, weight: FontWeight.w500, color: muted, height: 1)),
+      ]),
+      textDirection: TextDirection.ltr,
+      maxLines: 1,
+    )..layout();
+    final showDelta = i != 0 && size.height >= 70;
+    final tail = showDelta
+        ? _text('${up ? '▲' : '▼'} ${up ? '+' : '−'}$amount${pct == null ? '' : '  (${pct.abs().toStringAsFixed(1)}%)'}', 10, up ? good : bad, bold: true)
+        : null;
+    final w = math.max(head.width, tail?.width ?? 0) + 16;
+    final h = head.height + (tail == null ? 0 : tail.height + 5) + 12;
+    final left = pt.dx > size.width / 2 ? pt.dx - w - 12 : pt.dx + 12;
+    final x = left.clamp(0.0, math.max(0.0, size.width - w));
+    final y = pt.dy < size.height * 0.5 ? math.max(0.0, size.height - h) : 0.0;
+    final box = RRect.fromRectAndRadius(Rect.fromLTWH(x, y, w, h), const Radius.circular(8));
+    canvas.drawRRect(box, Paint()..color = surface);
+    canvas.drawRRect(box, Paint()
+      ..color = grid
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1);
+    head.paint(canvas, Offset(x + 8, y + 6));
+    tail?.paint(canvas, Offset(x + 8, y + 6 + head.height + 5));
+  }
+
+  @override
+  bool shouldRepaint(_MarketPainter o) =>
+      o.style != style ||
+      o.values != values ||
+      o.color != color ||
+      o.grid != grid ||
+      o.bounds != bounds ||
+      o.selected != selected ||
+      o.labels != labels;
 }
 
 class _TrendPainter extends CustomPainter {

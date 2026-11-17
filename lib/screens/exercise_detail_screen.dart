@@ -239,7 +239,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               if (history.length > 1) _bests(gc, ex.id, pr.kind),
               if (pr.kind == PrKind.weight && oneRm.length > 2) ...[
                 const SizedBox(height: 16),
-                TrendChart(values: [for (final v in oneRm) fit.toDisplayWeight(v)], height: 84, scale: fmt),
+                TrendChart(values: [for (final v in oneRm) fit.toDisplayWeight(fit.repMaxOf(ex.id, v))], height: 84, scale: fmt),
               ] else if (pr.kind == PrKind.reps && bestReps.length > 2) ...[
                 const SizedBox(height: 16),
                 TrendChart(values: bestReps, height: 84, scale: (v) => '${v.round()}'),
@@ -437,6 +437,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         fit.isAssisted(ex.id),
         () => fit.toggleAssisted(ex.id),
       ),
+      _repMaxRow(context, gc, ex.id),
       _progressRow(context, gc, ex.id),
       _switchRow(
         gc,
@@ -746,7 +747,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       decoration: BoxDecoration(border: Border.symmetric(horizontal: BorderSide(color: gc.border))),
       child: Row(children: [
         cell('Best', pr == null ? '–' : fit.recordLabel(pr),
-            pr == null || pr.kind != PrKind.weight || fit.isAssisted(ex.id) ? '' : 'est. 1RM ${fit.weightLabel(pr.oneRm)}'),
+            pr == null || pr.kind != PrKind.weight || fit.isAssisted(ex.id) ? '' : 'est. ${fit.rmLabel(ex.id)} ${fit.weightLabel(fit.repMaxOf(ex.id, pr.oneRm))}'),
         cell('Last done', _ago(history.first.date), _fmtDate(history.first.date)),
         cell('Sessions', '${history.length}', '$sets sets'),
       ]),
@@ -799,7 +800,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       if (heavy != null) {
         cells.add(('Heaviest set', ltr('${fit.weightLabel(heavy.set.weight)} × ${heavy.set.reps}'), heavy.date));
       }
-      if (oneRm > 0) cells.add(('Est. 1RM', fit.weightLabel(oneRm), oneRmDate));
+      if (oneRm > 0) cells.add(('Est. ${fit.rmLabel(ex.id)}', fit.weightLabel(fit.repMaxOf(ex.id, oneRm)), oneRmDate));
       if (setVol > 0) cells.add(('Best set volume', fit.weightLabel(setVol), setVolDate));
       if (session != null) {
         cells.add(('Best session volume', fit.bestWorkoutLabel(session.score, PrKind.weight), session.date));
@@ -887,7 +888,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       GymColors gc, Exercise ex, List<({DateTime date, LoggedExercise ex})> history, PersonalRecord pr) {
     final assisted = fit.isAssisted(ex.id);
     final options = <(String, String)>[
-      if (pr.kind == PrKind.weight && !assisted) ...const [('1rm', '1RM'), ('weight', 'Weight'), ('volume', 'Volume')],
+      if (pr.kind == PrKind.weight && !assisted) ...[('1rm', fit.rmLabel(ex.id)), ('weight', 'Weight'), ('volume', 'Volume')],
       if (pr.kind == PrKind.weight && assisted) ...const [('weight', 'Assist')],
       if (pr.kind == PrKind.reps) ...const [('reps', 'Best reps'), ('total', 'Total reps')],
       if (pr.kind == PrKind.time) ...const [('time', 'Best time')],
@@ -898,7 +899,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
     double value(LoggedExercise e) {
       final w = e.workingSets;
       return switch (metric) {
-        '1rm' => fit.toDisplayWeight(e.bestOneRm),
+        '1rm' => fit.toDisplayWeight(fit.repMaxOf(ex.id, e.bestOneRm)),
         'weight' => fit.toDisplayWeight(fit.headlineWeight(e)),
         'volume' => fit.toDisplayWeight(e.volume),
         'reps' => w.fold<int>(0, (m, s) => math.max(m, s.reps)).toDouble(),
@@ -968,7 +969,13 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                 style: AppTheme.f(10.5, weight: FontWeight.w500, color: gc.textSecondary)),
           ]),
           const SizedBox(height: 8),
-          TrendChart(values: [for (final p in points) p.v], height: 84, scale: fmt),
+          TrendChart(
+            values: [for (final p in points) p.v],
+            labels: [for (final p in points) _fmtDate(p.date)],
+            lowerBetter: assisted,
+            height: 84,
+            scale: fmt,
+          ),
           const SizedBox(height: 3),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Text(_fmtDate(points.first.date),
@@ -1628,6 +1635,59 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                   format: (v) => clockLabel(v.round()),
                   tickLabel: (v) => clockLabel(v.round()));
               if (v != null) fit.setExerciseRest(id, v.round());
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _repMaxRow(BuildContext context, GymColors gc, String id) {
+    final n = fit.rmRepsOf(id);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          _rowIcon(gc, PhosphorIconsRegular.barbell, n > 1),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Rep max shown', style: AppTheme.f(14.5, weight: FontWeight.w500, color: gc.text)),
+                const SizedBox(height: 3),
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: n > 1 ? () => fit.setRmReps(id, 1) : null,
+                  child: Text(
+                    n > 1 ? 'The chart and records use your ${n}RM. Tap for 1RM.' : 'The chart and records use your 1RM. Pick any rep count.',
+                    style: AppTheme.f(11.5, weight: FontWeight.w500, color: n > 1 ? gc.accent : gc.textSecondary),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          StepperControl(
+            key: const ValueKey('rep-max-stepper'),
+            value: '${n}RM',
+            minWidth: 44,
+            btnSize: 30,
+            gap: 3,
+            fontSize: 14,
+            btnRadius: 10,
+            onDec: () => fit.setRmReps(id, n - 1),
+            onInc: () => fit.setRmReps(id, n + 1),
+            onEdit: () async {
+              final v = await askRuler(context,
+                  title: 'Rep max shown',
+                  value: n.toDouble(),
+                  min: 1,
+                  max: 30,
+                  step: 1,
+                  majorEvery: 5,
+                  format: (v) => '${v.round()}RM',
+                  tickLabel: (v) => '${v.round()}');
+              if (v != null) fit.setRmReps(id, v.round());
             },
           ),
         ],

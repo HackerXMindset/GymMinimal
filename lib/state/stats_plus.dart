@@ -58,7 +58,7 @@ const kStatCards = <StatCardInfo>[
   StatCardInfo('food', 'body', 'Food on training and rest days', 'Calories and protein on both kinds of day. Needs food logged.'),
   StatCardInfo('cardio', 'body', 'Lifting and cardio', 'Cardio minutes next to lifting minutes. Needs cardio logged.'),
   StatCardInfo('fourWeeks', 'summary', 'This 4 weeks vs the last 4', 'Sessions, volume, sets, session length and records.'),
-  StatCardInfo('weekReport', 'summary', 'Weekly report card', 'A summary of this week you can share.'),
+  StatCardInfo('weekReport', 'summary', 'Weekly report card', 'A summary of the week you can share. Swipe for earlier weeks.'),
   StatCardInfo('x_level', 'exercise', 'Strength level', 'Your level on the main barbell lifts, from your estimated 1RM against bodyweight.'),
   StatCardInfo('x_volume', 'exercise', 'Sets and frequency', 'Sets per week on this lift and how often you train it.'),
   StatCardInfo('x_trend', 'exercise', 'Trend and stall tag', 'Change over 90 days, and a tag when a lift is stalled.'),
@@ -96,7 +96,7 @@ const kStatCards = <StatCardInfo>[
   StatCardInfo('m_heat', 'minimal', 'Body heat map', 'A body map of which muscles you trained lately, and the ones you have not.'),
   StatCardInfo('m_radar', 'minimal', 'Muscle radar', 'Your muscle balance as a radar chart.'),
   StatCardInfo('m_health', 'minimal', 'Health', 'Sleep, resting heart rate and the other Health Connect numbers you picked.'),
-  StatCardInfo('m_week', 'minimal', 'This week', 'A bar for each day of this week.'),
+  StatCardInfo('m_week', 'minimal', 'This week', 'A bar for each day of the week. Swipe for earlier weeks.'),
   StatCardInfo('m_effect', 'minimal', 'Sleep and energy effect', 'How your sleep and energy ratings change your sessions.'),
   StatCardInfo('m_totals', 'minimal', 'Streak and all-time totals', 'Your day streak, and sessions, sets and volume since day one.'),
   StatCardInfo('g_ready', 'g_before', 'Readiness', 'A score from sleep, HRV and resting heart rate against your own average.'),
@@ -424,8 +424,8 @@ mixin StatsPlus on FitCore, ToolsState, LibraryState, SettingsState, TimelineSta
   // ---- Consistency --------------------------------------------------------
 
   /// Training days per week, oldest first, the current week last.
-  List<int> sessionsPerWeek(int weeks) => _remember(('spw', weeks), () {
-        final first = shiftDays(weekStartDate, -7 * (weeks - 1));
+  List<int> sessionsPerWeek(int weeks, {int back = 0}) => _remember(('spw', weeks, back), () {
+        final first = shiftDays(weekStartDate, -7 * (weeks - 1) - 7 * weeks * back);
         final days = List.generate(weeks, (_) => <DateTime>{});
         for (final s in sessions) {
           final day = _dayKey(s.day);
@@ -766,6 +766,57 @@ mixin StatsPlus on FitCore, ToolsState, LibraryState, SettingsState, TimelineSta
         }).length;
         return (sessions: n, volume: volume, sets: sets, avgMin: n == 0 ? 0 : (secs / n / 60).round(), prs: prs);
       }, _today);
+
+  /// How many whole weeks before this one reach back to the first session. It
+  /// is how far a card can be dragged into the past.
+  int get weeksOfHistory => _remember('weeksOfHistory', () {
+        if (sessions.isEmpty) return 0;
+        var first = _dayKey(sessions.first.day);
+        for (final s in sessions) {
+          final d = _dayKey(s.day);
+          if (d.isBefore(first)) first = d;
+        }
+        final diff = weekStartDate.difference(first).inDays;
+        return diff <= 0 ? 0 : (diff / 7).ceil();
+      }, weekStartDay);
+
+  /// The week [back] weeks ago (0 is this week) at a glance, with the week
+  /// before it for comparison.
+  ({int sessions, double volume, int prs, int avgMin, List<String> muscles, int lastSessions, double lastVolume}) weekReportFor(int back) =>
+      back <= 0
+          ? weekReport
+          : _remember(('weekReportFor', back), () {
+              final start = shiftDays(weekStartDate, -7 * back);
+              final end = shiftDays(start, 7);
+              final lastStart = shiftDays(start, -7);
+              var n = 0, secs = 0, ln = 0;
+              var volume = 0.0, lv = 0.0;
+              for (final s in sessions) {
+                final day = _dayKey(s.day);
+                if (!day.isBefore(start) && day.isBefore(end)) {
+                  n++;
+                  secs += s.durationSec;
+                  volume += s.volume;
+                } else if (!day.isBefore(lastStart) && day.isBefore(start)) {
+                  ln++;
+                  lv += s.volume;
+                }
+              }
+              final sets = muscleSetsBetween(start, end).entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+              final prs = prEvents.where((e) {
+                final d = _dayKey(e.date);
+                return !d.isBefore(start) && d.isBefore(end);
+              }).length;
+              return (
+                sessions: n,
+                volume: volume,
+                prs: prs,
+                avgMin: n == 0 ? 0 : (secs / n / 60).round(),
+                muscles: [for (final e in sets.where((e) => e.value > 0).take(3)) muscleLabel(e.key)],
+                lastSessions: ln,
+                lastVolume: lv,
+              );
+            }, (_today, weekStartDay));
 
   /// This week at a glance, with last week for comparison.
   ({int sessions, double volume, int prs, int avgMin, List<String> muscles, int lastSessions, double lastVolume}) get weekReport =>

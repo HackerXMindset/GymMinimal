@@ -71,6 +71,39 @@ abstract class FitCore extends ChangeNotifier {
   final Map<String, String> exerciseMedia = {};
 
   final Map<String, int> exerciseRest = {};
+
+  /// The rep max the exercise page charts and shows as "est.": 1 is the 1RM,
+  /// 8 is the 8RM, and so on. Only exercises that were changed are listed.
+  final Map<String, int> rmReps = {};
+
+  /// How charts are drawn: classic, trading, bars or dots.
+  String chartStyle = 'classic';
+
+  int rmRepsOf(String id) => rmReps[id] ?? 1;
+  String rmLabel(String id) => '${rmRepsOf(id)}RM';
+
+  /// The weight you could lift for the chosen number of reps, from an
+  /// estimated 1RM (the same Epley rule the 1RM itself uses).
+  double repMaxOf(String id, double oneRm) {
+    final n = rmRepsOf(id);
+    return n <= 1 ? oneRm : oneRm / (1 + n / 30);
+  }
+
+  void setRmReps(String id, int n) {
+    if (n <= 1) {
+      rmReps.remove(id);
+    } else {
+      rmReps[id] = n.clamp(2, 30);
+    }
+    _persist();
+    notifyListeners();
+  }
+
+  void setChartStyle(String v) {
+    chartStyle = const ['classic', 'trading', 'bars', 'dots'].contains(v) ? v : 'classic';
+    _persist();
+    notifyListeners();
+  }
   final Map<String, String> exerciseUnits = {};
   final Map<String, String> exerciseDistance = {};
 

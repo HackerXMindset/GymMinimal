@@ -383,9 +383,9 @@ mixin StatsMore on FitCore, ToolsState, LibraryState, SettingsState, StatsState,
 
   // ---- Weekly amount (#12) -------------------------------------------------------
 
-  ({List<double> values, String unit, double avg, double thisWeek})? weeklyAmount(String id, {int weeks = 8}) {
+  ({List<double> values, String unit, double avg, double thisWeek})? weeklyAmount(String id, {int weeks = 8, int back = 0}) {
     final type = exerciseType(id);
-    final first = shiftDays(weekStartDate, -7 * (weeks - 1));
+    final first = shiftDays(weekStartDate, -7 * (weeks - 1) - 7 * weeks * back);
     final out = List<double>.filled(weeks, 0);
     final hasKm = _hist(id).any((h) => h.ex.sets.any((s) => (s.km ?? 0) > 0));
     for (final h in _hist(id)) {
@@ -825,9 +825,9 @@ mixin StatsMore on FitCore, ToolsState, LibraryState, SettingsState, StatsState,
   }
 
   /// Minutes in zones 4 and 5, per week, oldest first.
-  List<double>? zoneMinutesByWeek({int weeks = 8}) {
+  List<double>? zoneMinutesByWeek({int weeks = 8, int back = 0}) {
     if (!garminOn) return null;
-    final first = shiftDays(weekStartDate, -7 * (weeks - 1));
+    final first = shiftDays(weekStartDate, -7 * (weeks - 1) - 7 * weeks * back);
     final out = List<double>.filled(weeks, 0);
     var any = false;
     for (final s in sessions) {

@@ -15,6 +15,7 @@ import 'check_in.dart' show checkInWord;
 import 'glass.dart';
 import 'health_cards.dart' show HealthCard;
 import 'muscle_radar.dart' show MuscleRadarCard;
+import 'past_swipe.dart';
 import 'ui_kit.dart';
 
 part 'stat_cards_more.dart';
@@ -187,6 +188,30 @@ const _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 
 String _dm(DateTime d) => '${d.day} ${_months[d.month - 1]}';
 
 String _mmss(int sec) => '${sec ~/ 60}:${(sec % 60).toString().padLeft(2, '0')}';
+
+/// The name of the week that starts on [start], [back] weeks ago.
+String _weekName(DateTime start, int back) {
+  if (back == 0) return 'This week';
+  if (back == 1) return 'Last week';
+  return '${_dm(start)} – ${_dm(start.add(const Duration(days: 6)))}';
+}
+
+/// Arrows either side of [middle] that step back and forward through time.
+Widget _pager(GymColors gc, int back, int limit, void Function(int) go, Widget middle) {
+  Widget arrow(IconData icon, VoidCallback? onTap) => GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 2),
+          child: Icon(icon, size: 18, color: onTap == null ? gc.textTertiary.withValues(alpha: 0.3) : gc.textSecondary),
+        ),
+      );
+  return Row(mainAxisSize: MainAxisSize.min, children: [
+    arrow(Icons.chevron_left, back < limit ? () => go(1) : null),
+    middle,
+    arrow(Icons.chevron_right, back > 0 ? () => go(-1) : null),
+  ]);
+}
 
 String _signed(num pct) => pct.round() == 0 ? '0%' : '${pct > 0 ? '+' : '−'}${pct.abs().round()}%';
 
@@ -803,27 +828,31 @@ Widget? _mostDone(bool flat) {
 
 Widget? _weeks(bool flat) {
   if (fit.sessions.isEmpty) return null;
-  final counts = fit.sessionsPerWeek(12);
   final goal = fit.weeklyTarget;
   final streak = fit.weekStreak;
-  return Builder(builder: (context) {
-    final gc = context.gc;
-    return _Shell(
-      flat: flat,
-      title: 'Weeks',
-      trailing: _side(gc, 'Goal $goal a week'),
-      foot: _note(gc, 'Training days in each of the last 12 weeks. The line is your weekly goal.'),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          _big(gc, '$streak', unit: streak == 1 ? 'week in a row' : 'weeks in a row'),
-          const Spacer(),
-          _side(gc, '${counts.last} of $goal this week'),
+  final limit = fit.weeksOfHistory ~/ 12;
+  return PastSwipe(
+    limit: limit,
+    builder: (context, back, go) {
+      final gc = context.gc;
+      final counts = fit.sessionsPerWeek(12, back: back);
+      return _Shell(
+        flat: flat,
+        title: 'Weeks',
+        trailing: _pager(gc, back, limit, go, _side(gc, 'Goal $goal a week')),
+        foot: _note(gc, back == 0 ? 'Training days in each of the last 12 weeks. The line is your weekly goal.' : 'Training days in the 12 weeks ending ${back * 12} weeks ago.'),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            _big(gc, '$streak', unit: streak == 1 ? 'week in a row' : 'weeks in a row'),
+            const Spacer(),
+            if (back == 0) _side(gc, '${counts.last} of $goal this week'),
+          ]),
+          const SizedBox(height: 12),
+          _MiniBars(values: [for (final c in counts) c.toDouble()], goal: goal.toDouble(), height: 48),
         ]),
-        const SizedBox(height: 12),
-        _MiniBars(values: [for (final c in counts) c.toDouble()], goal: goal.toDouble(), height: 48),
-      ]),
-    );
-  });
+      );
+    },
+  );
 }
 
 Widget? _when(bool flat) {
@@ -1116,24 +1145,39 @@ class _WeekCard extends StatelessWidget {
     return AnimatedBuilder(
       animation: fit,
       builder: (context, _) {
-        final r = fit.weekReport;
-        if (r.sessions == 0 && r.lastSessions == 0) return const SizedBox.shrink();
-        String? delta(num a, num b) => b <= 0 ? null : _signed((a - b) / b * 100);
-        return _Shell(
-          flat: flat,
-          title: 'Weekly report card',
-          trailing: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () => showShareSheet(context),
-            child: Text('Share', style: AppTheme.f(12, weight: FontWeight.w700, color: gc.accent)),
-          ),
-          foot: r.muscles.isEmpty ? null : _note(gc, 'Most trained: ${r.muscles.join(', ')}.'),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            _tile(gc, 'Sessions', '${r.sessions}', note: delta(r.sessions, r.lastSessions)),
-            _tile(gc, 'Volume', '${fit.volumeValue(r.volume)} ${fit.volumeUnit}', note: delta(r.volume, r.lastVolume)),
-            _tile(gc, 'Records', '${r.prs}'),
-            _tile(gc, 'Session', r.avgMin == 0 ? '—' : '${r.avgMin} min'),
-          ]),
+        if (fit.sessions.isEmpty) return const SizedBox.shrink();
+        final limit = fit.weeksOfHistory;
+        return PastSwipe(
+          limit: limit,
+          builder: (context, back, go) {
+            final r = fit.weekReportFor(back);
+            final start = shiftDays(fit.weekStartDate, -7 * back);
+            String? delta(num a, num b) => b <= 0 ? null : _signed((a - b) / b * 100);
+            return _Shell(
+              flat: flat,
+              title: back == 0 ? 'Weekly report card' : _weekName(start, back),
+              trailing: _pager(
+                gc,
+                back,
+                limit,
+                go,
+                back == 0
+                    ? GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => showShareSheet(context),
+                        child: Text('Share', style: AppTheme.f(12, weight: FontWeight.w700, color: gc.accent)),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+              foot: r.muscles.isEmpty ? null : _note(gc, 'Most trained: ${r.muscles.join(', ')}.'),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                _tile(gc, 'Sessions', '${r.sessions}', note: delta(r.sessions, r.lastSessions)),
+                _tile(gc, 'Volume', '${fit.volumeValue(r.volume)} ${fit.volumeUnit}', note: delta(r.volume, r.lastVolume)),
+                _tile(gc, 'Records', '${r.prs}'),
+                _tile(gc, 'Session', r.avgMin == 0 ? '—' : '${r.avgMin} min'),
+              ]),
+            );
+          },
         );
       },
     );
