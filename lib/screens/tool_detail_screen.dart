@@ -128,7 +128,7 @@ class ToolDetailScreen extends StatelessWidget {
         return [
           ToolRow(label: t.weightLifted, control: StepperControl(value: ltr('${fit.weightValue(fit.rmWeight)} ${fit.units}'), onDec: () => fit.bumpRmWeight(-fit.fromDisplayWeight(fit.weightStep)), onInc: () => fit.bumpRmWeight(fit.fromDisplayWeight(fit.weightStep)), onEdit: () => _editNumber(context, title: t.weightLifted, current: fit.toDisplayWeight(fit.rmWeight), decimal: true, apply: (v) => fit.bumpRmWeight(fit.fromDisplayWeight(v) - fit.rmWeight)))),
           const SizedBox(height: 10),
-          ToolRow(label: t.repsPerformed, control: StepperControl(value: '${fit.rmCalcReps}', minWidth: 40, onDec: () => fit.bumpRmReps(-1), onInc: () => fit.bumpRmReps(1), onEdit: () => _editNumber(context, title: t.repsPerformed, current: fit.rmCalcReps.toDouble(), decimal: false, apply: (v) => fit.bumpRmReps(v.round() - fit.rmCalcReps)))),
+          ToolRow(label: t.repsPerformed, control: StepperControl(value: '${fit.rmReps}', minWidth: 40, onDec: () => fit.bumpRmReps(-1), onInc: () => fit.bumpRmReps(1), onEdit: () => _editNumber(context, title: t.repsPerformed, current: fit.rmReps.toDouble(), decimal: false, apply: (v) => fit.bumpRmReps(v.round() - fit.rmReps)))),
           const SizedBox(height: 10),
           ToolRow(label: t.rmPercent, control: StepperControl(value: '${fit.rmPct}%', minWidth: 52, onDec: () => fit.bumpRmPct(-1), onInc: () => fit.bumpRmPct(1), onEdit: () => _editNumber(context, title: t.rmPercent, current: fit.rmPct.toDouble(), decimal: false, apply: (v) => fit.bumpRmPct(v.round() - fit.rmPct)))),
           const SizedBox(height: 10),

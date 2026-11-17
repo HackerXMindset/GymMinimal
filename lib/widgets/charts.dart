@@ -647,7 +647,7 @@ class _MarketPainter extends CustomPainter {
     final w = math.max(head.width, tail?.width ?? 0) + 16;
     final h = head.height + (tail == null ? 0 : tail.height + 5) + 12;
     final left = pt.dx > size.width / 2 ? pt.dx - w - 12 : pt.dx + 12;
-    final x = left.clamp(0.0, math.max(0.0, size.width - w)).toDouble();
+    final x = left.clamp(0.0, math.max(0.0, size.width - w));
     final y = pt.dy < size.height * 0.5 ? math.max(0.0, size.height - h) : 0.0;
     final box = RRect.fromRectAndRadius(Rect.fromLTWH(x, y, w, h), const Radius.circular(8));
     canvas.drawRRect(box, Paint()..color = surface);

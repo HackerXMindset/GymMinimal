@@ -8,6 +8,7 @@ const kEssentialStats = {
   'x_level', 'x_trend', 'x_prs', 't_ready', 't_miles', 't_load', 't_weekly',
   'm_insights', 'm_recovery', 'm_balance', 'm_totals', 'm_week', 'm_heat',
   'g_ready', 'g_zones', 'g_rhr', 'g_sleep8',
+  'n_week', 'n_protein', 'n_hit',
 };
 
 class StatCardInfo {
@@ -36,6 +37,8 @@ const kStatGroups = <(String, String)>[
   ('g_ex', 'Garmin · by exercise'),
   ('g_after', 'Garmin · after the workout'),
   ('g_months', 'Garmin · over months'),
+  ('f_food', 'Food'),
+  ('f_gym', 'Food and training'),
 ];
 
 const kStatCards = <StatCardInfo>[
@@ -117,6 +120,18 @@ const kStatCards = <StatCardInfo>[
   StatCardInfo('g_calm', 'g_months', 'Stronger, calmer heart', 'Strength and resting heart rate, week by week.'),
   StatCardInfo('g_sleep8', 'g_months', 'Sleep, 8 nights', 'Hours slept over the last 8 nights.'),
   StatCardInfo('g_z45', 'g_months', 'Hard minutes a week', 'Minutes a week in zones 4 and 5.'),
+  StatCardInfo('n_week', 'f_food', 'Calories this week', 'A bar for each day of the week against your target. Swipe for earlier weeks.'),
+  StatCardInfo('n_macros', 'f_food', 'Where the energy comes from', 'Protein, carbs and fat as a share of the latest day.'),
+  StatCardInfo('n_trend', 'f_food', 'Calories, 30 days', 'Daily energy as a chart, with the average.'),
+  StatCardInfo('n_protein', 'f_food', 'Protein, 30 days', 'Daily protein as a chart, and how often you reached the target.'),
+  StatCardInfo('n_hit', 'f_food', 'Days on target', 'Days close to the energy target and days protein was reached.'),
+  StatCardInfo('n_meals', 'f_food', 'Calories by meal', 'Which meals carry the energy, over 14 days.'),
+  StatCardInfo('n_times', 'f_food', 'When you eat', 'Energy by time of day, over 14 days.'),
+  StatCardInfo('n_top', 'f_food', 'Most eaten foods', 'The foods that gave the most energy in 30 days.'),
+  StatCardInfo('n_water', 'f_food', 'Water, 14 days', 'Water each day against the target.'),
+  StatCardInfo('n_lift', 'f_gym', 'Lifting days and rest days', 'Protein and energy on days you lifted against days you did not.'),
+  StatCardInfo('n_weight', 'f_gym', 'Calories and bodyweight', 'Average energy a week next to how your weight moved.'),
+  StatCardInfo('n_before', 'f_gym', 'Eating before you lift', 'Load per set when you ate carbs in the 3 hours before, against lifting fasted.'),
 ];
 
 mixin StatsPlus on FitCore, ToolsState, LibraryState, SettingsState, TimelineState, StatsState, NutritionState {

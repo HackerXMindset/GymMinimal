@@ -62,6 +62,7 @@ part 'report_state.dart';
 part 'routines_state.dart';
 part 'settings_state.dart';
 part 'stats_more.dart';
+part 'mini_food_state.dart';
 part 'stats_plus.dart';
 part 'stats_state.dart';
 part 'steps_state.dart';
@@ -70,7 +71,7 @@ part 'tools_state.dart';
 part 'workout_state.dart';
 
 class FitState extends FitCore
-    with ToolsState, LibraryState, SettingsState, NotesState, PlacesState, GymPassState, MeasuresState, MomentsState, TimelineState, StatsState, StepsState, HealthState, CircuitState, NutritionState, StatsPlus, GarminState, StatsMore, ReportState, AwardsState, RoutinesState, WorkoutState {
+    with ToolsState, LibraryState, SettingsState, NotesState, PlacesState, GymPassState, MeasuresState, MomentsState, TimelineState, StatsState, StepsState, HealthState, CircuitState, NutritionState, StatsPlus, GarminState, StatsMore, MiniFoodState, ReportState, AwardsState, RoutinesState, WorkoutState {
   final Map<SoundGroup, String> notifSoundNames = {};
 
   void _loadNotifSounds(Object? raw) {
@@ -265,6 +266,7 @@ class FitState extends FitCore
       ..clear()
       ..addAll(((data['statsOff'] as List?) ?? const []).whereType<String>());
     loadGarmin(data['garmin'] as Map<String, dynamic>?);
+    loadMiniFood(data['miniFood'] as Map<String, dynamic>?);
     chartStyle = const ['classic', 'trading', 'bars', 'dots'].contains(data['chartStyle']) ? data['chartStyle'] as String : 'classic';
     rmReps.clear();
     ((data['rmReps'] as Map?) ?? const {}).forEach((k, v) {
@@ -666,6 +668,7 @@ class FitState extends FitCore
         'minimalTodayCalendar': minimalTodayCalendar,
         'statsOff': statsOff.toList(),
         'garmin': garminJson(),
+        'miniFood': miniFoodJson(),
         if (chartStyle != 'classic') 'chartStyle': chartStyle,
         if (rmReps.isNotEmpty) 'rmReps': rmReps,
         'musclePriority': musclePriority,
@@ -888,6 +891,7 @@ class FitState extends FitCore
     minimalTodayCalendar = true;
     statsOff.clear();
     loadGarmin(null);
+    loadMiniFood(null);
     chartStyle = 'classic';
     rmReps.clear();
     musclePriority.clear();
