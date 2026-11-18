@@ -31,6 +31,15 @@ import '../state/fit_state.dart';
 import '../widgets/charts.dart' show TrendChart;
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
+import '../services/app_icon.dart';
+import '../services/nfc_tags.dart';
+import '../services/quick_tiles.dart';
+import '../services/watch_link.dart';
+import 'help_topics.dart';
+import '../widgets/app_icon_sheet.dart';
+import '../widgets/nfc_sheet.dart';
+import '../widgets/quick_tiles_sheet.dart';
+import '../widgets/watch_sheet.dart';
 import '../widgets/auto_backup_sheet.dart';
 import '../widgets/body_rulers.dart';
 import '../widgets/dialogs.dart';
@@ -574,6 +583,24 @@ class SettingsScreen extends StatelessWidget {
                       ]),
                     ),
                   ),
+                  if (AppIcon.available)
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => showAppIconSheet(context),
+                      child: _prefRow(
+                        gc,
+                        PhosphorIconsRegular.appWindow,
+                        t.appIcon,
+                        Row(mainAxisSize: MainAxisSize.min, children: [
+                          ValueListenableBuilder<String>(
+                            valueListenable: AppIcon.current,
+                            builder: (_, _, _) => AppIconThumb(AppIcon.style, size: 26),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(PhosphorIconsRegular.caretRight, size: 15, color: gc.textTertiary),
+                        ]),
+                      ),
+                    ),
 
             GestureDetector(
               behavior: HitTestBehavior.opaque,
@@ -826,6 +853,35 @@ class SettingsScreen extends StatelessWidget {
                         hint: t.voiceSettingHint,
                         badge: BetaTag(t.sectionBeta, small: true)),
                   ),
+                  if (NfcTags.available)
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => showNfcSheet(context),
+                      child: _prefRow(
+                        gc,
+                        PhosphorIconsRegular.contactlessPayment,
+                        t.nfcRow,
+                        Row(mainAxisSize: MainAxisSize.min, children: [
+                          Text(fit.nfcTag ? t.nfcOn : t.nfcOff,
+                              style: AppTheme.f(13, weight: FontWeight.w600, color: gc.textSecondary)),
+                          const SizedBox(width: 6),
+                          Icon(PhosphorIconsRegular.caretRight, size: 15, color: gc.textTertiary),
+                        ]),
+                        hint: t.nfcRowHint,
+                      ),
+                    ),
+                  if (QuickTiles.available)
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => showQuickTilesSheet(context),
+                      child: _prefRow(
+                        gc,
+                        PhosphorIconsRegular.squaresFour,
+                        t.qsRow,
+                        Icon(PhosphorIconsRegular.caretRight, size: 15, color: gc.textTertiary),
+                        hint: t.qsRowHint,
+                      ),
+                    ),
           ]),
           _subhead(gc, t.routines),
           _card(gc, [
@@ -1275,10 +1331,11 @@ class SettingsScreen extends StatelessWidget {
               (PhosphorIconsRegular.downloadSimple, t.importBackup, () => _importBackup(context)),
               if (AutoBackup.instance.supported)
                 (PhosphorIconsRegular.clockCounterClockwise, t.autoBackup, () => showAutoBackupSheet(context)),
+              if (WatchLink.instance.available) (PhosphorIconsRegular.watch, t.watchRow, () => showWatchSheet(context)),
               (PhosphorIconsRegular.export, t.stravaRow, () => showStravaSheet(context)),
               (PhosphorIconsRegular.barbell, t.clearWorkouts, () => _clearWorkouts(context)),
               (PhosphorIconsRegular.trash, t.resetData, () => _resetAll(context)),
-          ], danger: AutoBackup.instance.supported ? 6 : 5),
+          ], danger: (AutoBackup.instance.supported ? 6 : 5) + (WatchLink.instance.available ? 1 : 0)),
         ];
       default:
         return [
@@ -1341,6 +1398,11 @@ class SettingsScreen extends StatelessWidget {
 
   static String sectionTitleOf(String id) => _sectionTitle(id);
 
+  List<(String, String)> get searchRows => [
+        for (final c in _categories())
+          for (final r in c.rows) (c.id, r.$1),
+      ];
+
   List<_Category> _categories() {
     const r = PhosphorIconsRegular.gearSix;
     return [
@@ -1352,6 +1414,7 @@ class SettingsScreen extends StatelessWidget {
         (t.heatRangeSetting, PhosphorIconsRegular.calendarDots),
         (t.heatmapLabelsSetting, PhosphorIconsRegular.gridNine),
         (t.background, PhosphorIconsRegular.image),
+        if (AppIcon.available) (t.appIcon, PhosphorIconsRegular.appWindow),
         (t.perfSetting, PhosphorIconsRegular.lightning),
         (t.textSizeSetting, PhosphorIconsRegular.textAa),
       ]),
@@ -1365,6 +1428,8 @@ class SettingsScreen extends StatelessWidget {
         (t.autoProgressSetting, PhosphorIconsRegular.trendUp),
         (t.deloadSetting, PhosphorIconsRegular.feather),
         (t.voiceSetting, PhosphorIconsRegular.waveform),
+        if (NfcTags.available) (t.nfcRow, PhosphorIconsRegular.contactlessPayment),
+        if (QuickTiles.available) (t.qsRow, PhosphorIconsRegular.squaresFour),
         (t.autoAdvance, PhosphorIconsRegular.skipForward),
         (t.countdownSetting, PhosphorIconsRegular.timer),
         (t.keepScreenOn, PhosphorIconsRegular.sun),
@@ -1423,6 +1488,7 @@ class SettingsScreen extends StatelessWidget {
         (t.exportBackup, PhosphorIconsRegular.fileZip),
         (t.importBackup, PhosphorIconsRegular.downloadSimple),
         (t.autoBackup, PhosphorIconsRegular.clockCounterClockwise),
+        if (WatchLink.instance.available) (t.watchRow, PhosphorIconsRegular.watch),
         (t.importFromApp, PhosphorIconsRegular.arrowSquareIn),
         (t.stravaRow, PhosphorIconsRegular.export),
         (t.clearWorkouts, PhosphorIconsRegular.barbell),
@@ -1916,8 +1982,11 @@ class SettingsScreen extends StatelessWidget {
                       ('Hevy', 'workout_data.csv'),
                       ('Strong', 'strong.csv'),
                       ('Lyfta', 'LyftaExport.csv'),
+                      ('Liftosaur', '.csv'),
+                      ('JEFIT', '.csv'),
+                      ('StrongLifts', '.csv'),
                       ('FitNotes', '.fitnotes'),
-                      ('openGym', 'opengym-backup.json'),
+                      ('openGym', '.json · .zip'),
                       ('CSV', ''),
                     ].indexed) ...[
                       if (i > 0) Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: gc.border),
@@ -2014,7 +2083,7 @@ class SettingsScreen extends StatelessWidget {
     String? raw;
     try {
       if (bytes.length > 2 && bytes[0] == 0x50 && bytes[1] == 0x4B) {
-        raw = weightCsvFromZip(bytes);
+        raw = openGymBackupFromZip(bytes) ?? weightCsvFromZip(bytes);
         if (raw == null) {
           _snack(context, t.importZipNoWeights);
           return;
@@ -3129,6 +3198,7 @@ class _SettingsHomeState extends State<_SettingsHome> {
   final _query = TextEditingController();
   final _focus = FocusNode();
   final _scroll = ScrollController();
+  String? _openHelp;
   static const _span = 96.0;
   static const _back = 36.0;
   static const _pill = 52.0;
@@ -3189,6 +3259,10 @@ class _SettingsHomeState extends State<_SettingsHome> {
           for (final r in c.rows)
             if (_plain(r.$1).contains(q) || _plain(c.title).contains(q)) (c, r.$1, r.$2),
     ];
+    final topics = searching ? helpTopics() : const <HelpTopic>[];
+    final asked = q.isEmpty
+        ? [for (final id in kHelpCommon) ...topics.where((h) => h.id == id)]
+        : topics.where((h) => h.matches(_query.text)).toList();
 
     final pad = MediaQuery.paddingOf(context).top;
     final titleTop = pad + 12 + _back + 18;
@@ -3222,7 +3296,7 @@ class _SettingsHomeState extends State<_SettingsHome> {
                     ),
                   ),
                   child: searching
-                      ? _results(gc, hits, q.isEmpty)
+                      ? _results(gc, cats, hits, asked, q.isEmpty)
                       : Column(
                           key: const ValueKey('cats'),
                           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -3444,17 +3518,138 @@ class _SettingsHomeState extends State<_SettingsHome> {
     );
   }
 
-  Widget _results(GymColors gc, List<(_Category, String, IconData)> hits, bool empty) {
-    if (empty) return const SizedBox(key: ValueKey('blank'), height: 200);
-    if (hits.isEmpty) {
+  void _goHelp(List<_Category> cats, HelpTopic h) {
+    final section = h.section;
+    if (section != null) {
+      final c = cats.where((c) => c.id == section).firstOrNull;
+      if (c != null) _go(c, h.row);
+      return;
+    }
+    _focus.unfocus();
+    h.go?.call();
+  }
+
+  Widget _helpLabel(GymColors gc, String text) => Padding(
+        padding: const EdgeInsets.fromLTRB(4, 6, 0, 10),
+        child: Text(text.toUpperCase(),
+            style: AppTheme.f(10.5, weight: FontWeight.w700, color: gc.textTertiary, letterSpacing: 1.4)),
+      );
+
+  Widget _helpGroup(GymColors gc, List<_Category> cats, List<HelpTopic> list) => Container(
+        decoration: BoxDecoration(color: gc.bgRaised, borderRadius: BorderRadius.circular(22)),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var i = 0; i < list.length; i++) _helpRow(gc, cats, list[i], last: i == list.length - 1),
+          ],
+        ),
+      );
+
+  Widget _helpRow(GymColors gc, List<_Category> cats, HelpTopic h, {required bool last}) {
+    final open = _openHelp == h.id;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: last ? null : Border(bottom: BorderSide(color: gc.border.withValues(alpha: 0.6))),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Semantics(
+            button: true,
+            expanded: open,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                HapticFeedback.selectionClick();
+                setState(() => _openHelp = open ? null : h.id);
+              },
+              child: Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(16, 15, 14, 15),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(h.question,
+                          style: AppTheme.f(14.5, weight: FontWeight.w600, color: gc.text, height: 1.3)),
+                    ),
+                    const SizedBox(width: 12),
+                    AnimatedRotation(
+                      turns: open ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 220),
+                      curve: Curves.easeOutCubic,
+                      child: Icon(PhosphorIconsRegular.caretDown, size: 15, color: gc.textTertiary),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 240),
+            curve: Curves.easeOutCubic,
+            alignment: Alignment.topCenter,
+            child: !open
+                ? const SizedBox(width: double.infinity)
+                : Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(16, 0, 16, 6),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(h.answer, style: AppTheme.s(13, color: gc.textSecondary, height: 1.45)),
+                        if (h.leads)
+                          Semantics(
+                            button: true,
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () {
+                                HapticFeedback.selectionClick();
+                                _goHelp(cats, h);
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(t.helpGo, style: AppTheme.f(13, weight: FontWeight.w700, color: gc.accent)),
+                                    const SizedBox(width: 4),
+                                    Icon(PhosphorIconsBold.arrowUpRight, size: 13, color: gc.accent),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                        else
+                          const SizedBox(height: 10),
+                      ],
+                    ),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _results(GymColors gc, List<_Category> cats, List<(_Category, String, IconData)> hits,
+      List<HelpTopic> asked, bool empty) {
+    if (empty) {
+      return Column(
+        key: const ValueKey('common'),
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _helpLabel(gc, t.helpCommon),
+          _helpGroup(gc, cats, asked),
+        ],
+      );
+    }
+    if (hits.isEmpty && asked.isEmpty) {
       return Padding(
         key: const ValueKey('none'),
         padding: const EdgeInsets.fromLTRB(4, 12, 4, 12),
-        child: Text(t.settingsNoResults, style: AppTheme.f(15, weight: FontWeight.w500, color: gc.textSecondary)),
+        child: Text(t.helpNoResults, style: AppTheme.f(15, weight: FontWeight.w500, color: gc.textSecondary)),
       );
     }
     return Column(
-      key: ValueKey('hits${hits.length}'),
+      key: ValueKey('hits${hits.length}-${asked.length}'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         for (var i = 0; i < hits.length; i++) ...[
@@ -3486,6 +3681,11 @@ class _SettingsHomeState extends State<_SettingsHome> {
               ),
             ),
           ),
+        ],
+        if (asked.isNotEmpty) ...[
+          if (hits.isNotEmpty) const SizedBox(height: 22),
+          _helpLabel(gc, t.helpQuestions),
+          _helpGroup(gc, cats, asked),
         ],
       ],
     );

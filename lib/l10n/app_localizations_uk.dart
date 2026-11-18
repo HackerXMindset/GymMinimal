@@ -3567,6 +3567,181 @@ class AppLocalizationsUk extends AppLocalizations {
   String get exerciseSettings => 'Налаштування вправи';
 
   @override
+  String get exerciseSettingsHint => 'Відпочинок, прогресія, розминка та інше';
+
+  @override
+  String get appIcon => 'Значок застосунку';
+
+  @override
+  String get appIconHint => 'Як GymMane виглядає на головному екрані';
+
+  @override
+  String get appIconColors => 'Кольори';
+
+  @override
+  String get appIconDesigns => 'Дизайни';
+
+  @override
+  String get appIconNote => 'Головному екрану може знадобитися кілька секунд, щоб показати зміну.';
+
+  @override
+  String get appIconDefault => 'Оригінал';
+
+  @override
+  String get appIconLight => 'Світлий';
+
+  @override
+  String get appIconSand => 'Пісок';
+
+  @override
+  String get appIconGraphite => 'Графіт';
+
+  @override
+  String get appIconSage => 'Шавлія';
+
+  @override
+  String get appIconNight => 'Ніч';
+
+  @override
+  String get appIconMaterial => 'Material';
+
+  @override
+  String get appIconMedal => 'Медаль';
+
+  @override
+  String get appIconGlass => 'Скло';
+
+  @override
+  String get appIconStopwatch => 'Секундомір';
+
+  @override
+  String get appIconMarble => 'Мармур';
+
+  @override
+  String get nfcRow => 'NFC-мітка';
+
+  @override
+  String get nfcRowHint => 'Піднесіть телефон і побачите тренування на сьогодні';
+
+  @override
+  String get nfcTitle => 'NFC-мітка';
+
+  @override
+  String get nfcSubtitle => 'Одна мітка на весь тиждень';
+
+  @override
+  String get nfcPoint1 => 'Сьогоднішнє тренування готове';
+
+  @override
+  String get nfcPoint1Body =>
+      'Піднесіть телефон, і відкриється програма на сьогодні з вправами. Починаєте, коли будете готові.';
+
+  @override
+  String get nfcPoint2 => 'У день відпочинку вона підкаже';
+
+  @override
+  String get nfcPoint2Body =>
+      'Якщо сьогодні день відпочинку, ви це побачите, і все одно зможете потренуватися.';
+
+  @override
+  String get nfcPoint3 => 'Записується один раз';
+
+  @override
+  String get nfcPoint3Body =>
+      'Змінюйте план коли завгодно: мітка завжди відкриває те, що заплановано на цей день.';
+
+  @override
+  String get nfcUse => 'Використовувати мітку';
+
+  @override
+  String get nfcUseHint => 'Якщо вимкнено, мітка нічого не робить';
+
+  @override
+  String get nfcWrite => 'Записати мітку';
+
+  @override
+  String get nfcOn => 'Увімк.';
+
+  @override
+  String get nfcOff => 'Вимк.';
+
+  @override
+  String get todayRestBody => 'Відпочинок теж частина плану. М’язи ростуть, поки ви відновлюєтеся.';
+
+  @override
+  String get todayNotNow => 'Не зараз';
+
+  @override
+  String get nfcWaitTitle => 'Піднесіть мітку до телефона';
+
+  @override
+  String get nfcWaitBody => 'Прикладіть її до задньої сторони телефона, біля камери, доки він не завібрує.';
+
+  @override
+  String get nfcTip =>
+      'Підійде будь-яка мітка NTAG213, 215 або 216. Вони найпоширеніші й коштують дуже мало.';
+
+  @override
+  String get nfcDoneTitle => 'Мітка готова';
+
+  @override
+  String get nfcDoneBody => 'Приклейте її там, де побачите, коли прийдете: на сумку, пляшку чи шафку.';
+
+  @override
+  String get nfcOffTitle => 'NFC вимкнено';
+
+  @override
+  String get nfcOffBody => 'Увімкніть NFC у налаштуваннях телефона, щоб записати мітку.';
+
+  @override
+  String get nfcOpenSettings => 'Відкрити налаштування';
+
+  @override
+  String get nfcFailTitle => 'Не вдалося записати';
+
+  @override
+  String get nfcErrLocked => 'Ця мітка заблокована, на неї не можна записати.';
+
+  @override
+  String get nfcErrSmall => 'Не вміщується на цю мітку. Використайте NTAG213 або більшу.';
+
+  @override
+  String get nfcErrLost => 'Мітка зсунулася завчасно. Тримайте її нерухомо й спробуйте ще раз.';
+
+  @override
+  String get nfcErrUnsupported => 'Ця мітка не підтримується. Використайте NTAG213, 215 або 216.';
+
+  @override
+  String get nfcRetry => 'Спробувати ще раз';
+
+  @override
+  String get raceTitle => 'Проти минулого тренування';
+
+  @override
+  String raceSince(String date) {
+    return 'Порівняно з $date';
+  }
+
+  @override
+  String get raceAhead => 'Ви попереду';
+
+  @override
+  String get raceBehind => 'Ще наздоганяєте';
+
+  @override
+  String get raceEven => 'Нарівні';
+
+  @override
+  String get raceToday => 'Сьогодні';
+
+  @override
+  String get raceThen => 'Тоді';
+
+  @override
+  String get raceHint =>
+      'Порівнюються лише однакові підходи: якщо ви зробили 2, то з вашими першими 2 того дня.';
+
+  @override
   String get placeActiveNow => 'Ви тут';
 
   @override
@@ -5432,6 +5607,15 @@ class AppLocalizationsUk extends AppLocalizations {
   String get importAsCopy => 'Додати копію';
 
   @override
+  String get routineExerciseNote => 'Нотатка програми';
+
+  @override
+  String get importRoutineNotes => 'Додати відсутні нотатки програми';
+
+  @override
+  String get routineNotesAdded => 'Нотатки програми додано';
+
+  @override
   String get importOwned => 'Уже є';
 
   @override
@@ -6513,6 +6697,15 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get reportShareCsv => 'Експорт CSV';
+
+  @override
+  String get reportChooseCsv => 'Виберіть, якими CSV-файлами поділитися.';
+
+  @override
+  String get reportWeighIns => 'Зважування';
+
+  @override
+  String get reportSessionDetails => 'Подробиці тренувань';
 
   @override
   String get reportShareCsvBoth => 'Експорт CSV (тренування й харчування)';
@@ -7857,6 +8050,45 @@ class AppLocalizationsUk extends AppLocalizations {
   String get webPhoneGuide => 'Як це налаштувати';
 
   @override
+  String get webSignOut => 'Вийти';
+
+  @override
+  String get wearSyncTitle => 'Телефон';
+
+  @override
+  String get wearSyncNever => 'Ще не синхронізовано';
+
+  @override
+  String wearSyncLast(String when) {
+    return 'Синхронізовано $when';
+  }
+
+  @override
+  String wearSyncWaiting(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n тренування чекають відправки на телефон',
+      many: '$n тренувань чекають відправки на телефон',
+      few: '$n тренування чекають відправки на телефон',
+      one: '$n тренування чекає відправки на телефон',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get wearSyncNow => 'Синхронізувати';
+
+  @override
+  String get wearSyncHow => 'На телефоні увімкни Налаштування › Годинник Wear OS і відкрий GymMane на обох.';
+
+  @override
+  String get routinesOrder => 'Змінити порядок програм';
+
+  @override
+  String get routinesOrderHint => 'Перетягуй, щоб змінити порядок.';
+
+  @override
   String get webPhoneOff => 'Синхронізацію з телефоном на цьому сервері вимкнено';
 
   @override
@@ -7947,4 +8179,462 @@ class AppLocalizationsUk extends AppLocalizations {
   String exerciseCopyName(String name) {
     return '$name (копія)';
   }
+
+  @override
+  String get foodAiRow => 'Fill in with an AI';
+
+  @override
+  String get foodAiRowHint => 'From a label, a screenshot or a link';
+
+  @override
+  String get foodAiTitle => 'Food with AI';
+
+  @override
+  String get foodAiHow =>
+      'Copy the request and paste it into any chatbot together with a photo of the nutrition label, a screenshot of the product or a link to it. Then paste its answer here.';
+
+  @override
+  String get foodAiCheck => 'The form fills itself in. Check the values against the label before saving.';
+
+  @override
+  String get foodAiFill => 'Fill in the food';
+
+  @override
+  String get foodAiFilled => 'Food filled in';
+
+  @override
+  String get foodAiFilledHint => 'Check the values before saving';
+
+  @override
+  String get fastAdd => 'Add a past fast';
+
+  @override
+  String get fastAddTitle => 'Add a fast';
+
+  @override
+  String get fastEditTitle => 'Edit fast';
+
+  @override
+  String get fastStartRow => 'Start';
+
+  @override
+  String get fastEndRow => 'End';
+
+  @override
+  String get fastEndedAt => 'When did you end it?';
+
+  @override
+  String fastLasted(String time) {
+    return 'Lasted $time';
+  }
+
+  @override
+  String get fastErrFuture => 'The end can\'t be later than now';
+
+  @override
+  String get fastErrOrder => 'The end has to come after the start';
+
+  @override
+  String get fastErrShort => 'A fast lasts at least 10 minutes';
+
+  @override
+  String get fastErrOverlap => 'It overlaps another fast';
+
+  @override
+  String get fastSaved => 'Fast saved';
+
+  @override
+  String get fastAdjust => 'Adjust';
+
+  @override
+  String get keepCounting => 'Рахувати далі';
+
+  @override
+  String get keepCountingHint => 'Сигналить на твоєму часі й іде далі, доки не зупиниш';
+
+  @override
+  String get holdOvertime => 'Понад час';
+
+  @override
+  String get pairSetting => 'Пара гантелей';
+
+  @override
+  String get pairSettingHint => 'Записуй вагу однієї. Обсяг рахує обидві.';
+
+  @override
+  String get helpCommon => 'Часті питання';
+
+  @override
+  String get helpQuestions => 'Питання';
+
+  @override
+  String get helpNoResults => 'Нічого не знайдено. Спробуй інше слово';
+
+  @override
+  String get helpLbQ => 'Чи можна використовувати фунти лише для однієї вправи?';
+
+  @override
+  String helpLbA(String option) {
+    return 'Так. Під час тренування відкрий меню ⋯ вправи й вибери «$option».';
+  }
+
+  @override
+  String get helpSupersetQ => 'Як зробити суперсет?';
+
+  @override
+  String get helpSupersetA => 'У редакторі програми натисни на зв’язок між двома вправами, щоб поєднати їх.';
+
+  @override
+  String get helpRangeQ => 'Як задати діапазон повторень, наприклад 8-12?';
+
+  @override
+  String get helpRangeA => 'У редакторі програми затисни повторення.';
+
+  @override
+  String get helpRestQ => 'Чи може кожна вправа мати свій відпочинок?';
+
+  @override
+  String helpRestA(String settings, String rest, String section) {
+    return 'Так: відкрий вправу › $settings › $rest. Відпочинок за замовчуванням у Налаштуваннях › $section.';
+  }
+
+  @override
+  String get helpSidesQ => 'Як записувати ліву й праву сторону окремо?';
+
+  @override
+  String helpSidesA(String settings, String sides) {
+    return 'Відкрий вправу › $settings › $sides.';
+  }
+
+  @override
+  String get helpPairQ => 'Гантелі: записувати одну чи обидві?';
+
+  @override
+  String helpPairA(String pair) {
+    return 'Одну. Увімкни «$pair» у налаштуваннях вправи, і обсяг порахує обидві.';
+  }
+
+  @override
+  String get helpKeepQ => 'Чи може підхід на час тривати довше?';
+
+  @override
+  String helpKeepA(String keep) {
+    return 'Так: увімкни «$keep» у налаштуваннях вправи. Сигналить на твоєму часі й рахує далі, доки не зупиниш.';
+  }
+
+  @override
+  String get helpDayOffQ => 'Як позначити день відпочинку, хвороби чи подорожі?';
+
+  @override
+  String get helpDayOffA =>
+      'На головній затисни день у своєму тижні. Серія й нагадування його не чіпатимуть.';
+
+  @override
+  String get helpImportQ => 'Чи можна перенести тренування з Hevy, Strong або іншого застосунку?';
+
+  @override
+  String helpImportA(String section, String row) {
+    return 'Так: Налаштування › $section › $row. Також читає FitNotes, Fitbod, JEFIT, StrongLifts, Liftosaur і Lyfta.';
+  }
+
+  @override
+  String get helpPhoneQ => 'Як перенести дані на новий телефон?';
+
+  @override
+  String helpPhoneA(String section, String import) {
+    return 'Експортуй копію в Налаштуваннях › $section і відкрий її на новому телефоні через «$import».';
+  }
+
+  @override
+  String get helpSlowQ => 'Застосунок гальмує на моєму телефоні';
+
+  @override
+  String helpSlowA(String section, String perf, String lite) {
+    return 'Налаштування › $section › $perf › $lite. Це вимикає розмиття, найважчу частину.';
+  }
+
+  @override
+  String get helpPlatesQ => 'Скільки млинців вішати на гриф?';
+
+  @override
+  String helpPlatesA(String tool, String places) {
+    return 'Використай «$tool» в Інструментах. Млинці й гриф твого залу задаються в «$places».';
+  }
+
+  @override
+  String get helpRaceQ => 'Як порівняти себе з минулим тренуванням?';
+
+  @override
+  String helpRaceA(String race) {
+    return 'Під час тренування натисни на плашку зверху: «$race».';
+  }
+
+  @override
+  String get helpFastQ => 'Я забув завершити голодування';
+
+  @override
+  String helpFastA(String adjust) {
+    return 'Заверши його й натисни «$adjust» у сповіщенні або натисни на голодування у вікні голодування, щоб змінити час.';
+  }
+
+  @override
+  String get helpGo => 'Показати';
+
+  @override
+  String get helpHomeOrderQ => 'Чи можна змінити порядок на головній?';
+
+  @override
+  String helpHomeOrderA(String section, String row) {
+    return 'Так: Налаштування › $section › «$row». Затисни й перетягуй розділи або вимкни ті, якими не користуєшся.';
+  }
+
+  @override
+  String get helpCustomQ => 'Чи можна створити свою вправу?';
+
+  @override
+  String helpCustomA(String button) {
+    return 'Так: у Вправах натисни «$button». Обираєш назву, м’язи й інвентар, і вона працює як будь-яка інша.';
+  }
+
+  @override
+  String get helpWarmupQ => 'Чи може застосунок сам додати розминкові підходи?';
+
+  @override
+  String helpWarmupA(String settings, String warm, String tool) {
+    return 'Так: відкрий вправу › $settings › «$warm». Щоб порахувати вручну, використай «$tool» в Інструментах.';
+  }
+
+  @override
+  String get helpPassQ => 'Чи можна зберігати картку залу в застосунку?';
+
+  @override
+  String helpPassA(String row, String section) {
+    return 'Так: «$row» у Налаштуваннях › $section. Показує штрихкод або QR-код для входу.';
+  }
+
+  @override
+  String get helpStepsQ => 'Чому я не бачу свої кроки?';
+
+  @override
+  String helpStepsA(String row, String section) {
+    return 'Кроки беруться з Health Connect, який є в Android 14 і новіших. На старих телефонах його немає. Якщо він у тебе є, увімкни «$row» у Налаштуваннях › $section.';
+  }
+
+  @override
+  String get helpNfcQ => 'Чи можна почати тренування дотиком телефона?';
+
+  @override
+  String helpNfcA(String row, String section) {
+    return 'Так, з NFC-міткою: «$row» у Налаштуваннях › $section. Наклей її в залі, і дотик відкриє сьогоднішнє тренування.';
+  }
+
+  @override
+  String get helpCleanQ => 'Як зробити екран Харчування чистішим?';
+
+  @override
+  String helpCleanA(String button) {
+    return 'У Харчуванні натисни кнопку з повзунками зверху («$button») і вимкни те, що не відстежуєш.';
+  }
+
+  @override
+  String alsoWorksMuscles(String muscles) {
+    return 'Також працюють $muscles';
+  }
+
+  @override
+  String get wearSyncAllow => 'Дозволити Bluetooth';
+
+  @override
+  String get wearSyncSearching => 'Шукаю телефон…';
+
+  @override
+  String get wearSyncNotFound => 'Телефон не знайдено';
+
+  @override
+  String get wearSyncBluetoothOff => 'Bluetooth вимкнено';
+
+  @override
+  String get watchRow => 'Годинник Wear OS';
+
+  @override
+  String get watchTitle => 'Годинник Wear OS';
+
+  @override
+  String get watchSubtitle => 'Програми на зап’ясті, тренування назад на телефоні';
+
+  @override
+  String get watchPoint1 => 'Встанови GymMane на годинник';
+
+  @override
+  String get watchPoint1Body =>
+      'Це той самий застосунок, що й на телефоні. Натисни, щоб відкрити інструкцію зі встановлення.';
+
+  @override
+  String get watchPoint2 => 'Відкрий GymMane на обох';
+
+  @override
+  String get watchPoint2Body =>
+      'Вони синхронізуються самі через Bluetooth, який уже з’єднує телефон і годинник. Без інтернету.';
+
+  @override
+  String get watchPoint3 => 'Тренуйся з годинником';
+
+  @override
+  String get watchPoint3Body =>
+      'Те, що робиш на годиннику, потрапляє на телефон, коли обидва знову будуть відкриті.';
+
+  @override
+  String get watchUse => 'Синхронізація з годинником';
+
+  @override
+  String get watchUseHint => 'Лише якщо маєш годинник. Попросить доступ до Bluetooth';
+
+  @override
+  String get watchTurnOnBluetooth => 'Увімкнути Bluetooth';
+
+  @override
+  String get watchSyncNow => 'Синхронізувати';
+
+  @override
+  String get watchSearching => 'Шукаю годинник…';
+
+  @override
+  String get watchSearchingHint => 'Відкрий GymMane на годиннику, якщо ще не відкрито.';
+
+  @override
+  String get watchBluetoothOff => 'Bluetooth вимкнено.';
+
+  @override
+  String get watchNotFound => 'Годинник не знайдено. Відкрий на ньому GymMane і спробуй ще раз.';
+
+  @override
+  String get watchNever => 'Ще не синхронізовано.';
+
+  @override
+  String watchLast(String when) {
+    return 'Синхронізовано $when.';
+  }
+
+  @override
+  String watchLastWith(String name, String when) {
+    return 'Синхронізовано з $name $when.';
+  }
+
+  @override
+  String get watchTip => 'Бета: ще перевірено не на всіх годинниках. Якщо не працює, напиши на GitHub.';
+
+  @override
+  String get mineralsTracker => 'Iron and potassium';
+
+  @override
+  String get ironLabel => 'Iron';
+
+  @override
+  String get potassiumLabel => 'Potassium';
+
+  @override
+  String mineralsCoverage(int known, int total) {
+    return '$known of $total foods today have iron and potassium';
+  }
+
+  @override
+  String get mineralsHint =>
+      'Few foods in the list come with iron and potassium, so the total only counts the ones that do. Add them to your own foods or with the AI.';
+
+  @override
+  String get qsRow => 'Плитки у швидких налаштуваннях';
+
+  @override
+  String get qsRowHint => 'Сьогоднішнє тренування або абонемент, з верхньої панелі';
+
+  @override
+  String get qsTitle => 'Плитки у швидких налаштуваннях';
+
+  @override
+  String get qsSubtitle =>
+      'Опустіть швидкі налаштування й потрапляйте туди одним дотиком, не шукаючи застосунок';
+
+  @override
+  String get qsToday => 'Тренування на сьогодні';
+
+  @override
+  String get qsTodayHint => 'Як NFC-наліпка: відкриває те, що заплановано на сьогодні';
+
+  @override
+  String get qsPass => 'Абонемент у зал';
+
+  @override
+  String qsPassHint(String name) {
+    return 'Відкриває $name, щоб прикласти його на вході';
+  }
+
+  @override
+  String get qsPassNone => 'Спочатку додайте абонемент у зал';
+
+  @override
+  String get qsRest => 'День відпочинку';
+
+  @override
+  String get qsAdd => 'Додати';
+
+  @override
+  String get qsAdded => 'Додано';
+
+  @override
+  String get qsManual =>
+      'Опустіть панель швидких налаштувань, торкніться олівця й перетягніть плитку GymMane до своїх.';
+
+  @override
+  String get qsPassUse => 'Відкривати зі швидких налаштувань';
+
+  @override
+  String get qsPassUseHint => 'Плитка у швидких налаштуваннях відкриває цей абонемент';
+
+  @override
+  String get measureAbdomen => 'Живіт';
+
+  @override
+  String get bfNeckBelow => 'Шия (під кадиком)';
+
+  @override
+  String get bfAbdomen => 'Живіт (на рівні пупка)';
+
+  @override
+  String get bfWaistNarrow => 'Талія (найвужче місце)';
+
+  @override
+  String get bfHipWide => 'Стегна (найширше місце)';
+
+  @override
+  String get measureBp => 'Тиск';
+
+  @override
+  String get measureLeft => 'Ліва';
+
+  @override
+  String get measureRight => 'Права';
+
+  @override
+  String get measureLeftShort => 'Л';
+
+  @override
+  String get measureRightShort => 'П';
+
+  @override
+  String get measureOneValue => 'Одне значення';
+
+  @override
+  String get measureNoteHint => 'Нотатка (необов’язково)';
+
+  @override
+  String get bpHigh => 'Систолічний';
+
+  @override
+  String get bpLow => 'Діастолічний';
+
+  @override
+  String get bpPulse => 'Пульс';
+
+  @override
+  String get bpPulseAdd => '+ Пульс';
 }

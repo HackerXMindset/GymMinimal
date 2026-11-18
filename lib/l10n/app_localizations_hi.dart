@@ -3545,6 +3545,177 @@ class AppLocalizationsHi extends AppLocalizations {
   String get exerciseSettings => 'इस एक्सरसाइज़ की सेटिंग्स';
 
   @override
+  String get exerciseSettingsHint => 'आराम, प्रगति, वार्म-अप और भी बहुत कुछ';
+
+  @override
+  String get appIcon => 'ऐप आइकन';
+
+  @override
+  String get appIconHint => 'होम स्क्रीन पर GymMane कैसा दिखता है';
+
+  @override
+  String get appIconColors => 'रंग';
+
+  @override
+  String get appIconDesigns => 'डिज़ाइन';
+
+  @override
+  String get appIconNote => 'होम स्क्रीन पर बदलाव दिखने में कुछ सेकंड लग सकते हैं।';
+
+  @override
+  String get appIconDefault => 'मूल';
+
+  @override
+  String get appIconLight => 'हल्का';
+
+  @override
+  String get appIconSand => 'रेत';
+
+  @override
+  String get appIconGraphite => 'ग्रेफ़ाइट';
+
+  @override
+  String get appIconSage => 'सेज';
+
+  @override
+  String get appIconNight => 'रात';
+
+  @override
+  String get appIconMaterial => 'Material';
+
+  @override
+  String get appIconMedal => 'पदक';
+
+  @override
+  String get appIconGlass => 'काँच';
+
+  @override
+  String get appIconStopwatch => 'स्टॉपवॉच';
+
+  @override
+  String get appIconMarble => 'संगमरमर';
+
+  @override
+  String get nfcRow => 'NFC स्टिकर';
+
+  @override
+  String get nfcRowHint => 'फ़ोन पास लाएँ और आज का वर्कआउट देखें';
+
+  @override
+  String get nfcTitle => 'NFC स्टिकर';
+
+  @override
+  String get nfcSubtitle => 'पूरे हफ़्ते के लिए एक स्टिकर';
+
+  @override
+  String get nfcPoint1 => 'आज का वर्कआउट, तैयार';
+
+  @override
+  String get nfcPoint1Body =>
+      'फ़ोन पास लाएँ और आज का रूटीन उसकी एक्सरसाइज़ के साथ खुल जाता है। तैयार होने पर इसे खुद शुरू करें।';
+
+  @override
+  String get nfcPoint2 => 'आराम के दिन यह बता देता है';
+
+  @override
+  String get nfcPoint2Body => 'अगर आज आराम का दिन है तो दिख जाएगा, और चाहें तो फिर भी ट्रेनिंग कर सकते हैं।';
+
+  @override
+  String get nfcPoint3 => 'एक बार लिखना काफ़ी है';
+
+  @override
+  String get nfcPoint3Body => 'जब चाहें प्लान बदलें: स्टिकर हमेशा उस दिन का तय वर्कआउट खोलता है।';
+
+  @override
+  String get nfcUse => 'स्टिकर इस्तेमाल करें';
+
+  @override
+  String get nfcUseHint => 'बंद होने पर स्टिकर पास लाने से कुछ नहीं होता';
+
+  @override
+  String get nfcWrite => 'स्टिकर लिखें';
+
+  @override
+  String get nfcOn => 'चालू';
+
+  @override
+  String get nfcOff => 'बंद';
+
+  @override
+  String get todayRestBody => 'आराम भी प्लान का हिस्सा है। रिकवरी के दौरान मांसपेशियाँ बढ़ती हैं।';
+
+  @override
+  String get todayNotNow => 'अभी नहीं';
+
+  @override
+  String get nfcWaitTitle => 'स्टिकर को फ़ोन के पास लाएँ';
+
+  @override
+  String get nfcWaitBody => 'इसे फ़ोन के पीछे, कैमरे के पास, वाइब्रेट होने तक लगाए रखें।';
+
+  @override
+  String get nfcTip => 'कोई भी NTAG213, 215 या 216 स्टिकर चलेगा। ये सबसे आम हैं और बहुत सस्ते हैं।';
+
+  @override
+  String get nfcDoneTitle => 'स्टिकर तैयार है';
+
+  @override
+  String get nfcDoneBody => 'इसे ऐसी जगह चिपकाएँ जहाँ पहुँचते ही नज़र आए: जिम बैग, बोतल या लॉकर।';
+
+  @override
+  String get nfcOffTitle => 'NFC बंद है';
+
+  @override
+  String get nfcOffBody => 'स्टिकर लिखने के लिए फ़ोन की सेटिंग में NFC चालू करें।';
+
+  @override
+  String get nfcOpenSettings => 'सेटिंग खोलें';
+
+  @override
+  String get nfcFailTitle => 'लिखा नहीं जा सका';
+
+  @override
+  String get nfcErrLocked => 'यह स्टिकर लॉक है, इस पर लिखा नहीं जा सकता।';
+
+  @override
+  String get nfcErrSmall => 'यह इस स्टिकर में नहीं आता। NTAG213 या बड़ा इस्तेमाल करें।';
+
+  @override
+  String get nfcErrLost => 'पूरा होने से पहले स्टिकर हिल गया। इसे स्थिर रखें और फिर से कोशिश करें।';
+
+  @override
+  String get nfcErrUnsupported => 'यह स्टिकर समर्थित नहीं है। NTAG213, 215 या 216 इस्तेमाल करें।';
+
+  @override
+  String get nfcRetry => 'फिर से कोशिश करें';
+
+  @override
+  String get raceTitle => 'पिछले सेशन के मुक़ाबले';
+
+  @override
+  String raceSince(String date) {
+    return '$date की तुलना में';
+  }
+
+  @override
+  String get raceAhead => 'आगे चल रहे हैं';
+
+  @override
+  String get raceBehind => 'अभी पीछा जारी है';
+
+  @override
+  String get raceEven => 'बराबरी पर';
+
+  @override
+  String get raceToday => 'आज';
+
+  @override
+  String get raceThen => 'तब';
+
+  @override
+  String get raceHint => 'सिर्फ़ एक जैसे सेट की तुलना होती है: 2 कर लिए हों तो उस दिन के पहले 2 से।';
+
+  @override
   String get placeActiveNow => 'तुम यहाँ हो';
 
   @override
@@ -5348,6 +5519,15 @@ class AppLocalizationsHi extends AppLocalizations {
   String get importAsCopy => 'कॉपी के रूप में जोड़ें';
 
   @override
+  String get routineExerciseNote => 'रूटीन नोट';
+
+  @override
+  String get importRoutineNotes => 'रूटीन के छूटे हुए नोट जोड़ें';
+
+  @override
+  String get routineNotesAdded => 'रूटीन नोट जोड़ दिए गए';
+
+  @override
   String get importOwned => 'पहले से तुम्हारा';
 
   @override
@@ -6390,6 +6570,15 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get reportShareCsv => 'CSV एक्सपोर्ट करें';
+
+  @override
+  String get reportChooseCsv => 'चुनें कि कौन-सी CSV फ़ाइलें शेयर करनी हैं।';
+
+  @override
+  String get reportWeighIns => 'वज़न की एंट्री';
+
+  @override
+  String get reportSessionDetails => 'सेशन का विवरण';
 
   @override
   String get reportShareCsvBoth => 'CSV एक्सपोर्ट करें (वर्कआउट और न्यूट्रिशन)';
@@ -7636,6 +7825,43 @@ class AppLocalizationsHi extends AppLocalizations {
   String get webPhoneGuide => 'इसे कैसे सेट करें';
 
   @override
+  String get webSignOut => 'साइन आउट';
+
+  @override
+  String get wearSyncTitle => 'फ़ोन';
+
+  @override
+  String get wearSyncNever => 'अभी सिंक नहीं हुआ';
+
+  @override
+  String wearSyncLast(String when) {
+    return '$when को सिंक हुआ';
+  }
+
+  @override
+  String wearSyncWaiting(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n वर्कआउट फ़ोन पर जाने का इंतज़ार कर रहे हैं',
+      one: '1 वर्कआउट फ़ोन पर जाने का इंतज़ार कर रहा है',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get wearSyncNow => 'अभी सिंक करें';
+
+  @override
+  String get wearSyncHow => 'फ़ोन पर सेटिंग्स › Wear OS घड़ी चालू करें और दोनों पर GymMane खोलें।';
+
+  @override
+  String get routinesOrder => 'रूटीन का क्रम बदलें';
+
+  @override
+  String get routinesOrderHint => 'दिखने का क्रम बदलने के लिए खींचें।';
+
+  @override
   String get webPhoneOff => 'इस सर्वर पर फ़ोन सिंक बंद है';
 
   @override
@@ -7724,4 +7950,459 @@ class AppLocalizationsHi extends AppLocalizations {
   String exerciseCopyName(String name) {
     return '$name (कॉपी)';
   }
+
+  @override
+  String get foodAiRow => 'Fill in with an AI';
+
+  @override
+  String get foodAiRowHint => 'From a label, a screenshot or a link';
+
+  @override
+  String get foodAiTitle => 'Food with AI';
+
+  @override
+  String get foodAiHow =>
+      'Copy the request and paste it into any chatbot together with a photo of the nutrition label, a screenshot of the product or a link to it. Then paste its answer here.';
+
+  @override
+  String get foodAiCheck => 'The form fills itself in. Check the values against the label before saving.';
+
+  @override
+  String get foodAiFill => 'Fill in the food';
+
+  @override
+  String get foodAiFilled => 'Food filled in';
+
+  @override
+  String get foodAiFilledHint => 'Check the values before saving';
+
+  @override
+  String get fastAdd => 'Add a past fast';
+
+  @override
+  String get fastAddTitle => 'Add a fast';
+
+  @override
+  String get fastEditTitle => 'Edit fast';
+
+  @override
+  String get fastStartRow => 'Start';
+
+  @override
+  String get fastEndRow => 'End';
+
+  @override
+  String get fastEndedAt => 'When did you end it?';
+
+  @override
+  String fastLasted(String time) {
+    return 'Lasted $time';
+  }
+
+  @override
+  String get fastErrFuture => 'The end can\'t be later than now';
+
+  @override
+  String get fastErrOrder => 'The end has to come after the start';
+
+  @override
+  String get fastErrShort => 'A fast lasts at least 10 minutes';
+
+  @override
+  String get fastErrOverlap => 'It overlaps another fast';
+
+  @override
+  String get fastSaved => 'Fast saved';
+
+  @override
+  String get fastAdjust => 'Adjust';
+
+  @override
+  String get keepCounting => 'गिनती जारी रखें';
+
+  @override
+  String get keepCountingHint => 'आपके समय पर बजता है और रोकने तक चलता रहता है';
+
+  @override
+  String get holdOvertime => 'अतिरिक्त समय';
+
+  @override
+  String get pairSetting => 'डंबल की जोड़ी';
+
+  @override
+  String get pairSettingHint => 'एक का वज़न लिखें। वॉल्यूम दोनों को गिनता है।';
+
+  @override
+  String get helpCommon => 'आम सवाल';
+
+  @override
+  String get helpQuestions => 'सवाल';
+
+  @override
+  String get helpNoResults => 'कुछ नहीं मिला। कोई और शब्द आज़माएँ';
+
+  @override
+  String get helpLbQ => 'क्या मैं सिर्फ़ एक एक्सरसाइज़ के लिए lb इस्तेमाल कर सकता हूँ?';
+
+  @override
+  String helpLbA(String option) {
+    return 'हाँ। वर्कआउट के दौरान एक्सरसाइज़ का ⋯ मेन्यू खोलें और “$option” चुनें।';
+  }
+
+  @override
+  String get helpSupersetQ => 'सुपरसेट कैसे बनाएँ?';
+
+  @override
+  String get helpSupersetA => 'रूटीन एडिटर में दो एक्सरसाइज़ के बीच के लिंक पर टैप करके उन्हें जोड़ें।';
+
+  @override
+  String get helpRangeQ => '8-12 जैसी रेप रेंज कैसे सेट करें?';
+
+  @override
+  String get helpRangeA => 'रूटीन एडिटर में रेप्स को देर तक दबाएँ।';
+
+  @override
+  String get helpRestQ => 'क्या हर एक्सरसाइज़ का अपना आराम हो सकता है?';
+
+  @override
+  String helpRestA(String settings, String rest, String section) {
+    return 'हाँ: एक्सरसाइज़ खोलें › $settings › $rest। आपका डिफ़ॉल्ट आराम सेटिंग्स › $section में है।';
+  }
+
+  @override
+  String get helpSidesQ => 'बायाँ और दायाँ अलग-अलग कैसे लिखें?';
+
+  @override
+  String helpSidesA(String settings, String sides) {
+    return 'एक्सरसाइज़ खोलें › $settings › $sides।';
+  }
+
+  @override
+  String get helpPairQ => 'डंबल: एक लिखूँ या दोनों?';
+
+  @override
+  String helpPairA(String pair) {
+    return 'एक। एक्सरसाइज़ की सेटिंग्स में “$pair” चालू करें, वॉल्यूम दोनों को गिनेगा।';
+  }
+
+  @override
+  String get helpKeepQ => 'क्या समय वाला सेट समय से आगे चल सकता है?';
+
+  @override
+  String helpKeepA(String keep) {
+    return 'हाँ: एक्सरसाइज़ की सेटिंग्स में “$keep” चालू करें। आपके समय पर बजता है और रोकने तक गिनता रहता है।';
+  }
+
+  @override
+  String get helpDayOffQ => 'आराम, बीमारी या सफ़र का दिन कैसे चिह्नित करें?';
+
+  @override
+  String get helpDayOffA =>
+      'होम पर अपने हफ़्ते में उस दिन को देर तक दबाएँ। स्ट्रीक और रिमाइंडर उसे नहीं छूते।';
+
+  @override
+  String get helpImportQ => 'क्या मैं Hevy, Strong या किसी और ऐप से वर्कआउट ला सकता हूँ?';
+
+  @override
+  String helpImportA(String section, String row) {
+    return 'हाँ: सेटिंग्स › $section › $row। यह FitNotes, Fitbod, JEFIT, StrongLifts, Liftosaur और Lyfta भी पढ़ता है।';
+  }
+
+  @override
+  String get helpPhoneQ => 'अपना डेटा नए फ़ोन पर कैसे ले जाएँ?';
+
+  @override
+  String helpPhoneA(String section, String import) {
+    return 'सेटिंग्स › $section में एक कॉपी एक्सपोर्ट करें और नए फ़ोन पर “$import” से खोलें।';
+  }
+
+  @override
+  String get helpSlowQ => 'मेरे फ़ोन पर ऐप धीमा है';
+
+  @override
+  String helpSlowA(String section, String perf, String lite) {
+    return 'सेटिंग्स › $section › $perf › $lite। यह ब्लर बंद करता है, जो सबसे भारी हिस्सा है।';
+  }
+
+  @override
+  String get helpPlatesQ => 'बार पर कितनी प्लेटें लगेंगी?';
+
+  @override
+  String helpPlatesA(String tool, String places) {
+    return 'टूल्स में “$tool” इस्तेमाल करें। आपके जिम की प्लेटें और बार “$places” में सेट होते हैं।';
+  }
+
+  @override
+  String get helpRaceQ => 'पिछले वर्कआउट से तुलना कैसे करें?';
+
+  @override
+  String helpRaceA(String race) {
+    return 'वर्कआउट के दौरान ऊपर वाली पिल पर टैप करें: “$race”।';
+  }
+
+  @override
+  String get helpFastQ => 'मैं अपना उपवास ख़त्म करना भूल गया';
+
+  @override
+  String helpFastA(String adjust) {
+    return 'उसे ख़त्म करें और सूचना पर “$adjust” टैप करें, या समय बदलने के लिए उपवास शीट में उस उपवास पर टैप करें।';
+  }
+
+  @override
+  String get helpGo => 'दिखाएँ';
+
+  @override
+  String get helpHomeOrderQ => 'क्या मैं होम का क्रम बदल सकता हूँ?';
+
+  @override
+  String helpHomeOrderA(String section, String row) {
+    return 'हाँ: सेटिंग्स › $section › “$row”। सेक्शन दबाकर खींचें, या जो इस्तेमाल नहीं करते उन्हें बंद करें।';
+  }
+
+  @override
+  String get helpCustomQ => 'क्या मैं अपनी एक्सरसाइज़ बना सकता हूँ?';
+
+  @override
+  String helpCustomA(String button) {
+    return 'हाँ: एक्सरसाइज़ में “$button” टैप करें। नाम, मांसपेशियाँ और उपकरण चुनें, और यह बाकी की तरह काम करती है।';
+  }
+
+  @override
+  String get helpWarmupQ => 'क्या ऐप मेरे लिए वार्म-अप सेट जोड़ सकता है?';
+
+  @override
+  String helpWarmupA(String settings, String warm, String tool) {
+    return 'हाँ: एक्सरसाइज़ खोलें › $settings › “$warm”। हाथ से गिनने के लिए टूल्स में “$tool” इस्तेमाल करें।';
+  }
+
+  @override
+  String get helpPassQ => 'क्या मैं जिम कार्ड ऐप में रख सकता हूँ?';
+
+  @override
+  String helpPassA(String row, String section) {
+    return 'हाँ: सेटिंग्स › $section में “$row”। यह दरवाज़े पर स्कैन के लिए बारकोड या QR कोड दिखाता है।';
+  }
+
+  @override
+  String get helpStepsQ => 'मुझे अपने कदम क्यों नहीं दिखते?';
+
+  @override
+  String helpStepsA(String row, String section) {
+    return 'कदम Health Connect से पढ़े जाते हैं, जो Android 14 और बाद के साथ आता है। पुराने फ़ोन पर यह उपलब्ध नहीं है। अगर आपके पास है, तो सेटिंग्स › $section में “$row” चालू करें।';
+  }
+
+  @override
+  String get helpNfcQ => 'क्या मैं फ़ोन छूकर वर्कआउट शुरू कर सकता हूँ?';
+
+  @override
+  String helpNfcA(String row, String section) {
+    return 'हाँ, NFC स्टिकर से: सेटिंग्स › $section में “$row”। इसे जिम में चिपकाएँ और छूने पर आज का वर्कआउट खुलता है।';
+  }
+
+  @override
+  String get helpCleanQ => 'पोषण स्क्रीन को साफ़ कैसे करें?';
+
+  @override
+  String helpCleanA(String button) {
+    return 'पोषण में ऊपर स्लाइडर वाला बटन (“$button”) टैप करें और जो ट्रैक नहीं करते उसे बंद करें।';
+  }
+
+  @override
+  String alsoWorksMuscles(String muscles) {
+    return '$muscles पर भी काम करता है';
+  }
+
+  @override
+  String get wearSyncAllow => 'ब्लूटूथ की अनुमति दें';
+
+  @override
+  String get wearSyncSearching => 'फ़ोन ढूँढ रहे हैं…';
+
+  @override
+  String get wearSyncNotFound => 'फ़ोन नहीं मिला';
+
+  @override
+  String get wearSyncBluetoothOff => 'ब्लूटूथ बंद है';
+
+  @override
+  String get watchRow => 'Wear OS घड़ी';
+
+  @override
+  String get watchTitle => 'Wear OS घड़ी';
+
+  @override
+  String get watchSubtitle => 'रूटीन कलाई पर, वर्कआउट वापस फ़ोन पर';
+
+  @override
+  String get watchPoint1 => 'घड़ी पर GymMane इंस्टॉल करें';
+
+  @override
+  String get watchPoint1Body => 'यह वही ऐप है जो फ़ोन पर है। इंस्टॉल गाइड देखने के लिए टैप करें।';
+
+  @override
+  String get watchPoint2 => 'दोनों पर GymMane खोलें';
+
+  @override
+  String get watchPoint2Body =>
+      'ये उसी ब्लूटूथ से अपने-आप सिंक होते हैं जो फ़ोन और घड़ी को पहले से जोड़ता है। बिना इंटरनेट।';
+
+  @override
+  String get watchPoint3 => 'घड़ी के साथ वर्कआउट करें';
+
+  @override
+  String get watchPoint3Body => 'घड़ी पर जो करें वह अगली बार दोनों खुले होने पर फ़ोन पर पहुँच जाता है।';
+
+  @override
+  String get watchUse => 'घड़ी से सिंक करें';
+
+  @override
+  String get watchUseHint => 'सिर्फ़ अगर आपके पास घड़ी है। ब्लूटूथ की अनुमति माँगता है';
+
+  @override
+  String get watchTurnOnBluetooth => 'ब्लूटूथ चालू करें';
+
+  @override
+  String get watchSyncNow => 'अभी सिंक करें';
+
+  @override
+  String get watchSearching => 'घड़ी ढूँढ रहे हैं…';
+
+  @override
+  String get watchSearchingHint => 'अगर अभी नहीं खुला है तो घड़ी पर GymMane खोलें।';
+
+  @override
+  String get watchBluetoothOff => 'ब्लूटूथ बंद है।';
+
+  @override
+  String get watchNotFound => 'घड़ी नहीं मिली। उस पर GymMane खोलें और फिर से कोशिश करें।';
+
+  @override
+  String get watchNever => 'अभी सिंक नहीं हुआ।';
+
+  @override
+  String watchLast(String when) {
+    return '$when को सिंक हुआ।';
+  }
+
+  @override
+  String watchLastWith(String name, String when) {
+    return '$name के साथ $when को सिंक हुआ।';
+  }
+
+  @override
+  String get watchTip => 'बीटा: अभी हर घड़ी पर नहीं परखा गया। काम न करे तो GitHub पर बताएँ।';
+
+  @override
+  String get mineralsTracker => 'Iron and potassium';
+
+  @override
+  String get ironLabel => 'Iron';
+
+  @override
+  String get potassiumLabel => 'Potassium';
+
+  @override
+  String mineralsCoverage(int known, int total) {
+    return '$known of $total foods today have iron and potassium';
+  }
+
+  @override
+  String get mineralsHint =>
+      'Few foods in the list come with iron and potassium, so the total only counts the ones that do. Add them to your own foods or with the AI.';
+
+  @override
+  String get qsRow => 'क्विक सेटिंग्स टाइलें';
+
+  @override
+  String get qsRowHint => 'आज की वर्कआउट या जिम पास, ऊपर वाले पैनल से';
+
+  @override
+  String get qsTitle => 'क्विक सेटिंग्स टाइलें';
+
+  @override
+  String get qsSubtitle => 'क्विक सेटिंग्स नीचे खींचें और ऐप ढूँढे बिना एक टैप में पहुँचें';
+
+  @override
+  String get qsToday => 'आज की वर्कआउट';
+
+  @override
+  String get qsTodayHint => 'NFC स्टिकर की तरह: आज जो तय है वह खुलता है';
+
+  @override
+  String get qsPass => 'जिम पास';
+
+  @override
+  String qsPassHint(String name) {
+    return 'दरवाज़े पर स्कैन करने के लिए $name खुलता है';
+  }
+
+  @override
+  String get qsPassNone => 'पहले अपना जिम पास जोड़ें';
+
+  @override
+  String get qsRest => 'आराम का दिन';
+
+  @override
+  String get qsAdd => 'जोड़ें';
+
+  @override
+  String get qsAdded => 'जोड़ा गया';
+
+  @override
+  String get qsManual =>
+      'क्विक सेटिंग्स नीचे खींचें, पेंसिल पर टैप करें और GymMane की टाइल अपनी टाइलों में खींचें।';
+
+  @override
+  String get qsPassUse => 'क्विक सेटिंग्स से खोलें';
+
+  @override
+  String get qsPassUseHint => 'क्विक सेटिंग्स की टाइल यह पास खोलती है';
+
+  @override
+  String get measureAbdomen => 'पेट';
+
+  @override
+  String get bfNeckBelow => 'गर्दन (टेंटुए के नीचे)';
+
+  @override
+  String get bfAbdomen => 'पेट (नाभि की ऊँचाई पर)';
+
+  @override
+  String get bfWaistNarrow => 'कमर (सबसे पतली जगह)';
+
+  @override
+  String get bfHipWide => 'कूल्हे (सबसे चौड़ी जगह)';
+
+  @override
+  String get measureBp => 'ब्लड प्रेशर';
+
+  @override
+  String get measureLeft => 'बायाँ';
+
+  @override
+  String get measureRight => 'दायाँ';
+
+  @override
+  String get measureLeftShort => 'बा';
+
+  @override
+  String get measureRightShort => 'दा';
+
+  @override
+  String get measureOneValue => 'एक मान';
+
+  @override
+  String get measureNoteHint => 'नोट (वैकल्पिक)';
+
+  @override
+  String get bpHigh => 'सिस्टोलिक';
+
+  @override
+  String get bpLow => 'डायस्टोलिक';
+
+  @override
+  String get bpPulse => 'नब्ज़';
+
+  @override
+  String get bpPulseAdd => '+ नब्ज़';
 }

@@ -3547,6 +3547,177 @@ class AppLocalizationsBn extends AppLocalizations {
   String get exerciseSettings => 'এই ব্যায়ামের সেটিংস';
 
   @override
+  String get exerciseSettingsHint => 'বিশ্রাম, অগ্রগতি, ওয়ার্ম-আপ আর আরও';
+
+  @override
+  String get appIcon => 'অ্যাপ আইকন';
+
+  @override
+  String get appIconHint => 'হোম স্ক্রিনে GymMane দেখতে কেমন';
+
+  @override
+  String get appIconColors => 'রং';
+
+  @override
+  String get appIconDesigns => 'ডিজাইন';
+
+  @override
+  String get appIconNote => 'হোম স্ক্রিনে পরিবর্তন দেখাতে কয়েক সেকেন্ড লাগতে পারে।';
+
+  @override
+  String get appIconDefault => 'আসল';
+
+  @override
+  String get appIconLight => 'হালকা';
+
+  @override
+  String get appIconSand => 'বালি';
+
+  @override
+  String get appIconGraphite => 'গ্রাফাইট';
+
+  @override
+  String get appIconSage => 'সেজ';
+
+  @override
+  String get appIconNight => 'রাত';
+
+  @override
+  String get appIconMaterial => 'Material';
+
+  @override
+  String get appIconMedal => 'পদক';
+
+  @override
+  String get appIconGlass => 'কাচ';
+
+  @override
+  String get appIconStopwatch => 'স্টপওয়াচ';
+
+  @override
+  String get appIconMarble => 'মার্বেল';
+
+  @override
+  String get nfcRow => 'NFC স্টিকার';
+
+  @override
+  String get nfcRowHint => 'ফোন কাছে এনে আজকের ওয়ার্কআউট দেখো';
+
+  @override
+  String get nfcTitle => 'NFC স্টিকার';
+
+  @override
+  String get nfcSubtitle => 'পুরো সপ্তাহের জন্য একটি স্টিকার';
+
+  @override
+  String get nfcPoint1 => 'আজকের ওয়ার্কআউট, তৈরি';
+
+  @override
+  String get nfcPoint1Body =>
+      'ফোন কাছে আনো, আজকের রুটিন তার এক্সারসাইজসহ খুলে যাবে। তৈরি হলে নিজেই শুরু করো।';
+
+  @override
+  String get nfcPoint2 => 'বিশ্রামের দিনে জানিয়ে দেয়';
+
+  @override
+  String get nfcPoint2Body => 'আজ বিশ্রামের দিন হলে দেখতে পাবে, আর চাইলে তবুও ট্রেনিং করতে পারো।';
+
+  @override
+  String get nfcPoint3 => 'একবার লিখলেই হয়';
+
+  @override
+  String get nfcPoint3Body => 'যখন খুশি প্ল্যান বদলাও: স্টিকার সবসময় সেদিনের নির্ধারিত ওয়ার্কআউট খোলে।';
+
+  @override
+  String get nfcUse => 'স্টিকার ব্যবহার করো';
+
+  @override
+  String get nfcUseHint => 'বন্ধ থাকলে স্টিকার কাছে আনলে কিছুই হয় না';
+
+  @override
+  String get nfcWrite => 'স্টিকার লেখো';
+
+  @override
+  String get nfcOn => 'চালু';
+
+  @override
+  String get nfcOff => 'বন্ধ';
+
+  @override
+  String get todayRestBody => 'বিশ্রামও প্ল্যানের অংশ। রিকভারির সময় পেশি বাড়ে।';
+
+  @override
+  String get todayNotNow => 'এখন না';
+
+  @override
+  String get nfcWaitTitle => 'স্টিকার ফোনের কাছে আনো';
+
+  @override
+  String get nfcWaitBody => 'ফোনের পেছনে, ক্যামেরার কাছে, কাঁপা পর্যন্ত ধরে রাখো।';
+
+  @override
+  String get nfcTip => 'যেকোনো NTAG213, 215 বা 216 স্টিকার চলবে। এগুলোই সবচেয়ে প্রচলিত আর খুব সস্তা।';
+
+  @override
+  String get nfcDoneTitle => 'স্টিকার তৈরি';
+
+  @override
+  String get nfcDoneBody => 'এমন জায়গায় লাগাও যেখানে পৌঁছেই চোখে পড়ে: জিম ব্যাগ, বোতল বা লকার।';
+
+  @override
+  String get nfcOffTitle => 'NFC বন্ধ আছে';
+
+  @override
+  String get nfcOffBody => 'স্টিকার লিখতে ফোনের সেটিংসে NFC চালু করো।';
+
+  @override
+  String get nfcOpenSettings => 'সেটিংস খোলো';
+
+  @override
+  String get nfcFailTitle => 'লেখা গেল না';
+
+  @override
+  String get nfcErrLocked => 'এই স্টিকার লক করা, এতে লেখা যায় না।';
+
+  @override
+  String get nfcErrSmall => 'এই স্টিকারে আঁটে না। NTAG213 বা বড় কিছু ব্যবহার করো।';
+
+  @override
+  String get nfcErrLost => 'শেষ হওয়ার আগেই স্টিকার নড়ে গেছে। স্থির রেখে আবার চেষ্টা করো।';
+
+  @override
+  String get nfcErrUnsupported => 'এই স্টিকার সমর্থিত নয়। NTAG213, 215 বা 216 ব্যবহার করো।';
+
+  @override
+  String get nfcRetry => 'আবার চেষ্টা করো';
+
+  @override
+  String get raceTitle => 'গত সেশনের তুলনায়';
+
+  @override
+  String raceSince(String date) {
+    return '$date-এর তুলনায়';
+  }
+
+  @override
+  String get raceAhead => 'তুমি এগিয়ে';
+
+  @override
+  String get raceBehind => 'এখনও ধরছ';
+
+  @override
+  String get raceEven => 'সমানে সমান';
+
+  @override
+  String get raceToday => 'আজ';
+
+  @override
+  String get raceThen => 'তখন';
+
+  @override
+  String get raceHint => 'শুধু একই সেট তুলনা হয়: 2টি করলে সেদিনের প্রথম 2টির সাথে।';
+
+  @override
   String get placeActiveNow => 'তুমি এখানে';
 
   @override
@@ -5362,6 +5533,15 @@ class AppLocalizationsBn extends AppLocalizations {
   String get importAsCopy => 'কপি হিসেবে যোগ করো';
 
   @override
+  String get routineExerciseNote => 'রুটিন নোট';
+
+  @override
+  String get importRoutineNotes => 'রুটিনের বাদ পড়া নোট যোগ করো';
+
+  @override
+  String get routineNotesAdded => 'রুটিন নোট যোগ হয়েছে';
+
+  @override
   String get importOwned => 'আগেই তোমার';
 
   @override
@@ -6411,6 +6591,15 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get reportShareCsv => 'CSV এক্সপোর্ট করো';
+
+  @override
+  String get reportChooseCsv => 'কোন CSV ফাইলগুলো শেয়ার করবে বেছে নাও।';
+
+  @override
+  String get reportWeighIns => 'ওজনের রেকর্ড';
+
+  @override
+  String get reportSessionDetails => 'সেশনের বিবরণ';
 
   @override
   String get reportShareCsvBoth => 'CSV এক্সপোর্ট করো (ওয়ার্কআউট আর পুষ্টি)';
@@ -7664,6 +7853,43 @@ class AppLocalizationsBn extends AppLocalizations {
   String get webPhoneGuide => 'কীভাবে সেট আপ করবে';
 
   @override
+  String get webSignOut => 'সাইন আউট';
+
+  @override
+  String get wearSyncTitle => 'ফোন';
+
+  @override
+  String get wearSyncNever => 'এখনও সিঙ্ক হয়নি';
+
+  @override
+  String wearSyncLast(String when) {
+    return '$when সিঙ্ক হয়েছে';
+  }
+
+  @override
+  String wearSyncWaiting(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$nটি ওয়ার্কআউট ফোনে যাওয়ার অপেক্ষায়',
+      one: '১টি ওয়ার্কআউট ফোনে যাওয়ার অপেক্ষায়',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get wearSyncNow => 'এখনই সিঙ্ক করুন';
+
+  @override
+  String get wearSyncHow => 'ফোনে সেটিংস › Wear OS ঘড়ি চালু করুন এবং দুটোতেই GymMane খুলুন।';
+
+  @override
+  String get routinesOrder => 'রুটিনের ক্রম বদলান';
+
+  @override
+  String get routinesOrderHint => 'দেখানোর ক্রম বদলাতে টেনে আনুন।';
+
+  @override
   String get webPhoneOff => 'এই সার্ভারে ফোন সিঙ্ক বন্ধ';
 
   @override
@@ -7751,4 +7977,459 @@ class AppLocalizationsBn extends AppLocalizations {
   String exerciseCopyName(String name) {
     return '$name (কপি)';
   }
+
+  @override
+  String get foodAiRow => 'Fill in with an AI';
+
+  @override
+  String get foodAiRowHint => 'From a label, a screenshot or a link';
+
+  @override
+  String get foodAiTitle => 'Food with AI';
+
+  @override
+  String get foodAiHow =>
+      'Copy the request and paste it into any chatbot together with a photo of the nutrition label, a screenshot of the product or a link to it. Then paste its answer here.';
+
+  @override
+  String get foodAiCheck => 'The form fills itself in. Check the values against the label before saving.';
+
+  @override
+  String get foodAiFill => 'Fill in the food';
+
+  @override
+  String get foodAiFilled => 'Food filled in';
+
+  @override
+  String get foodAiFilledHint => 'Check the values before saving';
+
+  @override
+  String get fastAdd => 'Add a past fast';
+
+  @override
+  String get fastAddTitle => 'Add a fast';
+
+  @override
+  String get fastEditTitle => 'Edit fast';
+
+  @override
+  String get fastStartRow => 'Start';
+
+  @override
+  String get fastEndRow => 'End';
+
+  @override
+  String get fastEndedAt => 'When did you end it?';
+
+  @override
+  String fastLasted(String time) {
+    return 'Lasted $time';
+  }
+
+  @override
+  String get fastErrFuture => 'The end can\'t be later than now';
+
+  @override
+  String get fastErrOrder => 'The end has to come after the start';
+
+  @override
+  String get fastErrShort => 'A fast lasts at least 10 minutes';
+
+  @override
+  String get fastErrOverlap => 'It overlaps another fast';
+
+  @override
+  String get fastSaved => 'Fast saved';
+
+  @override
+  String get fastAdjust => 'Adjust';
+
+  @override
+  String get keepCounting => 'গোনা চালিয়ে যান';
+
+  @override
+  String get keepCountingHint => 'আপনার সময়ে বাজে এবং থামানো পর্যন্ত চলতে থাকে';
+
+  @override
+  String get holdOvertime => 'অতিরিক্ত সময়';
+
+  @override
+  String get pairSetting => 'এক জোড়া ডাম্বেল';
+
+  @override
+  String get pairSettingHint => 'একটির ওজন লিখুন। ভলিউম দুটোই গোনে।';
+
+  @override
+  String get helpCommon => 'সাধারণ প্রশ্ন';
+
+  @override
+  String get helpQuestions => 'প্রশ্ন';
+
+  @override
+  String get helpNoResults => 'কিছু মেলেনি। অন্য শব্দ চেষ্টা করুন';
+
+  @override
+  String get helpLbQ => 'শুধু একটি ব্যায়ামে কি lb ব্যবহার করা যায়?';
+
+  @override
+  String helpLbA(String option) {
+    return 'হ্যাঁ। ওয়ার্কআউটের সময় ব্যায়ামের ⋯ মেনু খুলে “$option” বেছে নিন।';
+  }
+
+  @override
+  String get helpSupersetQ => 'সুপারসেট কীভাবে বানাব?';
+
+  @override
+  String get helpSupersetA => 'রুটিন এডিটরে দুটি ব্যায়ামের মাঝের লিঙ্কে ট্যাপ করে সেগুলো জুড়ুন।';
+
+  @override
+  String get helpRangeQ => '৮-১২ এর মতো রেপ রেঞ্জ কীভাবে সেট করব?';
+
+  @override
+  String get helpRangeA => 'রুটিন এডিটরে রেপে দীর্ঘক্ষণ চাপুন।';
+
+  @override
+  String get helpRestQ => 'প্রতিটি ব্যায়ামের কি নিজস্ব বিশ্রাম থাকতে পারে?';
+
+  @override
+  String helpRestA(String settings, String rest, String section) {
+    return 'হ্যাঁ: ব্যায়াম খুলুন › $settings › $rest। আপনার ডিফল্ট বিশ্রাম সেটিংস › $section-এ আছে।';
+  }
+
+  @override
+  String get helpSidesQ => 'বাম আর ডান আলাদা করে কীভাবে লিখব?';
+
+  @override
+  String helpSidesA(String settings, String sides) {
+    return 'ব্যায়াম খুলুন › $settings › $sides।';
+  }
+
+  @override
+  String get helpPairQ => 'ডাম্বেল: একটা লিখব নাকি দুটো?';
+
+  @override
+  String helpPairA(String pair) {
+    return 'একটা। ব্যায়ামের সেটিংসে “$pair” চালু করুন, ভলিউম দুটোই গুনবে।';
+  }
+
+  @override
+  String get helpKeepQ => 'সময়ভিত্তিক সেট কি সময় পেরিয়ে চলতে পারে?';
+
+  @override
+  String helpKeepA(String keep) {
+    return 'হ্যাঁ: ব্যায়ামের সেটিংসে “$keep” চালু করুন। আপনার সময়ে বাজে এবং থামানো পর্যন্ত গুনতে থাকে।';
+  }
+
+  @override
+  String get helpDayOffQ => 'বিশ্রাম, অসুস্থতা বা ভ্রমণের দিন কীভাবে চিহ্নিত করব?';
+
+  @override
+  String get helpDayOffA =>
+      'হোমে আপনার সপ্তাহের সেই দিনে দীর্ঘক্ষণ চাপুন। স্ট্রিক আর রিমাইন্ডার সেটি ছুঁয়ে দেখে না।';
+
+  @override
+  String get helpImportQ => 'Hevy, Strong বা অন্য অ্যাপ থেকে কি ওয়ার্কআউট আনা যায়?';
+
+  @override
+  String helpImportA(String section, String row) {
+    return 'হ্যাঁ: সেটিংস › $section › $row। এটি FitNotes, Fitbod, JEFIT, StrongLifts, Liftosaur ও Lyfta-ও পড়ে।';
+  }
+
+  @override
+  String get helpPhoneQ => 'নতুন ফোনে ডেটা কীভাবে নেব?';
+
+  @override
+  String helpPhoneA(String section, String import) {
+    return 'সেটিংস › $section-এ একটি কপি এক্সপোর্ট করুন এবং নতুন ফোনে “$import” দিয়ে খুলুন।';
+  }
+
+  @override
+  String get helpSlowQ => 'আমার ফোনে অ্যাপ ধীর লাগছে';
+
+  @override
+  String helpSlowA(String section, String perf, String lite) {
+    return 'সেটিংস › $section › $perf › $lite। এটি ব্লার বন্ধ করে, যা সবচেয়ে ভারী অংশ।';
+  }
+
+  @override
+  String get helpPlatesQ => 'বারে কয়টা প্লেট লাগবে?';
+
+  @override
+  String helpPlatesA(String tool, String places) {
+    return 'টুলসে “$tool” ব্যবহার করুন। আপনার জিমের প্লেট আর বার “$places”-এ সেট হয়।';
+  }
+
+  @override
+  String get helpRaceQ => 'শেষ ওয়ার্কআউটের সাথে কীভাবে তুলনা করব?';
+
+  @override
+  String helpRaceA(String race) {
+    return 'ওয়ার্কআউটের সময় উপরের পিলে ট্যাপ করুন: “$race”।';
+  }
+
+  @override
+  String get helpFastQ => 'রোজা শেষ করতে ভুলে গেছি';
+
+  @override
+  String helpFastA(String adjust) {
+    return 'এটি শেষ করে নোটিশে “$adjust” ট্যাপ করুন, অথবা সময় বদলাতে রোজার শিটে সেই রোজায় ট্যাপ করুন।';
+  }
+
+  @override
+  String get helpGo => 'দেখান';
+
+  @override
+  String get helpHomeOrderQ => 'হোমের ক্রম কি বদলানো যায়?';
+
+  @override
+  String helpHomeOrderA(String section, String row) {
+    return 'হ্যাঁ: সেটিংস › $section › “$row”। অংশগুলো ধরে টেনে আনুন, অথবা যেগুলো ব্যবহার করেন না সেগুলো বন্ধ করুন।';
+  }
+
+  @override
+  String get helpCustomQ => 'নিজের ব্যায়াম কি বানানো যায়?';
+
+  @override
+  String helpCustomA(String button) {
+    return 'হ্যাঁ: ব্যায়ামে “$button” ট্যাপ করুন। নাম, পেশি আর সরঞ্জাম বাছুন, আর এটি অন্য সবগুলোর মতোই কাজ করে।';
+  }
+
+  @override
+  String get helpWarmupQ => 'অ্যাপ কি আমার জন্য ওয়ার্ম-আপ সেট যোগ করতে পারে?';
+
+  @override
+  String helpWarmupA(String settings, String warm, String tool) {
+    return 'হ্যাঁ: ব্যায়াম খুলুন › $settings › “$warm”। হাতে হিসাব করতে টুলসে “$tool” ব্যবহার করুন।';
+  }
+
+  @override
+  String get helpPassQ => 'জিম কার্ড কি অ্যাপে রাখা যায়?';
+
+  @override
+  String helpPassA(String row, String section) {
+    return 'হ্যাঁ: সেটিংস › $section-এ “$row”। এটি দরজায় স্ক্যান করার বারকোড বা QR কোড দেখায়।';
+  }
+
+  @override
+  String get helpStepsQ => 'আমার পদক্ষেপ দেখাচ্ছে না কেন?';
+
+  @override
+  String helpStepsA(String row, String section) {
+    return 'পদক্ষেপ Health Connect থেকে পড়া হয়, যা Android 14 ও পরের সংস্করণে থাকে। পুরোনো ফোনে এটি নেই। আপনার থাকলে সেটিংস › $section-এ “$row” চালু করুন।';
+  }
+
+  @override
+  String get helpNfcQ => 'ফোন ছুঁইয়ে কি ওয়ার্কআউট শুরু করা যায়?';
+
+  @override
+  String helpNfcA(String row, String section) {
+    return 'হ্যাঁ, NFC স্টিকার দিয়ে: সেটিংস › $section-এ “$row”। জিমে লাগিয়ে রাখুন, ছোঁয়ালেই আজকের ওয়ার্কআউট খুলবে।';
+  }
+
+  @override
+  String get helpCleanQ => 'পুষ্টির স্ক্রিন কীভাবে পরিচ্ছন্ন করব?';
+
+  @override
+  String helpCleanA(String button) {
+    return 'পুষ্টিতে উপরের স্লাইডার বোতামে (“$button”) ট্যাপ করুন এবং যা ট্র্যাক করেন না তা বন্ধ করুন।';
+  }
+
+  @override
+  String alsoWorksMuscles(String muscles) {
+    return '$muscles-ও কাজ করে';
+  }
+
+  @override
+  String get wearSyncAllow => 'ব্লুটুথের অনুমতি দিন';
+
+  @override
+  String get wearSyncSearching => 'ফোন খোঁজা হচ্ছে…';
+
+  @override
+  String get wearSyncNotFound => 'ফোন পাওয়া যায়নি';
+
+  @override
+  String get wearSyncBluetoothOff => 'ব্লুটুথ বন্ধ';
+
+  @override
+  String get watchRow => 'Wear OS ঘড়ি';
+
+  @override
+  String get watchTitle => 'Wear OS ঘড়ি';
+
+  @override
+  String get watchSubtitle => 'রুটিন কবজিতে, ওয়ার্কআউট আবার ফোনে';
+
+  @override
+  String get watchPoint1 => 'ঘড়িতে GymMane ইনস্টল করুন';
+
+  @override
+  String get watchPoint1Body => 'এটি ফোনের মতোই একই অ্যাপ। ইনস্টল গাইড দেখতে ট্যাপ করুন।';
+
+  @override
+  String get watchPoint2 => 'দুটোতেই GymMane খুলুন';
+
+  @override
+  String get watchPoint2Body =>
+      'ফোন আর ঘড়িকে আগে থেকেই যুক্ত রাখা ব্লুটুথ দিয়ে এরা নিজে থেকেই সিঙ্ক হয়। ইন্টারনেট ছাড়া।';
+
+  @override
+  String get watchPoint3 => 'ঘড়ি দিয়ে ব্যায়াম করুন';
+
+  @override
+  String get watchPoint3Body => 'ঘড়িতে যা করবেন তা পরের বার দুটো খোলা থাকলে ফোনে পৌঁছে যাবে।';
+
+  @override
+  String get watchUse => 'ঘড়ির সাথে সিঙ্ক করুন';
+
+  @override
+  String get watchUseHint => 'শুধু ঘড়ি থাকলে। ব্লুটুথের অনুমতি চায়';
+
+  @override
+  String get watchTurnOnBluetooth => 'ব্লুটুথ চালু করুন';
+
+  @override
+  String get watchSyncNow => 'এখনই সিঙ্ক করুন';
+
+  @override
+  String get watchSearching => 'ঘড়ি খোঁজা হচ্ছে…';
+
+  @override
+  String get watchSearchingHint => 'এখনও না খুলে থাকলে ঘড়িতে GymMane খুলুন।';
+
+  @override
+  String get watchBluetoothOff => 'ব্লুটুথ বন্ধ।';
+
+  @override
+  String get watchNotFound => 'ঘড়ি পাওয়া যায়নি। এতে GymMane খুলে আবার চেষ্টা করুন।';
+
+  @override
+  String get watchNever => 'এখনও সিঙ্ক হয়নি।';
+
+  @override
+  String watchLast(String when) {
+    return '$when সিঙ্ক হয়েছে।';
+  }
+
+  @override
+  String watchLastWith(String name, String when) {
+    return '$name-এর সাথে $when সিঙ্ক হয়েছে।';
+  }
+
+  @override
+  String get watchTip => 'বেটা: এখনও সব ঘড়িতে পরীক্ষা হয়নি। কাজ না করলে GitHub-এ জানান।';
+
+  @override
+  String get mineralsTracker => 'Iron and potassium';
+
+  @override
+  String get ironLabel => 'Iron';
+
+  @override
+  String get potassiumLabel => 'Potassium';
+
+  @override
+  String mineralsCoverage(int known, int total) {
+    return '$known of $total foods today have iron and potassium';
+  }
+
+  @override
+  String get mineralsHint =>
+      'Few foods in the list come with iron and potassium, so the total only counts the ones that do. Add them to your own foods or with the AI.';
+
+  @override
+  String get qsRow => 'কুইক সেটিংস টাইল';
+
+  @override
+  String get qsRowHint => 'আজকের ওয়ার্কআউট বা জিম পাস, ওপরের প্যানেল থেকে';
+
+  @override
+  String get qsTitle => 'কুইক সেটিংস টাইল';
+
+  @override
+  String get qsSubtitle => 'কুইক সেটিংস নিচে টানুন আর অ্যাপ না খুঁজেই এক ট্যাপে পৌঁছে যান';
+
+  @override
+  String get qsToday => 'আজকের ওয়ার্কআউট';
+
+  @override
+  String get qsTodayHint => 'NFC স্টিকারের মতো: আজ যা ঠিক করা আছে তা খোলে';
+
+  @override
+  String get qsPass => 'জিম পাস';
+
+  @override
+  String qsPassHint(String name) {
+    return 'দরজায় স্ক্যান করতে $name খোলে';
+  }
+
+  @override
+  String get qsPassNone => 'আগে আপনার জিম পাস যোগ করুন';
+
+  @override
+  String get qsRest => 'বিশ্রামের দিন';
+
+  @override
+  String get qsAdd => 'যোগ করুন';
+
+  @override
+  String get qsAdded => 'যোগ হয়েছে';
+
+  @override
+  String get qsManual =>
+      'কুইক সেটিংস নিচে টানুন, পেনসিলে ট্যাপ করুন আর GymMane-এর টাইল আপনার টাইলগুলোর মধ্যে টেনে আনুন।';
+
+  @override
+  String get qsPassUse => 'কুইক সেটিংস থেকে খুলুন';
+
+  @override
+  String get qsPassUseHint => 'কুইক সেটিংসের টাইল এই পাস খোলে';
+
+  @override
+  String get measureAbdomen => 'পেট';
+
+  @override
+  String get bfNeckBelow => 'ঘাড় (কণ্ঠার নিচে)';
+
+  @override
+  String get bfAbdomen => 'পেট (নাভির উচ্চতায়)';
+
+  @override
+  String get bfWaistNarrow => 'কোমর (সবচেয়ে সরু জায়গা)';
+
+  @override
+  String get bfHipWide => 'নিতম্ব (সবচেয়ে চওড়া জায়গা)';
+
+  @override
+  String get measureBp => 'রক্তচাপ';
+
+  @override
+  String get measureLeft => 'বাঁ';
+
+  @override
+  String get measureRight => 'ডান';
+
+  @override
+  String get measureLeftShort => 'বাঁ';
+
+  @override
+  String get measureRightShort => 'ডা';
+
+  @override
+  String get measureOneValue => 'একটি মান';
+
+  @override
+  String get measureNoteHint => 'নোট (ঐচ্ছিক)';
+
+  @override
+  String get bpHigh => 'সিস্টোলিক';
+
+  @override
+  String get bpLow => 'ডায়াস্টোলিক';
+
+  @override
+  String get bpPulse => 'পালস';
+
+  @override
+  String get bpPulseAdd => '+ পালস';
 }

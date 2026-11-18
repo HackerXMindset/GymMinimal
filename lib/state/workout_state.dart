@@ -142,8 +142,12 @@ mixin WorkoutState on FitCore, SettingsState, LibraryState, PlacesState, StatsSt
         ..sort((a, b) => rank(a).compareTo(rank(b)));
       if (forMuscle.isNotEmpty) picks.add(forMuscle.first);
     }
+    int aim(Exercise e) => muscles.contains(e.primary) ? 0 : 1;
     final rest = pool.where((e) => !picks.contains(e)).toList()
-      ..sort((a, b) => rank(a).compareTo(rank(b)));
+      ..sort((a, b) {
+        final byAim = aim(a).compareTo(aim(b));
+        return byAim != 0 ? byAim : rank(a).compareTo(rank(b));
+      });
     for (final e in rest) {
       if (picks.length >= _pickTarget) break;
       picks.add(e);
@@ -229,6 +233,7 @@ mixin WorkoutState on FitCore, SettingsState, LibraryState, PlacesState, StatsSt
     final warmWeight = fromDisplayWeight(_roundTo(toDisplayWeight(first.weight * 0.5), plateStep));
     final out = <SessionSet>[];
     var w = 0;
+    final hold = nextHoldSeconds(id);
     for (final p in planned) {
       final warm = p.kind == SetKind.warmup;
       final b = warm || base.isEmpty ? first : base[(w++).clamp(0, base.length - 1)];
@@ -238,7 +243,7 @@ mixin WorkoutState on FitCore, SettingsState, LibraryState, PlacesState, StatsSt
         own ? b.weight : p.weightKg ?? (warm ? warmWeight : b.weight),
         false,
         kind: p.kind,
-        sec: p.sec ?? b.sec,
+        sec: !warm && hold != null ? hold : p.sec ?? b.sec,
         km: p.km ?? b.km,
         goal: own || warm || p.repsMax == null ? null : p.repsLabel,
       ));
@@ -299,14 +304,14 @@ mixin WorkoutState on FitCore, SettingsState, LibraryState, PlacesState, StatsSt
     if (step <= 0) return null;
     final secs = [for (final l in lastSetsFor(id)) if (l.counts && (l.sec ?? 0) > 0) l.sec!];
     if (secs.isEmpty) return null;
-    final aim = secs.first;
+    final aim = secs.reduce(math.max);
     return secs.every((s) => s >= aim) ? aim + step : aim;
   }
 
   bool holdGoesUp(String id) {
     final next = nextHoldSeconds(id);
     final last = [for (final l in lastSetsFor(id)) if (l.counts && (l.sec ?? 0) > 0) l.sec!];
-    return next != null && last.isNotEmpty && next > last.first;
+    return next != null && last.isNotEmpty && next > last.reduce(math.max);
   }
 
   List<SessionSet> _modeOpeners(String mode, List<LoggedSet> last, [String? id]) {
@@ -895,11 +900,63 @@ mixin WorkoutState on FitCore, SettingsState, LibraryState, PlacesState, StatsSt
   double get sessionVolumeKg {
     var kg = 0.0;
     for (final e in session?.exercises ?? const <SessionExercise>[]) {
+      final times = isPaired(e.id) ? 2 : 1;
       for (final st in e.sets) {
-        if (st.done && st.counts) kg += st.weakReps * st.weight;
+        if (st.done && st.counts) kg += st.logged.volume * (st.repsR == null ? times : 1);
       }
     }
     return kg;
+  }
+
+  LoggedSession? get raceSession {
+    final s = session;
+    if (s == null || s.complete || s.manual) return null;
+    final ids = {for (final e in s.exercises) e.id};
+    LoggedSession? best;
+    for (final p in sessions) {
+      if (p.deload) continue;
+      if (s.routineId != null) {
+        if (p.routineId != s.routineId) continue;
+      } else {
+        final shared = p.exercises.where((e) => ids.contains(e.id)).length;
+        if (shared == 0 || shared * 2 < ids.length) continue;
+      }
+      if (best == null || p.date.isAfter(best.date)) best = p;
+    }
+    return best;
+  }
+
+  List<({String id, String name, double now, double then})> get raceRows {
+    final s = session;
+    final last = raceSession;
+    if (s == null || last == null) return const [];
+    final rows = <({String id, String name, double now, double then})>[];
+    for (final e in s.exercises) {
+      final done = [for (final x in e.sets) if (x.done && x.counts) x];
+      if (done.isEmpty) continue;
+      final before = [
+        for (final p in last.exercises)
+          if (p.id == e.id) ...p.workingSets,
+      ];
+      if (before.isEmpty) continue;
+      var now = 0.0;
+      var then = 0.0;
+      for (var i = 0; i < done.length; i++) {
+        now += done[i].logged.volume;
+        if (i < before.length) then += before[i].volume;
+      }
+      if (now <= 0 && then <= 0) continue;
+      rows.add((id: e.id, name: e.name, now: now, then: then));
+    }
+    return rows;
+  }
+
+  double? get raceDelta {
+    final rows = raceRows;
+    final then = rows.fold(0.0, (a, r) => a + r.then);
+    if (then <= 0) return null;
+    final now = rows.fold(0.0, (a, r) => a + r.now);
+    return (now - then) / then;
   }
 
   List<int> chainAt(int exIdx) {
@@ -1270,7 +1327,18 @@ mixin WorkoutState on FitCore, SettingsState, LibraryState, PlacesState, StatsSt
   int holdSet = -1;
   int holdSide = 0;
   int holdSides = 1;
+  DateTime? holdOverFrom;
+  int _pausedOverMs = 0;
   Timer? _holdTimer;
+
+  bool get holdOvertime => holdOverFrom != null;
+
+  int get holdExtra {
+    final from = holdOverFrom;
+    if (from == null) return 0;
+    if (holdPaused) return _pausedOverMs ~/ 1000;
+    return math.max(0, DateTime.now().difference(from).inSeconds);
+  }
 
   static const holdLeadIn = 5;
 
@@ -1296,6 +1364,20 @@ mixin WorkoutState on FitCore, SettingsState, LibraryState, PlacesState, StatsSt
     final start = holdStartsAt, end = holdEndsAt;
     if (start == null || end == null) return;
     final now = DateTime.now();
+    final over = holdOverFrom;
+    if (over != null) {
+      if (holdPaused) {
+        holdOverFrom = now.subtract(Duration(milliseconds: _pausedOverMs));
+        holdPaused = false;
+        _runHold();
+      } else {
+        _pausedOverMs = math.max(0, now.difference(over).inMilliseconds);
+        _holdTimer?.cancel();
+        holdPaused = true;
+      }
+      notifyListeners();
+      return;
+    }
     if (holdPaused) {
       holdStartsAt = now.add(Duration(milliseconds: _pausedLeadMs));
       holdEndsAt = now.add(Duration(milliseconds: _pausedEndMs));
@@ -1311,11 +1393,19 @@ mixin WorkoutState on FitCore, SettingsState, LibraryState, PlacesState, StatsSt
   }
 
   void completeHold() {
+    if (holdOvertime) {
+      _finishOvertime();
+      return;
+    }
     final s = session;
     if (s != null && holdEx >= 0 && holdEx < s.exercises.length && holdLead == 0) {
       final ex = s.exercises[holdEx];
       final ran = holdTotal - (holdRemaining ?? 0);
-      if (modeOf(ex.id) == 'cardio' && ran > 0 && holdSet < ex.sets.length) ex.sets[holdSet].sec = ran;
+      final mode = modeOf(ex.id);
+      final short = mode == 'cardio' ? ran < holdTotal : ran < holdTotal - 2;
+      if ((mode == 'cardio' || mode == 'time') && ran > 0 && short && holdSet < ex.sets.length) {
+        ex.sets[holdSet].sec = ran;
+      }
     }
     _finishHold();
   }
@@ -1350,6 +1440,7 @@ mixin WorkoutState on FitCore, SettingsState, LibraryState, PlacesState, StatsSt
     holdSide = 0;
     holdSides = isEachSide(s.exercises[exIdx].id) ? 2 : 1;
     holdTotal = secs;
+    holdOverFrom = null;
     final now = DateTime.now();
     holdStartsAt = now.add(const Duration(seconds: holdLeadIn));
     holdEndsAt = holdStartsAt!.add(Duration(seconds: secs));
@@ -1363,13 +1454,27 @@ mixin WorkoutState on FitCore, SettingsState, LibraryState, PlacesState, StatsSt
     final sound = alarmStyle != 'vibrate';
     var shownLead = holdLead;
     var shown = holdRemaining;
+    var shownExtra = holdExtra;
     _holdTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
+      if (holdOverFrom != null) {
+        final extra = holdExtra;
+        if (extra != shownExtra) {
+          shownExtra = extra;
+          clock.value++;
+        }
+        return;
+      }
       final lead = holdLead;
       final left = holdRemaining;
       if (left == 0) {
         Beeper.instance.go(sound: sound);
         if (holdSide + 1 < holdSides) {
           _nextSide();
+        } else if (_holdKeepsCounting) {
+          holdOverFrom = DateTime.now();
+          shownExtra = 0;
+          clock.value++;
+          notifyListeners();
         } else {
           _finishHold();
         }
@@ -1404,7 +1509,30 @@ mixin WorkoutState on FitCore, SettingsState, LibraryState, PlacesState, StatsSt
     notifyListeners();
   }
 
+  bool get _holdKeepsCounting {
+    final s = session;
+    if (s == null || holdEx < 0 || holdEx >= s.exercises.length || holdSides > 1) return false;
+    return keepsCounting(s.exercises[holdEx].id);
+  }
+
+  void _finishOvertime() {
+    final s = session;
+    if (s != null && holdEx >= 0 && holdEx < s.exercises.length) {
+      final sets = s.exercises[holdEx].sets;
+      if (holdSet >= 0 && holdSet < sets.length) sets[holdSet].sec = (holdTotal + holdExtra).clamp(1, 18000);
+    }
+    _finishHold();
+  }
+
   void stopHold() {
+    if (holdOvertime) {
+      _finishOvertime();
+      return;
+    }
+    _clearHold();
+  }
+
+  void _clearHold() {
     _holdTimer?.cancel();
     _holdTimer = null;
     holdPaused = false;
@@ -1412,6 +1540,7 @@ mixin WorkoutState on FitCore, SettingsState, LibraryState, PlacesState, StatsSt
     holdSides = 1;
     holdEndsAt = null;
     holdStartsAt = null;
+    holdOverFrom = null;
     holdEx = -1;
     holdSet = -1;
     notifyListeners();
@@ -1419,7 +1548,7 @@ mixin WorkoutState on FitCore, SettingsState, LibraryState, PlacesState, StatsSt
 
   void _finishHold() {
     final exIdx = holdEx, setIdx = holdSet;
-    stopHold();
+    _clearHold();
     final s = session;
     if (s == null || exIdx < 0 || exIdx >= s.exercises.length) return;
     final sets = s.exercises[exIdx].sets;
@@ -1773,6 +1902,7 @@ mixin WorkoutState on FitCore, SettingsState, LibraryState, PlacesState, StatsSt
   void finishSession() {
     _holdTimer?.cancel();
     holdEndsAt = null;
+    holdOverFrom = null;
     _advanceTimer?.cancel();
     _sessionTimer?.cancel();
     _restTimer?.cancel();
@@ -1787,7 +1917,7 @@ mixin WorkoutState on FitCore, SettingsState, LibraryState, PlacesState, StatsSt
         if (st.counts) working.add(st);
       }
     }
-    s.summaryVolume = working.fold<double>(0, (sum, st) => sum + st.weakReps * st.weight).round();
+    s.summaryVolume = working.fold<double>(0, (sum, st) => sum + st.logged.volume).round();
     s.summarySets = working.length;
     s.summaryDuration = s.manual ? _elapsedBefore : sessionElapsed;
     s.complete = true;
@@ -2284,6 +2414,7 @@ mixin WorkoutState on FitCore, SettingsState, LibraryState, PlacesState, StatsSt
   void saveAndExit() {
     _holdTimer?.cancel();
     holdEndsAt = null;
+    holdOverFrom = null;
     holdEx = -1;
     holdSet = -1;
     _advanceTimer?.cancel();

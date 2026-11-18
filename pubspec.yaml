@@ -1,7 +1,7 @@
 name: gymmane
 description: "GymMane — an offline, ad-free gym log for Android and iOS."
 publish_to: 'none'
-version: 2.2.0+13
+version: 2.4.0+15
 
 environment:
   sdk: ^3.11.5
@@ -60,6 +60,7 @@ flutter:
     - assets/badges/
     - assets/data/
     - assets/food/
+    - assets/icon/variants/
 
   shaders:
     - assets/shaders/medal.frag

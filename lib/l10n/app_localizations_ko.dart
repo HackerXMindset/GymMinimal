@@ -3459,6 +3459,176 @@ class AppLocalizationsKo extends AppLocalizations {
   String get exerciseSettings => '이 운동의 설정';
 
   @override
+  String get exerciseSettingsHint => '휴식, 점진, 워밍업 등';
+
+  @override
+  String get appIcon => '앱 아이콘';
+
+  @override
+  String get appIconHint => '홈 화면에서 GymMane이 보이는 모습';
+
+  @override
+  String get appIconColors => '색상';
+
+  @override
+  String get appIconDesigns => '디자인';
+
+  @override
+  String get appIconNote => '홈 화면에 변경 사항이 보이기까지 몇 초 걸릴 수 있어요.';
+
+  @override
+  String get appIconDefault => '기본';
+
+  @override
+  String get appIconLight => '라이트';
+
+  @override
+  String get appIconSand => '샌드';
+
+  @override
+  String get appIconGraphite => '그래파이트';
+
+  @override
+  String get appIconSage => '세이지';
+
+  @override
+  String get appIconNight => '나이트';
+
+  @override
+  String get appIconMaterial => 'Material';
+
+  @override
+  String get appIconMedal => '메달';
+
+  @override
+  String get appIconGlass => '유리';
+
+  @override
+  String get appIconStopwatch => '스톱워치';
+
+  @override
+  String get appIconMarble => '대리석';
+
+  @override
+  String get nfcRow => 'NFC 스티커';
+
+  @override
+  String get nfcRowHint => '휴대폰을 대고 오늘의 운동 보기';
+
+  @override
+  String get nfcTitle => 'NFC 스티커';
+
+  @override
+  String get nfcSubtitle => '일주일 내내 쓰는 스티커 하나';
+
+  @override
+  String get nfcPoint1 => '오늘의 운동, 바로 준비';
+
+  @override
+  String get nfcPoint1Body => '휴대폰을 대면 오늘의 루틴이 운동과 함께 열려요. 준비되면 직접 시작하세요.';
+
+  @override
+  String get nfcPoint2 => '휴식일이면 알려 줘요';
+
+  @override
+  String get nfcPoint2Body => '오늘이 휴식일이면 그렇게 보이고, 원하면 그래도 운동할 수 있어요.';
+
+  @override
+  String get nfcPoint3 => '한 번만 쓰면 돼요';
+
+  @override
+  String get nfcPoint3Body => '계획은 언제든 바꾸세요. 스티커는 항상 그날 예정된 운동을 열어요.';
+
+  @override
+  String get nfcUse => '스티커 사용';
+
+  @override
+  String get nfcUseHint => '꺼져 있으면 스티커에 대도 아무 일도 없어요';
+
+  @override
+  String get nfcWrite => '스티커 쓰기';
+
+  @override
+  String get nfcOn => '켜짐';
+
+  @override
+  String get nfcOff => '꺼짐';
+
+  @override
+  String get todayRestBody => '쉬는 것도 계획의 일부예요. 회복하는 동안 근육이 자라요.';
+
+  @override
+  String get todayNotNow => '나중에';
+
+  @override
+  String get nfcWaitTitle => '스티커를 휴대폰에 대세요';
+
+  @override
+  String get nfcWaitBody => '휴대폰 뒷면, 카메라 근처에 대고 진동할 때까지 기다리세요.';
+
+  @override
+  String get nfcTip => 'NTAG213, 215, 216 스티커면 무엇이든 돼요. 가장 흔하고 아주 저렴해요.';
+
+  @override
+  String get nfcDoneTitle => '스티커 준비 완료';
+
+  @override
+  String get nfcDoneBody => '도착했을 때 보이는 곳에 붙이세요. 운동 가방, 물병, 사물함 같은 곳이요.';
+
+  @override
+  String get nfcOffTitle => 'NFC가 꺼져 있어요';
+
+  @override
+  String get nfcOffBody => '스티커를 쓰려면 휴대폰 설정에서 NFC를 켜세요.';
+
+  @override
+  String get nfcOpenSettings => '설정 열기';
+
+  @override
+  String get nfcFailTitle => '쓰지 못했어요';
+
+  @override
+  String get nfcErrLocked => '이 스티커는 잠겨 있어서 쓸 수 없어요.';
+
+  @override
+  String get nfcErrSmall => '이 스티커에는 들어가지 않아요. NTAG213 이상을 사용하세요.';
+
+  @override
+  String get nfcErrLost => '끝나기 전에 스티커가 움직였어요. 움직이지 말고 다시 시도하세요.';
+
+  @override
+  String get nfcErrUnsupported => '지원하지 않는 스티커예요. NTAG213, 215, 216을 사용하세요.';
+
+  @override
+  String get nfcRetry => '다시 시도';
+
+  @override
+  String get raceTitle => '지난 세션과 비교';
+
+  @override
+  String raceSince(String date) {
+    return '$date와 비교';
+  }
+
+  @override
+  String get raceAhead => '앞서고 있어요';
+
+  @override
+  String get raceBehind => '아직 따라잡는 중';
+
+  @override
+  String get raceEven => '막상막하';
+
+  @override
+  String get raceToday => '오늘';
+
+  @override
+  String get raceThen => '그날';
+
+  @override
+  String get raceHint => '같은 세트만 비교해요. 2세트를 했다면 그날의 첫 2세트와 비교해요.';
+
+  @override
   String get placeActiveNow => '지금 여기';
 
   @override
@@ -5213,6 +5383,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get importAsCopy => '사본으로 추가';
 
   @override
+  String get routineExerciseNote => '루틴 메모';
+
+  @override
+  String get importRoutineNotes => '빠진 루틴 메모 추가';
+
+  @override
+  String get routineNotesAdded => '루틴 메모를 추가했어요';
+
+  @override
   String get importOwned => '이미 있음';
 
   @override
@@ -6218,6 +6397,15 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get reportShareCsv => 'CSV 내보내기';
+
+  @override
+  String get reportChooseCsv => '공유할 CSV 파일을 고르세요.';
+
+  @override
+  String get reportWeighIns => '체중 기록';
+
+  @override
+  String get reportSessionDetails => '세션 상세';
 
   @override
   String get reportShareCsvBoth => 'CSV 내보내기 (운동과 영양)';
@@ -7424,6 +7612,38 @@ class AppLocalizationsKo extends AppLocalizations {
   String get webPhoneGuide => '설정 방법';
 
   @override
+  String get webSignOut => '로그아웃';
+
+  @override
+  String get wearSyncTitle => '휴대폰';
+
+  @override
+  String get wearSyncNever => '아직 동기화하지 않음';
+
+  @override
+  String wearSyncLast(String when) {
+    return '$when 동기화됨';
+  }
+
+  @override
+  String wearSyncWaiting(int n) {
+    String _temp0 = intl.Intl.pluralLogic(n, locale: localeName, other: '운동 $n개가 휴대폰으로 보내기를 기다리는 중');
+    return '$_temp0';
+  }
+
+  @override
+  String get wearSyncNow => '지금 동기화';
+
+  @override
+  String get wearSyncHow => '휴대폰에서 설정 › Wear OS 워치를 켜고 두 기기에서 GymMane을 여세요.';
+
+  @override
+  String get routinesOrder => '루틴 순서 바꾸기';
+
+  @override
+  String get routinesOrderHint => '끌어서 표시 순서를 바꾸세요.';
+
+  @override
   String get webPhoneOff => '이 서버에서는 휴대폰 동기화가 꺼져 있어요';
 
   @override
@@ -7507,4 +7727,456 @@ class AppLocalizationsKo extends AppLocalizations {
   String exerciseCopyName(String name) {
     return '$name (사본)';
   }
+
+  @override
+  String get foodAiRow => 'Fill in with an AI';
+
+  @override
+  String get foodAiRowHint => 'From a label, a screenshot or a link';
+
+  @override
+  String get foodAiTitle => 'Food with AI';
+
+  @override
+  String get foodAiHow =>
+      'Copy the request and paste it into any chatbot together with a photo of the nutrition label, a screenshot of the product or a link to it. Then paste its answer here.';
+
+  @override
+  String get foodAiCheck => 'The form fills itself in. Check the values against the label before saving.';
+
+  @override
+  String get foodAiFill => 'Fill in the food';
+
+  @override
+  String get foodAiFilled => 'Food filled in';
+
+  @override
+  String get foodAiFilledHint => 'Check the values before saving';
+
+  @override
+  String get fastAdd => 'Add a past fast';
+
+  @override
+  String get fastAddTitle => 'Add a fast';
+
+  @override
+  String get fastEditTitle => 'Edit fast';
+
+  @override
+  String get fastStartRow => 'Start';
+
+  @override
+  String get fastEndRow => 'End';
+
+  @override
+  String get fastEndedAt => 'When did you end it?';
+
+  @override
+  String fastLasted(String time) {
+    return 'Lasted $time';
+  }
+
+  @override
+  String get fastErrFuture => 'The end can\'t be later than now';
+
+  @override
+  String get fastErrOrder => 'The end has to come after the start';
+
+  @override
+  String get fastErrShort => 'A fast lasts at least 10 minutes';
+
+  @override
+  String get fastErrOverlap => 'It overlaps another fast';
+
+  @override
+  String get fastSaved => 'Fast saved';
+
+  @override
+  String get fastAdjust => 'Adjust';
+
+  @override
+  String get keepCounting => '계속 세기';
+
+  @override
+  String get keepCountingHint => '정한 시간에 알리고 멈출 때까지 계속됩니다';
+
+  @override
+  String get holdOvertime => '추가 시간';
+
+  @override
+  String get pairSetting => '덤벨 한 쌍';
+
+  @override
+  String get pairSettingHint => '하나의 무게만 기록하세요. 볼륨은 둘 다 셉니다.';
+
+  @override
+  String get helpCommon => '자주 묻는 질문';
+
+  @override
+  String get helpQuestions => '질문';
+
+  @override
+  String get helpNoResults => '일치하는 항목이 없어요. 다른 단어로 찾아보세요';
+
+  @override
+  String get helpLbQ => '한 운동만 lb로 쓸 수 있나요?';
+
+  @override
+  String helpLbA(String option) {
+    return '네. 운동 중에 해당 운동의 ⋯ 메뉴를 열고 “$option”을 고르세요.';
+  }
+
+  @override
+  String get helpSupersetQ => '슈퍼세트는 어떻게 만드나요?';
+
+  @override
+  String get helpSupersetA => '루틴 편집에서 두 운동 사이의 연결을 탭해 이어 주세요.';
+
+  @override
+  String get helpRangeQ => '8-12처럼 반복 범위를 정하려면?';
+
+  @override
+  String get helpRangeA => '루틴 편집에서 반복 횟수를 길게 누르세요.';
+
+  @override
+  String get helpRestQ => '운동마다 휴식 시간을 따로 둘 수 있나요?';
+
+  @override
+  String helpRestA(String settings, String rest, String section) {
+    return '네: 운동 열기 › $settings › $rest. 기본 휴식은 설정 › $section에 있어요.';
+  }
+
+  @override
+  String get helpSidesQ => '왼쪽과 오른쪽을 따로 기록하려면?';
+
+  @override
+  String helpSidesA(String settings, String sides) {
+    return '운동 열기 › $settings › $sides.';
+  }
+
+  @override
+  String get helpPairQ => '덤벨은 하나만 기록하나요, 둘 다 기록하나요?';
+
+  @override
+  String helpPairA(String pair) {
+    return '하나만요. 운동 설정에서 “$pair”을 켜면 볼륨은 둘 다 셉니다.';
+  }
+
+  @override
+  String get helpKeepQ => '시간 세트가 시간을 넘겨 계속될 수 있나요?';
+
+  @override
+  String helpKeepA(String keep) {
+    return '네: 운동 설정에서 “$keep”를 켜세요. 정한 시간에 알리고 멈출 때까지 계속 셉니다.';
+  }
+
+  @override
+  String get helpDayOffQ => '휴식일, 아픈 날, 여행일은 어떻게 표시하나요?';
+
+  @override
+  String get helpDayOffA => '홈에서 이번 주의 그 날을 길게 누르세요. 연속 기록과 알림은 그 날을 건드리지 않아요.';
+
+  @override
+  String get helpImportQ => 'Hevy, Strong 같은 다른 앱의 운동을 가져올 수 있나요?';
+
+  @override
+  String helpImportA(String section, String row) {
+    return '네: 설정 › $section › $row. FitNotes, Fitbod, JEFIT, StrongLifts, Liftosaur, Lyfta도 읽어요.';
+  }
+
+  @override
+  String get helpPhoneQ => '새 휴대폰으로 데이터를 옮기려면?';
+
+  @override
+  String helpPhoneA(String section, String import) {
+    return '설정 › $section에서 사본을 내보내고 새 휴대폰에서 “$import”로 여세요.';
+  }
+
+  @override
+  String get helpSlowQ => '휴대폰에서 앱이 느려요';
+
+  @override
+  String helpSlowA(String section, String perf, String lite) {
+    return '설정 › $section › $perf › $lite. 가장 무거운 흐림 효과를 끕니다.';
+  }
+
+  @override
+  String get helpPlatesQ => '바에 원판을 몇 개 끼우나요?';
+
+  @override
+  String helpPlatesA(String tool, String places) {
+    return '도구의 “$tool”을 쓰세요. 헬스장의 원판과 바는 “$places”에서 정해요.';
+  }
+
+  @override
+  String get helpRaceQ => '지난 운동과 비교하려면?';
+
+  @override
+  String helpRaceA(String race) {
+    return '운동 중에 위쪽 알약 모양을 탭하세요: “$race”.';
+  }
+
+  @override
+  String get helpFastQ => '단식 종료를 깜빡했어요';
+
+  @override
+  String helpFastA(String adjust) {
+    return '종료한 뒤 알림의 “$adjust”을 탭하거나, 단식 시트에서 그 단식을 탭해 시간을 바꾸세요.';
+  }
+
+  @override
+  String get helpGo => '보여 줘';
+
+  @override
+  String get helpHomeOrderQ => '홈 순서를 바꿀 수 있나요?';
+
+  @override
+  String helpHomeOrderA(String section, String row) {
+    return '네: 설정 › $section › “$row”. 섹션을 길게 눌러 끌거나 안 쓰는 섹션을 끄세요.';
+  }
+
+  @override
+  String get helpCustomQ => '나만의 운동을 만들 수 있나요?';
+
+  @override
+  String helpCustomA(String button) {
+    return '네: 운동에서 “$button”을 탭하세요. 이름, 근육, 장비를 고르면 다른 운동처럼 작동해요.';
+  }
+
+  @override
+  String get helpWarmupQ => '앱이 워밍업 세트를 추가해 줄 수 있나요?';
+
+  @override
+  String helpWarmupA(String settings, String warm, String tool) {
+    return '네: 운동 열기 › $settings › “$warm”. 직접 계산하려면 도구의 “$tool”을 쓰세요.';
+  }
+
+  @override
+  String get helpPassQ => '헬스장 회원 카드를 앱에 넣을 수 있나요?';
+
+  @override
+  String helpPassA(String row, String section) {
+    return '네: 설정 › $section의 “$row”. 입구에서 찍을 바코드나 QR 코드를 보여 줘요.';
+  }
+
+  @override
+  String get helpStepsQ => '걸음 수가 왜 안 보이나요?';
+
+  @override
+  String helpStepsA(String row, String section) {
+    return '걸음 수는 Android 14 이상에 들어 있는 Health Connect에서 읽어요. 더 오래된 휴대폰에는 없어요. 있다면 설정 › $section에서 “$row”을 켜세요.';
+  }
+
+  @override
+  String get helpNfcQ => '휴대폰을 대서 운동을 시작할 수 있나요?';
+
+  @override
+  String helpNfcA(String row, String section) {
+    return '네, NFC 스티커로요: 설정 › $section의 “$row”. 헬스장에 붙여 두면 대기만 해도 오늘 운동이 열려요.';
+  }
+
+  @override
+  String get helpCleanQ => '영양 화면을 더 깔끔하게 하려면?';
+
+  @override
+  String helpCleanA(String button) {
+    return '영양에서 위쪽 슬라이더 버튼(“$button”)을 탭하고 기록하지 않는 항목을 끄세요.';
+  }
+
+  @override
+  String alsoWorksMuscles(String muscles) {
+    return '$muscles도 운동';
+  }
+
+  @override
+  String get wearSyncAllow => '블루투스 허용';
+
+  @override
+  String get wearSyncSearching => '휴대폰을 찾는 중…';
+
+  @override
+  String get wearSyncNotFound => '휴대폰을 찾을 수 없음';
+
+  @override
+  String get wearSyncBluetoothOff => '블루투스가 꺼져 있음';
+
+  @override
+  String get watchRow => 'Wear OS 워치';
+
+  @override
+  String get watchTitle => 'Wear OS 워치';
+
+  @override
+  String get watchSubtitle => '루틴은 손목에, 운동 기록은 다시 휴대폰으로';
+
+  @override
+  String get watchPoint1 => '워치에 GymMane 설치';
+
+  @override
+  String get watchPoint1Body => '휴대폰과 같은 앱이에요. 탭해서 설치 안내를 보세요.';
+
+  @override
+  String get watchPoint2 => '두 기기에서 GymMane 열기';
+
+  @override
+  String get watchPoint2Body => '휴대폰과 워치를 이미 잇는 블루투스로 알아서 동기화돼요. 인터넷은 필요 없어요.';
+
+  @override
+  String get watchPoint3 => '워치로 운동하기';
+
+  @override
+  String get watchPoint3Body => '워치에서 한 운동은 다음에 둘 다 열려 있을 때 휴대폰으로 와요.';
+
+  @override
+  String get watchUse => '워치와 동기화';
+
+  @override
+  String get watchUseHint => '워치가 있을 때만. 블루투스 권한을 요청해요';
+
+  @override
+  String get watchTurnOnBluetooth => '블루투스 켜기';
+
+  @override
+  String get watchSyncNow => '지금 동기화';
+
+  @override
+  String get watchSearching => '워치를 찾는 중…';
+
+  @override
+  String get watchSearchingHint => '아직이라면 워치에서 GymMane을 여세요.';
+
+  @override
+  String get watchBluetoothOff => '블루투스가 꺼져 있어요.';
+
+  @override
+  String get watchNotFound => '워치를 찾을 수 없어요. 워치에서 GymMane을 열고 다시 시도하세요.';
+
+  @override
+  String get watchNever => '아직 동기화하지 않았어요.';
+
+  @override
+  String watchLast(String when) {
+    return '$when 동기화됨.';
+  }
+
+  @override
+  String watchLastWith(String name, String when) {
+    return '$name와 $when 동기화됨.';
+  }
+
+  @override
+  String get watchTip => '베타: 아직 모든 워치에서 시험하지 않았어요. 안 되면 GitHub에 알려 주세요.';
+
+  @override
+  String get mineralsTracker => 'Iron and potassium';
+
+  @override
+  String get ironLabel => 'Iron';
+
+  @override
+  String get potassiumLabel => 'Potassium';
+
+  @override
+  String mineralsCoverage(int known, int total) {
+    return '$known of $total foods today have iron and potassium';
+  }
+
+  @override
+  String get mineralsHint =>
+      'Few foods in the list come with iron and potassium, so the total only counts the ones that do. Add them to your own foods or with the AI.';
+
+  @override
+  String get qsRow => '빠른 설정 타일';
+
+  @override
+  String get qsRowHint => '오늘의 운동이나 헬스장 회원증을 위쪽 패널에서';
+
+  @override
+  String get qsTitle => '빠른 설정 타일';
+
+  @override
+  String get qsSubtitle => '빠른 설정을 내리면 앱을 찾지 않고 한 번에 들어갈 수 있어요';
+
+  @override
+  String get qsToday => '오늘의 운동';
+
+  @override
+  String get qsTodayHint => 'NFC 스티커처럼 오늘 예정된 운동을 엽니다';
+
+  @override
+  String get qsPass => '헬스장 회원증';
+
+  @override
+  String qsPassHint(String name) {
+    return '입구에서 찍을 수 있게 $name을(를) 엽니다';
+  }
+
+  @override
+  String get qsPassNone => '먼저 헬스장 회원증을 추가하세요';
+
+  @override
+  String get qsRest => '휴식일';
+
+  @override
+  String get qsAdd => '추가';
+
+  @override
+  String get qsAdded => '추가됨';
+
+  @override
+  String get qsManual => '빠른 설정을 내리고 연필을 탭한 뒤 GymMane 타일을 내 타일로 끌어오세요.';
+
+  @override
+  String get qsPassUse => '빠른 설정에서 열기';
+
+  @override
+  String get qsPassUseHint => '빠른 설정 타일이 이 회원증을 엽니다';
+
+  @override
+  String get measureAbdomen => '복부';
+
+  @override
+  String get bfNeckBelow => '목 (울대뼈 아래)';
+
+  @override
+  String get bfAbdomen => '복부 (배꼽 높이)';
+
+  @override
+  String get bfWaistNarrow => '허리 (가장 가는 곳)';
+
+  @override
+  String get bfHipWide => '엉덩이 (가장 넓은 곳)';
+
+  @override
+  String get measureBp => '혈압';
+
+  @override
+  String get measureLeft => '왼쪽';
+
+  @override
+  String get measureRight => '오른쪽';
+
+  @override
+  String get measureLeftShort => '왼';
+
+  @override
+  String get measureRightShort => '오';
+
+  @override
+  String get measureOneValue => '값 하나';
+
+  @override
+  String get measureNoteHint => '메모 (선택)';
+
+  @override
+  String get bpHigh => '수축기';
+
+  @override
+  String get bpLow => '이완기';
+
+  @override
+  String get bpPulse => '맥박';
+
+  @override
+  String get bpPulseAdd => '+ 맥박';
 }

@@ -110,7 +110,8 @@ class _GlassSheetRoute<T> extends ModalBottomSheetRoute<T> with _GlassCount<T> {
   @override
   Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
     final page = super.buildPage(context, animation, secondaryAnimation);
-    return floating ? Padding(padding: const EdgeInsets.only(top: 28, bottom: 28), child: page) : page;
+    return _KeyboardLift(
+        child: floating ? Padding(padding: const EdgeInsets.only(top: 28, bottom: 28), child: page) : page);
   }
 
   @override
@@ -133,6 +134,24 @@ class _GlassSheetRoute<T> extends ModalBottomSheetRoute<T> with _GlassCount<T> {
           ),
         );
       },
+    );
+  }
+}
+
+class _KeyboardLift extends StatelessWidget {
+  const _KeyboardLift({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
+    return Padding(
+      padding: EdgeInsets.only(bottom: media.viewInsets.bottom),
+      child: MediaQuery(
+        data: media.copyWith(viewInsets: media.viewInsets.copyWith(bottom: 0)),
+        child: child,
+      ),
     );
   }
 }
@@ -222,6 +241,8 @@ class _GlassDialogRoute<T> extends DialogRoute<T> with _GlassCount<T> {
 }
 
 
+final ValueNotifier<double?> edgeBlurRaster = ValueNotifier(null);
+
 class EdgeBlur extends StatefulWidget {
   const EdgeBlur({super.key, required this.height, this.top = true, this.sigma = 16, this.shade = 1});
 
@@ -245,6 +266,7 @@ class _EdgeBlurState extends State<EdgeBlur> {
   @override
   void initState() {
     super.initState();
+    edgeBlurRaster.addListener(_rerender);
     if (_program != null || !ui.ImageFilter.isShaderFilterSupported) return;
     (_loading ??= ui.FragmentProgram.fromAsset('assets/shaders/edge_fade.frag')).then((p) {
       _program = p;
@@ -252,8 +274,13 @@ class _EdgeBlurState extends State<EdgeBlur> {
     }, onError: (_) {});
   }
 
+  void _rerender() {
+    if (mounted) setState(() {});
+  }
+
   @override
   void dispose() {
+    edgeBlurRaster.removeListener(_rerender);
     _dropShaders();
     super.dispose();
   }
@@ -300,7 +327,7 @@ class _EdgeBlurState extends State<EdgeBlur> {
             if (!blurEffects)
               const SizedBox.shrink()
             else if (program != null)
-              for (final f in _layers(program, MediaQuery.devicePixelRatioOf(context)))
+              for (final f in _layers(program, edgeBlurRaster.value ?? MediaQuery.devicePixelRatioOf(context)))
                 Positioned.fill(
                   child: ClipRect(child: BackdropFilter(filter: f, child: const SizedBox.expand())),
                 )
