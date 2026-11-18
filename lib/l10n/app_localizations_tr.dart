@@ -3552,6 +3552,177 @@ class AppLocalizationsTr extends AppLocalizations {
   String get exerciseSettings => 'Bu egzersizin ayarları';
 
   @override
+  String get exerciseSettingsHint => 'Dinlenme, ilerleme, ısınma ve daha fazlası';
+
+  @override
+  String get appIcon => 'Uygulama simgesi';
+
+  @override
+  String get appIconHint => 'GymMane ana ekranında nasıl görünür';
+
+  @override
+  String get appIconColors => 'Renkler';
+
+  @override
+  String get appIconDesigns => 'Tasarımlar';
+
+  @override
+  String get appIconNote => 'Ana ekranın değişikliği göstermesi birkaç saniye sürebilir.';
+
+  @override
+  String get appIconDefault => 'Orijinal';
+
+  @override
+  String get appIconLight => 'Açık';
+
+  @override
+  String get appIconSand => 'Kum';
+
+  @override
+  String get appIconGraphite => 'Grafit';
+
+  @override
+  String get appIconSage => 'Adaçayı';
+
+  @override
+  String get appIconNight => 'Gece';
+
+  @override
+  String get appIconMaterial => 'Material';
+
+  @override
+  String get appIconMedal => 'Madalya';
+
+  @override
+  String get appIconGlass => 'Cam';
+
+  @override
+  String get appIconStopwatch => 'Kronometre';
+
+  @override
+  String get appIconMarble => 'Mermer';
+
+  @override
+  String get nfcRow => 'NFC etiketi';
+
+  @override
+  String get nfcRowHint => 'Telefonu yaklaştır, bugünün antrenmanını gör';
+
+  @override
+  String get nfcTitle => 'NFC etiketi';
+
+  @override
+  String get nfcSubtitle => 'Haftanın her günü için tek etiket';
+
+  @override
+  String get nfcPoint1 => 'Bugünün antrenmanı hazır';
+
+  @override
+  String get nfcPoint1Body =>
+      'Telefonu yaklaştır, bugünün rutini egzersizleriyle açılsın. Hazır olunca sen başlatırsın.';
+
+  @override
+  String get nfcPoint2 => 'Dinlenme günlerinde söyler';
+
+  @override
+  String get nfcPoint2Body => 'Bugün dinlenme günüyse görürsün, istersen yine de antrenman yapabilirsin.';
+
+  @override
+  String get nfcPoint3 => 'Bir kez yazılır';
+
+  @override
+  String get nfcPoint3Body => 'Planını istediğin zaman değiştir: etiket her zaman o gün planlananı açar.';
+
+  @override
+  String get nfcUse => 'Etiketi kullan';
+
+  @override
+  String get nfcUseHint => 'Kapalıyken etikete dokunmak hiçbir şey yapmaz';
+
+  @override
+  String get nfcWrite => 'Etiket yaz';
+
+  @override
+  String get nfcOn => 'Açık';
+
+  @override
+  String get nfcOff => 'Kapalı';
+
+  @override
+  String get todayRestBody => 'Dinlenmek de planın bir parçası. Kasların sen toparlanırken büyür.';
+
+  @override
+  String get todayNotNow => 'Şimdi değil';
+
+  @override
+  String get nfcWaitTitle => 'Etiketi telefona yaklaştır';
+
+  @override
+  String get nfcWaitBody => 'Telefonun arkasına, kameranın yakınına, titreyene kadar tut.';
+
+  @override
+  String get nfcTip => 'Her NTAG213, 215 ya da 216 etiket olur. En yaygın olanlar bunlar ve çok ucuzlar.';
+
+  @override
+  String get nfcDoneTitle => 'Etiket hazır';
+
+  @override
+  String get nfcDoneBody => 'Geldiğinde göreceğin bir yere yapıştır: spor çantan, matara ya da dolabın.';
+
+  @override
+  String get nfcOffTitle => 'NFC kapalı';
+
+  @override
+  String get nfcOffBody => 'Etiketi yazmak için telefon ayarlarından NFC\'yi aç.';
+
+  @override
+  String get nfcOpenSettings => 'Ayarları aç';
+
+  @override
+  String get nfcFailTitle => 'Yazılamadı';
+
+  @override
+  String get nfcErrLocked => 'Bu etiket kilitli, üzerine yazılamaz.';
+
+  @override
+  String get nfcErrSmall => 'Bu etikete sığmıyor. NTAG213 ya da daha büyüğünü kullan.';
+
+  @override
+  String get nfcErrLost => 'Etiket bitmeden kıpırdadı. Sabit tut ve tekrar dene.';
+
+  @override
+  String get nfcErrUnsupported => 'Bu etiket desteklenmiyor. NTAG213, 215 ya da 216 kullan.';
+
+  @override
+  String get nfcRetry => 'Tekrar dene';
+
+  @override
+  String get raceTitle => 'Son antrenmanına karşı';
+
+  @override
+  String raceSince(String date) {
+    return '$date ile karşılaştırıldı';
+  }
+
+  @override
+  String get raceAhead => 'Öndesin';
+
+  @override
+  String get raceBehind => 'Hâlâ yetişiyorsun';
+
+  @override
+  String get raceEven => 'Başa baş';
+
+  @override
+  String get raceToday => 'Bugün';
+
+  @override
+  String get raceThen => 'O gün';
+
+  @override
+  String get raceHint => 'Sadece aynı setler karşılaştırılır: 2 set yaptıysan, o günkü ilk 2 setinle.';
+
+  @override
   String get placeActiveNow => 'Buradasın';
 
   @override
@@ -5368,6 +5539,15 @@ class AppLocalizationsTr extends AppLocalizations {
   String get importAsCopy => 'Kopya olarak ekle';
 
   @override
+  String get routineExerciseNote => 'Rutin notu';
+
+  @override
+  String get importRoutineNotes => 'Eksik rutin notlarını ekle';
+
+  @override
+  String get routineNotesAdded => 'Rutin notları eklendi';
+
+  @override
   String get importOwned => 'Zaten var';
 
   @override
@@ -6411,6 +6591,15 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get reportShareCsv => 'CSV dışa aktar';
+
+  @override
+  String get reportChooseCsv => 'Hangi CSV dosyalarının paylaşılacağını seç.';
+
+  @override
+  String get reportWeighIns => 'Tartılmalar';
+
+  @override
+  String get reportSessionDetails => 'Antrenman ayrıntıları';
 
   @override
   String get reportShareCsvBoth => 'CSV dışa aktar (antrenmanlar ve beslenme)';
@@ -7668,6 +7857,43 @@ class AppLocalizationsTr extends AppLocalizations {
   String get webPhoneGuide => 'Nasıl kurulur';
 
   @override
+  String get webSignOut => 'Çıkış yap';
+
+  @override
+  String get wearSyncTitle => 'Telefon';
+
+  @override
+  String get wearSyncNever => 'Henüz eşitlenmedi';
+
+  @override
+  String wearSyncLast(String when) {
+    return 'Eşitlendi: $when';
+  }
+
+  @override
+  String wearSyncWaiting(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n antrenman telefona gitmeyi bekliyor',
+      one: '1 antrenman telefona gitmeyi bekliyor',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get wearSyncNow => 'Şimdi eşitle';
+
+  @override
+  String get wearSyncHow => 'Telefonda Ayarlar › Wear OS saat seçeneğini aç ve GymMane\'i ikisinde de aç.';
+
+  @override
+  String get routinesOrder => 'Programları sırala';
+
+  @override
+  String get routinesOrderHint => 'Sırasını değiştirmek için sürükle.';
+
+  @override
   String get webPhoneOff => 'Bu sunucuda telefon eşitlemesi kapalı';
 
   @override
@@ -7756,4 +7982,459 @@ class AppLocalizationsTr extends AppLocalizations {
   String exerciseCopyName(String name) {
     return '$name (kopya)';
   }
+
+  @override
+  String get foodAiRow => 'Fill in with an AI';
+
+  @override
+  String get foodAiRowHint => 'From a label, a screenshot or a link';
+
+  @override
+  String get foodAiTitle => 'Food with AI';
+
+  @override
+  String get foodAiHow =>
+      'Copy the request and paste it into any chatbot together with a photo of the nutrition label, a screenshot of the product or a link to it. Then paste its answer here.';
+
+  @override
+  String get foodAiCheck => 'The form fills itself in. Check the values against the label before saving.';
+
+  @override
+  String get foodAiFill => 'Fill in the food';
+
+  @override
+  String get foodAiFilled => 'Food filled in';
+
+  @override
+  String get foodAiFilledHint => 'Check the values before saving';
+
+  @override
+  String get fastAdd => 'Add a past fast';
+
+  @override
+  String get fastAddTitle => 'Add a fast';
+
+  @override
+  String get fastEditTitle => 'Edit fast';
+
+  @override
+  String get fastStartRow => 'Start';
+
+  @override
+  String get fastEndRow => 'End';
+
+  @override
+  String get fastEndedAt => 'When did you end it?';
+
+  @override
+  String fastLasted(String time) {
+    return 'Lasted $time';
+  }
+
+  @override
+  String get fastErrFuture => 'The end can\'t be later than now';
+
+  @override
+  String get fastErrOrder => 'The end has to come after the start';
+
+  @override
+  String get fastErrShort => 'A fast lasts at least 10 minutes';
+
+  @override
+  String get fastErrOverlap => 'It overlaps another fast';
+
+  @override
+  String get fastSaved => 'Fast saved';
+
+  @override
+  String get fastAdjust => 'Adjust';
+
+  @override
+  String get keepCounting => 'Saymaya devam et';
+
+  @override
+  String get keepCountingHint => 'Sürende öter ve sen durdurana kadar devam eder';
+
+  @override
+  String get holdOvertime => 'Ek süre';
+
+  @override
+  String get pairSetting => 'Dambıl çifti';
+
+  @override
+  String get pairSettingHint => 'Birinin ağırlığını gir. Hacim ikisini de sayar.';
+
+  @override
+  String get helpCommon => 'Sık sorulanlar';
+
+  @override
+  String get helpQuestions => 'Sorular';
+
+  @override
+  String get helpNoResults => 'Eşleşen bir şey yok. Başka bir kelime dene';
+
+  @override
+  String get helpLbQ => 'Sadece bir egzersizde lb kullanabilir miyim?';
+
+  @override
+  String helpLbA(String option) {
+    return 'Evet. Antrenman sırasında egzersizin ⋯ menüsünü aç ve “$option” seç.';
+  }
+
+  @override
+  String get helpSupersetQ => 'Süperset nasıl yapılır?';
+
+  @override
+  String get helpSupersetA =>
+      'Program düzenleyicide iki egzersiz arasındaki bağlantıya dokunarak onları birleştir.';
+
+  @override
+  String get helpRangeQ => '8-12 gibi bir tekrar aralığı nasıl ayarlanır?';
+
+  @override
+  String get helpRangeA => 'Program düzenleyicide tekrarlara uzun bas.';
+
+  @override
+  String get helpRestQ => 'Her egzersizin kendi dinlenmesi olabilir mi?';
+
+  @override
+  String helpRestA(String settings, String rest, String section) {
+    return 'Evet: egzersizi aç › $settings › $rest. Varsayılan dinlenme Ayarlar › $section içinde.';
+  }
+
+  @override
+  String get helpSidesQ => 'Sol ve sağı ayrı nasıl kaydederim?';
+
+  @override
+  String helpSidesA(String settings, String sides) {
+    return 'Egzersizi aç › $settings › $sides.';
+  }
+
+  @override
+  String get helpPairQ => 'Dambıl: birini mi ikisini mi kaydederim?';
+
+  @override
+  String helpPairA(String pair) {
+    return 'Birini. Egzersizin ayarlarında “$pair” seçeneğini aç, hacim ikisini de sayar.';
+  }
+
+  @override
+  String get helpKeepQ => 'Süreli bir set süreyi geçebilir mi?';
+
+  @override
+  String helpKeepA(String keep) {
+    return 'Evet: egzersizin ayarlarında “$keep” seçeneğini aç. Sürende öter ve sen durdurana kadar saymaya devam eder.';
+  }
+
+  @override
+  String get helpDayOffQ => 'Dinlenme, hastalık veya seyahat günü nasıl işaretlenir?';
+
+  @override
+  String get helpDayOffA => 'Ana sayfada haftandaki güne uzun bas. Serin ve hatırlatıcı o güne dokunmaz.';
+
+  @override
+  String get helpImportQ => 'Antrenmanlarımı Hevy, Strong veya başka bir uygulamadan getirebilir miyim?';
+
+  @override
+  String helpImportA(String section, String row) {
+    return 'Evet: Ayarlar › $section › $row. FitNotes, Fitbod, JEFIT, StrongLifts, Liftosaur ve Lyfta\'yı da okur.';
+  }
+
+  @override
+  String get helpPhoneQ => 'Verilerimi yeni telefona nasıl taşırım?';
+
+  @override
+  String helpPhoneA(String section, String import) {
+    return 'Ayarlar › $section içinden bir kopya dışa aktar ve yeni telefonda “$import” ile aç.';
+  }
+
+  @override
+  String get helpSlowQ => 'Uygulama telefonumda yavaş';
+
+  @override
+  String helpSlowA(String section, String perf, String lite) {
+    return 'Ayarlar › $section › $perf › $lite. En ağır kısım olan bulanıklığı kapatır.';
+  }
+
+  @override
+  String get helpPlatesQ => 'Bara kaç plaka takılır?';
+
+  @override
+  String helpPlatesA(String tool, String places) {
+    return 'Araçlar\'daki “$tool” aracını kullan. Salonunun plakaları ve barı “$places” içinde ayarlanır.';
+  }
+
+  @override
+  String get helpRaceQ => 'Son antrenmanımla nasıl karşılaştırırım?';
+
+  @override
+  String helpRaceA(String race) {
+    return 'Antrenman sırasında üstteki hapa dokun: “$race”.';
+  }
+
+  @override
+  String get helpFastQ => 'Orucumu bitirmeyi unuttum';
+
+  @override
+  String helpFastA(String adjust) {
+    return 'Bitir ve bildirimdeki “$adjust” düğmesine dokun ya da saatlerini değiştirmek için oruç sayfasındaki oruca dokun.';
+  }
+
+  @override
+  String get helpGo => 'Göster';
+
+  @override
+  String get helpHomeOrderQ => 'Ana sayfanın sırasını değiştirebilir miyim?';
+
+  @override
+  String helpHomeOrderA(String section, String row) {
+    return 'Evet: Ayarlar › $section › “$row”. Bölümleri basılı tutup sürükle ya da kullanmadıklarını kapat.';
+  }
+
+  @override
+  String get helpCustomQ => 'Kendi egzersizimi oluşturabilir miyim?';
+
+  @override
+  String helpCustomA(String button) {
+    return 'Evet: Egzersizler\'de “$button” düğmesine dokun. Adını, kaslarını ve ekipmanını seçersin, diğerleri gibi çalışır.';
+  }
+
+  @override
+  String get helpWarmupQ => 'Uygulama ısınma setlerini benim için ekleyebilir mi?';
+
+  @override
+  String helpWarmupA(String settings, String warm, String tool) {
+    return 'Evet: egzersizi aç › $settings › “$warm”. Elle hesaplamak için Araçlar\'daki “$tool” aracını kullan.';
+  }
+
+  @override
+  String get helpPassQ => 'Salon kartımı uygulamada tutabilir miyim?';
+
+  @override
+  String helpPassA(String row, String section) {
+    return 'Evet: Ayarlar › $section içinde “$row”. Girişte okutulacak barkodu veya QR kodu gösterir.';
+  }
+
+  @override
+  String get helpStepsQ => 'Adımlarımı neden göremiyorum?';
+
+  @override
+  String helpStepsA(String row, String section) {
+    return 'Adımlar, Android 14 ve sonrasında gelen Health Connect\'ten okunur. Daha eski telefonlarda yoktur. Sende varsa Ayarlar › $section içinde “$row” seçeneğini aç.';
+  }
+
+  @override
+  String get helpNfcQ => 'Telefonumu dokundurarak antrenmana başlayabilir miyim?';
+
+  @override
+  String helpNfcA(String row, String section) {
+    return 'Evet, bir NFC etiketiyle: Ayarlar › $section içinde “$row”. Salona yapıştır, dokundurunca bugünün antrenmanı açılır.';
+  }
+
+  @override
+  String get helpCleanQ => 'Beslenme ekranını nasıl sadeleştiririm?';
+
+  @override
+  String helpCleanA(String button) {
+    return 'Beslenme\'de üstteki kaydırıcı düğmesine dokun (“$button”) ve takip etmediklerini kapat.';
+  }
+
+  @override
+  String alsoWorksMuscles(String muscles) {
+    return 'Ayrıca çalıştırır: $muscles';
+  }
+
+  @override
+  String get wearSyncAllow => 'Bluetooth\'a izin ver';
+
+  @override
+  String get wearSyncSearching => 'Telefon aranıyor…';
+
+  @override
+  String get wearSyncNotFound => 'Telefon bulunamadı';
+
+  @override
+  String get wearSyncBluetoothOff => 'Bluetooth kapalı';
+
+  @override
+  String get watchRow => 'Wear OS saat';
+
+  @override
+  String get watchTitle => 'Wear OS saat';
+
+  @override
+  String get watchSubtitle => 'Programların bileğinde, antrenmanların yine telefonunda';
+
+  @override
+  String get watchPoint1 => 'GymMane\'i saate kur';
+
+  @override
+  String get watchPoint1Body => 'Telefondakiyle aynı uygulama. Kurulum rehberini görmek için dokun.';
+
+  @override
+  String get watchPoint2 => 'GymMane\'i ikisinde de aç';
+
+  @override
+  String get watchPoint2Body =>
+      'Telefonla saati zaten bağlayan Bluetooth üzerinden kendi kendilerine eşitlenirler. İnternet gerekmez.';
+
+  @override
+  String get watchPoint3 => 'Saatle antrenman yap';
+
+  @override
+  String get watchPoint3Body => 'Saatte yaptıkların, ikisi bir dahaki açık olduğunda telefona ulaşır.';
+
+  @override
+  String get watchUse => 'Saatle eşitle';
+
+  @override
+  String get watchUseHint => 'Sadece saatin varsa. Bluetooth izni ister';
+
+  @override
+  String get watchTurnOnBluetooth => 'Bluetooth\'u aç';
+
+  @override
+  String get watchSyncNow => 'Şimdi eşitle';
+
+  @override
+  String get watchSearching => 'Saat aranıyor…';
+
+  @override
+  String get watchSearchingHint => 'Henüz açık değilse GymMane\'i saatte aç.';
+
+  @override
+  String get watchBluetoothOff => 'Bluetooth kapalı.';
+
+  @override
+  String get watchNotFound => 'Saat bulunamadı. GymMane\'i saatte açıp tekrar dene.';
+
+  @override
+  String get watchNever => 'Henüz eşitlenmedi.';
+
+  @override
+  String watchLast(String when) {
+    return 'Eşitlendi: $when.';
+  }
+
+  @override
+  String watchLastWith(String name, String when) {
+    return '$name ile eşitlendi: $when.';
+  }
+
+  @override
+  String get watchTip => 'Beta: henüz her saatte denenmedi. Çalışmazsa GitHub\'da bize yaz.';
+
+  @override
+  String get mineralsTracker => 'Iron and potassium';
+
+  @override
+  String get ironLabel => 'Iron';
+
+  @override
+  String get potassiumLabel => 'Potassium';
+
+  @override
+  String mineralsCoverage(int known, int total) {
+    return '$known of $total foods today have iron and potassium';
+  }
+
+  @override
+  String get mineralsHint =>
+      'Few foods in the list come with iron and potassium, so the total only counts the ones that do. Add them to your own foods or with the AI.';
+
+  @override
+  String get qsRow => 'Hızlı ayarlar kutucukları';
+
+  @override
+  String get qsRowHint => 'Bugünün antrenmanı ya da spor salonu kartın, üst panelden';
+
+  @override
+  String get qsTitle => 'Hızlı ayarlar kutucukları';
+
+  @override
+  String get qsSubtitle => 'Hızlı ayarları aşağı çek ve uygulamayı aramadan tek dokunuşla ulaş';
+
+  @override
+  String get qsToday => 'Bugünün antrenmanı';
+
+  @override
+  String get qsTodayHint => 'NFC etiketi gibi: bugün planlananı açar';
+
+  @override
+  String get qsPass => 'Spor salonu kartı';
+
+  @override
+  String qsPassHint(String name) {
+    return 'Girişte okutman için $name kartını açar';
+  }
+
+  @override
+  String get qsPassNone => 'Önce spor salonu kartını ekle';
+
+  @override
+  String get qsRest => 'Dinlenme günü';
+
+  @override
+  String get qsAdd => 'Ekle';
+
+  @override
+  String get qsAdded => 'Eklendi';
+
+  @override
+  String get qsManual =>
+      'Hızlı ayarları aşağı çek, kaleme dokun ve GymMane kutucuğunu kendi kutucuklarına sürükle.';
+
+  @override
+  String get qsPassUse => 'Hızlı ayarlardan aç';
+
+  @override
+  String get qsPassUseHint => 'Hızlı ayarlardaki kutucuk bu kartı açar';
+
+  @override
+  String get measureAbdomen => 'Karın';
+
+  @override
+  String get bfNeckBelow => 'Boyun (âdemelmasının altı)';
+
+  @override
+  String get bfAbdomen => 'Karın (göbek hizasında)';
+
+  @override
+  String get bfWaistNarrow => 'Bel (en ince yer)';
+
+  @override
+  String get bfHipWide => 'Kalça (en geniş yer)';
+
+  @override
+  String get measureBp => 'Tansiyon';
+
+  @override
+  String get measureLeft => 'Sol';
+
+  @override
+  String get measureRight => 'Sağ';
+
+  @override
+  String get measureLeftShort => 'Sol';
+
+  @override
+  String get measureRightShort => 'Sağ';
+
+  @override
+  String get measureOneValue => 'Tek değer';
+
+  @override
+  String get measureNoteHint => 'Not (isteğe bağlı)';
+
+  @override
+  String get bpHigh => 'Büyük tansiyon';
+
+  @override
+  String get bpLow => 'Küçük tansiyon';
+
+  @override
+  String get bpPulse => 'Nabız';
+
+  @override
+  String get bpPulseAdd => '+ Nabız';
 }

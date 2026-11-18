@@ -3484,6 +3484,177 @@ class AppLocalizationsVi extends AppLocalizations {
   String get exerciseSettings => 'Cài đặt cho bài tập này';
 
   @override
+  String get exerciseSettingsHint => 'Nghỉ, tăng tiến, khởi động và hơn nữa';
+
+  @override
+  String get appIcon => 'Biểu tượng ứng dụng';
+
+  @override
+  String get appIconHint => 'GymMane trông thế nào trên màn hình chính';
+
+  @override
+  String get appIconColors => 'Màu sắc';
+
+  @override
+  String get appIconDesigns => 'Thiết kế';
+
+  @override
+  String get appIconNote => 'Màn hình chính có thể mất vài giây để hiện thay đổi.';
+
+  @override
+  String get appIconDefault => 'Gốc';
+
+  @override
+  String get appIconLight => 'Sáng';
+
+  @override
+  String get appIconSand => 'Cát';
+
+  @override
+  String get appIconGraphite => 'Than chì';
+
+  @override
+  String get appIconSage => 'Xô thơm';
+
+  @override
+  String get appIconNight => 'Đêm';
+
+  @override
+  String get appIconMaterial => 'Material';
+
+  @override
+  String get appIconMedal => 'Huy chương';
+
+  @override
+  String get appIconGlass => 'Kính';
+
+  @override
+  String get appIconStopwatch => 'Đồng hồ bấm giờ';
+
+  @override
+  String get appIconMarble => 'Đá cẩm thạch';
+
+  @override
+  String get nfcRow => 'Nhãn NFC';
+
+  @override
+  String get nfcRowHint => 'Chạm điện thoại vào để xem buổi tập hôm nay';
+
+  @override
+  String get nfcTitle => 'Nhãn NFC';
+
+  @override
+  String get nfcSubtitle => 'Một nhãn cho cả tuần';
+
+  @override
+  String get nfcPoint1 => 'Buổi tập hôm nay, sẵn sàng';
+
+  @override
+  String get nfcPoint1Body =>
+      'Chạm điện thoại vào và giáo án hôm nay mở ra cùng các bài tập. Bạn bắt đầu khi đã sẵn sàng.';
+
+  @override
+  String get nfcPoint2 => 'Ngày nghỉ, nó sẽ báo';
+
+  @override
+  String get nfcPoint2Body => 'Nếu hôm nay là ngày nghỉ bạn sẽ thấy, và vẫn có thể tập nếu muốn.';
+
+  @override
+  String get nfcPoint3 => 'Chỉ ghi một lần';
+
+  @override
+  String get nfcPoint3Body => 'Đổi kế hoạch bất cứ lúc nào: nhãn luôn mở đúng buổi đã lên lịch cho ngày đó.';
+
+  @override
+  String get nfcUse => 'Dùng nhãn';
+
+  @override
+  String get nfcUseHint => 'Khi tắt, chạm vào nhãn sẽ không có gì xảy ra';
+
+  @override
+  String get nfcWrite => 'Ghi nhãn';
+
+  @override
+  String get nfcOn => 'Bật';
+
+  @override
+  String get nfcOff => 'Tắt';
+
+  @override
+  String get todayRestBody => 'Nghỉ ngơi cũng là một phần của kế hoạch. Cơ bắp phát triển khi bạn hồi phục.';
+
+  @override
+  String get todayNotNow => 'Để sau';
+
+  @override
+  String get nfcWaitTitle => 'Áp nhãn vào điện thoại';
+
+  @override
+  String get nfcWaitBody => 'Áp vào mặt sau điện thoại, gần camera, cho đến khi rung.';
+
+  @override
+  String get nfcTip => 'Nhãn NTAG213, 215 hoặc 216 nào cũng được. Đây là loại phổ biến nhất và rất rẻ.';
+
+  @override
+  String get nfcDoneTitle => 'Nhãn đã sẵn sàng';
+
+  @override
+  String get nfcDoneBody => 'Dán ở chỗ bạn thấy khi đến: túi tập, bình nước hoặc tủ đồ.';
+
+  @override
+  String get nfcOffTitle => 'NFC đang tắt';
+
+  @override
+  String get nfcOffBody => 'Bật NFC trong cài đặt điện thoại để ghi nhãn.';
+
+  @override
+  String get nfcOpenSettings => 'Mở cài đặt';
+
+  @override
+  String get nfcFailTitle => 'Không ghi được';
+
+  @override
+  String get nfcErrLocked => 'Nhãn này đã bị khóa, không thể ghi.';
+
+  @override
+  String get nfcErrSmall => 'Không vừa nhãn này. Dùng NTAG213 hoặc lớn hơn.';
+
+  @override
+  String get nfcErrLost => 'Nhãn bị xê dịch trước khi xong. Giữ yên và thử lại.';
+
+  @override
+  String get nfcErrUnsupported => 'Nhãn này không được hỗ trợ. Dùng NTAG213, 215 hoặc 216.';
+
+  @override
+  String get nfcRetry => 'Thử lại';
+
+  @override
+  String get raceTitle => 'So với buổi tập trước';
+
+  @override
+  String raceSince(String date) {
+    return 'So với $date';
+  }
+
+  @override
+  String get raceAhead => 'Bạn đang dẫn trước';
+
+  @override
+  String get raceBehind => 'Vẫn đang đuổi theo';
+
+  @override
+  String get raceEven => 'Ngang ngửa';
+
+  @override
+  String get raceToday => 'Hôm nay';
+
+  @override
+  String get raceThen => 'Hôm đó';
+
+  @override
+  String get raceHint => 'Chỉ so các hiệp giống nhau: nếu bạn đã tập 2 hiệp, so với 2 hiệp đầu của hôm đó.';
+
+  @override
   String get placeActiveNow => 'Bạn đang ở đây';
 
   @override
@@ -5256,6 +5427,15 @@ class AppLocalizationsVi extends AppLocalizations {
   String get importAsCopy => 'Thêm dưới dạng bản sao';
 
   @override
+  String get routineExerciseNote => 'Ghi chú giáo án';
+
+  @override
+  String get importRoutineNotes => 'Thêm các ghi chú giáo án còn thiếu';
+
+  @override
+  String get routineNotesAdded => 'Đã thêm ghi chú giáo án';
+
+  @override
   String get importOwned => 'Đã có';
 
   @override
@@ -6286,6 +6466,15 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get reportShareCsv => 'Xuất CSV';
+
+  @override
+  String get reportChooseCsv => 'Chọn tệp CSV muốn chia sẻ.';
+
+  @override
+  String get reportWeighIns => 'Lần cân';
+
+  @override
+  String get reportSessionDetails => 'Chi tiết các buổi tập';
 
   @override
   String get reportShareCsvBoth => 'Xuất CSV (buổi tập và dinh dưỡng)';
@@ -7527,6 +7716,42 @@ class AppLocalizationsVi extends AppLocalizations {
   String get webPhoneGuide => 'Cách thiết lập';
 
   @override
+  String get webSignOut => 'Đăng xuất';
+
+  @override
+  String get wearSyncTitle => 'Điện thoại';
+
+  @override
+  String get wearSyncNever => 'Chưa đồng bộ';
+
+  @override
+  String wearSyncLast(String when) {
+    return 'Đã đồng bộ $when';
+  }
+
+  @override
+  String wearSyncWaiting(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n buổi tập đang chờ gửi sang điện thoại',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get wearSyncNow => 'Đồng bộ ngay';
+
+  @override
+  String get wearSyncHow => 'Trên điện thoại, bật Cài đặt › Đồng hồ Wear OS và mở GymMane trên cả hai.';
+
+  @override
+  String get routinesOrder => 'Sắp xếp giáo án';
+
+  @override
+  String get routinesOrderHint => 'Kéo để đổi thứ tự hiển thị.';
+
+  @override
   String get webPhoneOff => 'Đồng bộ điện thoại đang tắt trên máy chủ này';
 
   @override
@@ -7613,4 +7838,457 @@ class AppLocalizationsVi extends AppLocalizations {
   String exerciseCopyName(String name) {
     return '$name (bản sao)';
   }
+
+  @override
+  String get foodAiRow => 'Fill in with an AI';
+
+  @override
+  String get foodAiRowHint => 'From a label, a screenshot or a link';
+
+  @override
+  String get foodAiTitle => 'Food with AI';
+
+  @override
+  String get foodAiHow =>
+      'Copy the request and paste it into any chatbot together with a photo of the nutrition label, a screenshot of the product or a link to it. Then paste its answer here.';
+
+  @override
+  String get foodAiCheck => 'The form fills itself in. Check the values against the label before saving.';
+
+  @override
+  String get foodAiFill => 'Fill in the food';
+
+  @override
+  String get foodAiFilled => 'Food filled in';
+
+  @override
+  String get foodAiFilledHint => 'Check the values before saving';
+
+  @override
+  String get fastAdd => 'Add a past fast';
+
+  @override
+  String get fastAddTitle => 'Add a fast';
+
+  @override
+  String get fastEditTitle => 'Edit fast';
+
+  @override
+  String get fastStartRow => 'Start';
+
+  @override
+  String get fastEndRow => 'End';
+
+  @override
+  String get fastEndedAt => 'When did you end it?';
+
+  @override
+  String fastLasted(String time) {
+    return 'Lasted $time';
+  }
+
+  @override
+  String get fastErrFuture => 'The end can\'t be later than now';
+
+  @override
+  String get fastErrOrder => 'The end has to come after the start';
+
+  @override
+  String get fastErrShort => 'A fast lasts at least 10 minutes';
+
+  @override
+  String get fastErrOverlap => 'It overlaps another fast';
+
+  @override
+  String get fastSaved => 'Fast saved';
+
+  @override
+  String get fastAdjust => 'Adjust';
+
+  @override
+  String get keepCounting => 'Đếm tiếp';
+
+  @override
+  String get keepCountingHint => 'Kêu khi đến giờ và chạy tiếp cho tới khi bạn dừng';
+
+  @override
+  String get holdOvertime => 'Quá giờ';
+
+  @override
+  String get pairSetting => 'Cặp tạ đơn';
+
+  @override
+  String get pairSettingHint => 'Ghi mức tạ của một quả. Khối lượng tính cả hai.';
+
+  @override
+  String get helpCommon => 'Câu hỏi thường gặp';
+
+  @override
+  String get helpQuestions => 'Câu hỏi';
+
+  @override
+  String get helpNoResults => 'Không có kết quả. Thử từ khác';
+
+  @override
+  String get helpLbQ => 'Có dùng lb cho riêng một bài được không?';
+
+  @override
+  String helpLbA(String option) {
+    return 'Được. Trong buổi tập, mở menu ⋯ của bài và chọn “$option”.';
+  }
+
+  @override
+  String get helpSupersetQ => 'Làm superset thế nào?';
+
+  @override
+  String get helpSupersetA => 'Trong trình sửa giáo án, chạm vào liên kết giữa hai bài để nối chúng.';
+
+  @override
+  String get helpRangeQ => 'Đặt khoảng số lần như 8-12 thế nào?';
+
+  @override
+  String get helpRangeA => 'Trong trình sửa giáo án, nhấn giữ số lần.';
+
+  @override
+  String get helpRestQ => 'Mỗi bài có thể có thời gian nghỉ riêng không?';
+
+  @override
+  String helpRestA(String settings, String rest, String section) {
+    return 'Có: mở bài › $settings › $rest. Thời gian nghỉ mặc định ở Cài đặt › $section.';
+  }
+
+  @override
+  String get helpSidesQ => 'Ghi riêng bên trái và bên phải thế nào?';
+
+  @override
+  String helpSidesA(String settings, String sides) {
+    return 'Mở bài › $settings › $sides.';
+  }
+
+  @override
+  String get helpPairQ => 'Tạ đơn: ghi một quả hay cả hai?';
+
+  @override
+  String helpPairA(String pair) {
+    return 'Một quả. Bật “$pair” trong cài đặt của bài và khối lượng sẽ tính cả hai.';
+  }
+
+  @override
+  String get helpKeepQ => 'Hiệp theo thời gian có chạy quá giờ được không?';
+
+  @override
+  String helpKeepA(String keep) {
+    return 'Được: bật “$keep” trong cài đặt của bài. Nó kêu khi đến giờ và đếm tiếp cho tới khi bạn dừng.';
+  }
+
+  @override
+  String get helpDayOffQ => 'Đánh dấu ngày nghỉ, ốm hay đi xa thế nào?';
+
+  @override
+  String get helpDayOffA => 'Ở Trang chủ, nhấn giữ ngày đó trong tuần. Chuỗi ngày và lời nhắc sẽ bỏ qua nó.';
+
+  @override
+  String get helpImportQ => 'Có chuyển buổi tập từ Hevy, Strong hay ứng dụng khác được không?';
+
+  @override
+  String helpImportA(String section, String row) {
+    return 'Có: Cài đặt › $section › $row. Còn đọc được FitNotes, Fitbod, JEFIT, StrongLifts, Liftosaur và Lyfta.';
+  }
+
+  @override
+  String get helpPhoneQ => 'Chuyển dữ liệu sang điện thoại mới thế nào?';
+
+  @override
+  String helpPhoneA(String section, String import) {
+    return 'Xuất một bản sao ở Cài đặt › $section rồi mở nó trên điện thoại mới bằng “$import”.';
+  }
+
+  @override
+  String get helpSlowQ => 'Ứng dụng chạy chậm trên điện thoại tôi';
+
+  @override
+  String helpSlowA(String section, String perf, String lite) {
+    return 'Cài đặt › $section › $perf › $lite. Tắt hiệu ứng mờ, phần nặng nhất.';
+  }
+
+  @override
+  String get helpPlatesQ => 'Lắp bao nhiêu bánh tạ lên đòn?';
+
+  @override
+  String helpPlatesA(String tool, String places) {
+    return 'Dùng “$tool” trong Công cụ. Bánh tạ và đòn ở phòng tập của bạn đặt trong “$places”.';
+  }
+
+  @override
+  String get helpRaceQ => 'So với buổi tập trước thế nào?';
+
+  @override
+  String helpRaceA(String race) {
+    return 'Trong buổi tập, chạm viên thuốc ở trên cùng: “$race”.';
+  }
+
+  @override
+  String get helpFastQ => 'Tôi quên kết thúc nhịn ăn';
+
+  @override
+  String helpFastA(String adjust) {
+    return 'Kết thúc nó rồi chạm “$adjust” trên thông báo, hoặc chạm lần nhịn ăn trong bảng nhịn ăn để đổi giờ.';
+  }
+
+  @override
+  String get helpGo => 'Chỉ cho tôi';
+
+  @override
+  String get helpHomeOrderQ => 'Đổi thứ tự Trang chủ được không?';
+
+  @override
+  String helpHomeOrderA(String section, String row) {
+    return 'Được: Cài đặt › $section › “$row”. Giữ và kéo các mục, hoặc tắt những mục bạn không dùng.';
+  }
+
+  @override
+  String get helpCustomQ => 'Tự tạo bài tập được không?';
+
+  @override
+  String helpCustomA(String button) {
+    return 'Được: trong Bài tập, chạm “$button”. Bạn chọn tên, cơ và dụng cụ, và nó hoạt động như mọi bài khác.';
+  }
+
+  @override
+  String get helpWarmupQ => 'Ứng dụng có tự thêm hiệp khởi động không?';
+
+  @override
+  String helpWarmupA(String settings, String warm, String tool) {
+    return 'Có: mở bài › $settings › “$warm”. Muốn tự tính, dùng “$tool” trong Công cụ.';
+  }
+
+  @override
+  String get helpPassQ => 'Có lưu thẻ phòng tập trong ứng dụng được không?';
+
+  @override
+  String helpPassA(String row, String section) {
+    return 'Có: “$row” trong Cài đặt › $section. Nó hiện mã vạch hoặc mã QR để quét ở cửa.';
+  }
+
+  @override
+  String get helpStepsQ => 'Sao tôi không thấy số bước?';
+
+  @override
+  String helpStepsA(String row, String section) {
+    return 'Số bước lấy từ Health Connect, có sẵn từ Android 14 trở lên. Điện thoại cũ hơn thì không có. Nếu có, bật “$row” trong Cài đặt › $section.';
+  }
+
+  @override
+  String get helpNfcQ => 'Có bắt đầu buổi tập bằng cách chạm điện thoại được không?';
+
+  @override
+  String helpNfcA(String row, String section) {
+    return 'Có, với nhãn NFC: “$row” trong Cài đặt › $section. Dán ở phòng tập, chạm vào là mở buổi tập hôm nay.';
+  }
+
+  @override
+  String get helpCleanQ => 'Làm màn hình Dinh dưỡng gọn hơn thế nào?';
+
+  @override
+  String helpCleanA(String button) {
+    return 'Trong Dinh dưỡng, chạm nút thanh trượt ở trên (“$button”) và tắt những gì bạn không theo dõi.';
+  }
+
+  @override
+  String alsoWorksMuscles(String muscles) {
+    return 'Cũng tập $muscles';
+  }
+
+  @override
+  String get wearSyncAllow => 'Cho phép Bluetooth';
+
+  @override
+  String get wearSyncSearching => 'Đang tìm điện thoại…';
+
+  @override
+  String get wearSyncNotFound => 'Không thấy điện thoại';
+
+  @override
+  String get wearSyncBluetoothOff => 'Bluetooth đang tắt';
+
+  @override
+  String get watchRow => 'Đồng hồ Wear OS';
+
+  @override
+  String get watchTitle => 'Đồng hồ Wear OS';
+
+  @override
+  String get watchSubtitle => 'Giáo án trên cổ tay, buổi tập quay về điện thoại';
+
+  @override
+  String get watchPoint1 => 'Cài GymMane lên đồng hồ';
+
+  @override
+  String get watchPoint1Body => 'Cùng một ứng dụng như trên điện thoại. Chạm để xem hướng dẫn cài.';
+
+  @override
+  String get watchPoint2 => 'Mở GymMane trên cả hai';
+
+  @override
+  String get watchPoint2Body =>
+      'Chúng tự đồng bộ qua Bluetooth vốn đã nối điện thoại và đồng hồ. Không cần Internet.';
+
+  @override
+  String get watchPoint3 => 'Tập với đồng hồ';
+
+  @override
+  String get watchPoint3Body => 'Những gì bạn làm trên đồng hồ sẽ về điện thoại vào lần tới cả hai cùng mở.';
+
+  @override
+  String get watchUse => 'Đồng bộ với đồng hồ';
+
+  @override
+  String get watchUseHint => 'Chỉ khi bạn có đồng hồ. Sẽ xin quyền Bluetooth';
+
+  @override
+  String get watchTurnOnBluetooth => 'Bật Bluetooth';
+
+  @override
+  String get watchSyncNow => 'Đồng bộ ngay';
+
+  @override
+  String get watchSearching => 'Đang tìm đồng hồ…';
+
+  @override
+  String get watchSearchingHint => 'Mở GymMane trên đồng hồ nếu chưa mở.';
+
+  @override
+  String get watchBluetoothOff => 'Bluetooth đang tắt.';
+
+  @override
+  String get watchNotFound => 'Không thấy đồng hồ. Mở GymMane trên đồng hồ rồi thử lại.';
+
+  @override
+  String get watchNever => 'Chưa đồng bộ.';
+
+  @override
+  String watchLast(String when) {
+    return 'Đã đồng bộ $when.';
+  }
+
+  @override
+  String watchLastWith(String name, String when) {
+    return 'Đã đồng bộ với $name $when.';
+  }
+
+  @override
+  String get watchTip => 'Beta: chưa thử trên mọi đồng hồ. Nếu lỗi, hãy báo trên GitHub.';
+
+  @override
+  String get mineralsTracker => 'Iron and potassium';
+
+  @override
+  String get ironLabel => 'Iron';
+
+  @override
+  String get potassiumLabel => 'Potassium';
+
+  @override
+  String mineralsCoverage(int known, int total) {
+    return '$known of $total foods today have iron and potassium';
+  }
+
+  @override
+  String get mineralsHint =>
+      'Few foods in the list come with iron and potassium, so the total only counts the ones that do. Add them to your own foods or with the AI.';
+
+  @override
+  String get qsRow => 'Ô trong Cài đặt nhanh';
+
+  @override
+  String get qsRowHint => 'Buổi tập hôm nay hoặc thẻ phòng tập, từ bảng phía trên';
+
+  @override
+  String get qsTitle => 'Ô trong Cài đặt nhanh';
+
+  @override
+  String get qsSubtitle => 'Kéo Cài đặt nhanh xuống và vào ngay bằng một chạm, không cần tìm ứng dụng';
+
+  @override
+  String get qsToday => 'Buổi tập hôm nay';
+
+  @override
+  String get qsTodayHint => 'Giống nhãn NFC: mở những gì đã lên lịch hôm nay';
+
+  @override
+  String get qsPass => 'Thẻ phòng tập';
+
+  @override
+  String qsPassHint(String name) {
+    return 'Mở $name để quét ở cửa vào';
+  }
+
+  @override
+  String get qsPassNone => 'Hãy thêm thẻ phòng tập trước';
+
+  @override
+  String get qsRest => 'Ngày nghỉ';
+
+  @override
+  String get qsAdd => 'Thêm';
+
+  @override
+  String get qsAdded => 'Đã thêm';
+
+  @override
+  String get qsManual => 'Kéo Cài đặt nhanh xuống, chạm vào bút chì và kéo ô GymMane vào các ô của bạn.';
+
+  @override
+  String get qsPassUse => 'Mở từ Cài đặt nhanh';
+
+  @override
+  String get qsPassUseHint => 'Ô trong Cài đặt nhanh sẽ mở thẻ này';
+
+  @override
+  String get measureAbdomen => 'Bụng';
+
+  @override
+  String get bfNeckBelow => 'Cổ (dưới yết hầu)';
+
+  @override
+  String get bfAbdomen => 'Bụng (ngang rốn)';
+
+  @override
+  String get bfWaistNarrow => 'Eo (chỗ nhỏ nhất)';
+
+  @override
+  String get bfHipWide => 'Hông (chỗ rộng nhất)';
+
+  @override
+  String get measureBp => 'Huyết áp';
+
+  @override
+  String get measureLeft => 'Trái';
+
+  @override
+  String get measureRight => 'Phải';
+
+  @override
+  String get measureLeftShort => 'T';
+
+  @override
+  String get measureRightShort => 'P';
+
+  @override
+  String get measureOneValue => 'Một giá trị';
+
+  @override
+  String get measureNoteHint => 'Ghi chú (không bắt buộc)';
+
+  @override
+  String get bpHigh => 'Tâm thu';
+
+  @override
+  String get bpLow => 'Tâm trương';
+
+  @override
+  String get bpPulse => 'Nhịp tim';
+
+  @override
+  String get bpPulseAdd => '+ Nhịp tim';
 }

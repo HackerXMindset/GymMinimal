@@ -3478,6 +3478,179 @@ class AppLocalizationsId extends AppLocalizations {
   String get exerciseSettings => 'Pengaturan gerakan ini';
 
   @override
+  String get exerciseSettingsHint => 'Istirahat, progresi, pemanasan, dan lainnya';
+
+  @override
+  String get appIcon => 'Ikon aplikasi';
+
+  @override
+  String get appIconHint => 'Tampilan GymMane di layar utama';
+
+  @override
+  String get appIconColors => 'Warna';
+
+  @override
+  String get appIconDesigns => 'Desain';
+
+  @override
+  String get appIconNote => 'Layar utama mungkin butuh beberapa detik untuk menampilkan perubahan.';
+
+  @override
+  String get appIconDefault => 'Asli';
+
+  @override
+  String get appIconLight => 'Terang';
+
+  @override
+  String get appIconSand => 'Pasir';
+
+  @override
+  String get appIconGraphite => 'Grafit';
+
+  @override
+  String get appIconSage => 'Sage';
+
+  @override
+  String get appIconNight => 'Malam';
+
+  @override
+  String get appIconMaterial => 'Material';
+
+  @override
+  String get appIconMedal => 'Medali';
+
+  @override
+  String get appIconGlass => 'Kaca';
+
+  @override
+  String get appIconStopwatch => 'Stopwatch';
+
+  @override
+  String get appIconMarble => 'Marmer';
+
+  @override
+  String get nfcRow => 'Stiker NFC';
+
+  @override
+  String get nfcRowHint => 'Tempelkan ponsel untuk melihat latihan hari ini';
+
+  @override
+  String get nfcTitle => 'Stiker NFC';
+
+  @override
+  String get nfcSubtitle => 'Satu stiker untuk seminggu penuh';
+
+  @override
+  String get nfcPoint1 => 'Latihan hari ini, siap';
+
+  @override
+  String get nfcPoint1Body =>
+      'Tempelkan ponsel dan rutinitas hari ini terbuka dengan latihannya. Kamu mulai saat sudah siap.';
+
+  @override
+  String get nfcPoint2 => 'Saat hari istirahat, ia memberi tahu';
+
+  @override
+  String get nfcPoint2Body =>
+      'Kalau hari ini hari istirahat, kamu akan melihatnya, dan tetap bisa latihan kalau mau.';
+
+  @override
+  String get nfcPoint3 => 'Ditulis sekali saja';
+
+  @override
+  String get nfcPoint3Body => 'Ubah rencanamu kapan saja: stiker selalu membuka yang dijadwalkan hari itu.';
+
+  @override
+  String get nfcUse => 'Gunakan stiker';
+
+  @override
+  String get nfcUseHint => 'Saat mati, menempelkan stiker tidak melakukan apa-apa';
+
+  @override
+  String get nfcWrite => 'Tulis stiker';
+
+  @override
+  String get nfcOn => 'Aktif';
+
+  @override
+  String get nfcOff => 'Mati';
+
+  @override
+  String get todayRestBody => 'Istirahat juga bagian dari rencana. Ototmu tumbuh saat kamu pulih.';
+
+  @override
+  String get todayNotNow => 'Nanti saja';
+
+  @override
+  String get nfcWaitTitle => 'Tempelkan stiker ke ponsel';
+
+  @override
+  String get nfcWaitBody => 'Tahan di bagian belakang ponsel, dekat kamera, sampai bergetar.';
+
+  @override
+  String get nfcTip => 'Stiker NTAG213, 215, atau 216 apa pun bisa. Paling umum dan harganya sangat murah.';
+
+  @override
+  String get nfcDoneTitle => 'Stiker siap';
+
+  @override
+  String get nfcDoneBody => 'Tempel di tempat yang kamu lihat saat datang: tas gym, botol, atau loker.';
+
+  @override
+  String get nfcOffTitle => 'NFC mati';
+
+  @override
+  String get nfcOffBody => 'Nyalakan NFC di pengaturan ponsel untuk menulis stiker.';
+
+  @override
+  String get nfcOpenSettings => 'Buka pengaturan';
+
+  @override
+  String get nfcFailTitle => 'Gagal menulis';
+
+  @override
+  String get nfcErrLocked => 'Stiker ini terkunci dan tidak bisa ditulis.';
+
+  @override
+  String get nfcErrSmall => 'Tidak muat di stiker ini. Pakai NTAG213 atau yang lebih besar.';
+
+  @override
+  String get nfcErrLost => 'Stiker bergeser sebelum selesai. Tahan diam dan coba lagi.';
+
+  @override
+  String get nfcErrUnsupported => 'Stiker ini tidak didukung. Pakai NTAG213, 215, atau 216.';
+
+  @override
+  String get nfcRetry => 'Coba lagi';
+
+  @override
+  String get raceTitle => 'Lawan sesi terakhirmu';
+
+  @override
+  String raceSince(String date) {
+    return 'Dibandingkan dengan $date';
+  }
+
+  @override
+  String get raceAhead => 'Kamu unggul';
+
+  @override
+  String get raceBehind => 'Masih mengejar';
+
+  @override
+  String get raceEven => 'Imbang';
+
+  @override
+  String get raceToday => 'Hari ini';
+
+  @override
+  String get raceThen => 'Saat itu';
+
+  @override
+  String get raceHint =>
+      'Hanya set yang sama yang dibandingkan: kalau kamu sudah 2, dengan 2 set pertamamu hari itu.';
+
+  @override
   String get placeActiveNow => 'Kamu di sini';
 
   @override
@@ -5251,6 +5424,15 @@ class AppLocalizationsId extends AppLocalizations {
   String get importAsCopy => 'Tambah sebagai salinan';
 
   @override
+  String get routineExerciseNote => 'Catatan rutinitas';
+
+  @override
+  String get importRoutineNotes => 'Tambahkan catatan rutinitas yang belum ada';
+
+  @override
+  String get routineNotesAdded => 'Catatan rutinitas ditambahkan';
+
+  @override
   String get importOwned => 'Sudah milikmu';
 
   @override
@@ -6281,6 +6463,15 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get reportShareCsv => 'Ekspor CSV';
+
+  @override
+  String get reportChooseCsv => 'Pilih file CSV yang ingin dibagikan.';
+
+  @override
+  String get reportWeighIns => 'Penimbangan';
+
+  @override
+  String get reportSessionDetails => 'Detail sesi latihan';
 
   @override
   String get reportShareCsvBoth => 'Ekspor CSV (latihan dan nutrisi)';
@@ -7516,6 +7707,43 @@ class AppLocalizationsId extends AppLocalizations {
   String get webPhoneGuide => 'Cara mengaturnya';
 
   @override
+  String get webSignOut => 'Keluar';
+
+  @override
+  String get wearSyncTitle => 'Ponsel';
+
+  @override
+  String get wearSyncNever => 'Belum disinkronkan';
+
+  @override
+  String wearSyncLast(String when) {
+    return 'Disinkronkan $when';
+  }
+
+  @override
+  String wearSyncWaiting(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n latihan menunggu dikirim ke ponsel',
+      one: '1 latihan menunggu dikirim ke ponsel',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get wearSyncNow => 'Sinkronkan sekarang';
+
+  @override
+  String get wearSyncHow => 'Di ponsel, aktifkan Pengaturan › Jam Wear OS dan buka GymMane di keduanya.';
+
+  @override
+  String get routinesOrder => 'Urutkan rutinitas';
+
+  @override
+  String get routinesOrderHint => 'Seret untuk mengubah urutannya.';
+
+  @override
   String get webPhoneOff => 'Sinkronisasi ponsel mati di server ini';
 
   @override
@@ -7603,4 +7831,461 @@ class AppLocalizationsId extends AppLocalizations {
   String exerciseCopyName(String name) {
     return '$name (salinan)';
   }
+
+  @override
+  String get foodAiRow => 'Fill in with an AI';
+
+  @override
+  String get foodAiRowHint => 'From a label, a screenshot or a link';
+
+  @override
+  String get foodAiTitle => 'Food with AI';
+
+  @override
+  String get foodAiHow =>
+      'Copy the request and paste it into any chatbot together with a photo of the nutrition label, a screenshot of the product or a link to it. Then paste its answer here.';
+
+  @override
+  String get foodAiCheck => 'The form fills itself in. Check the values against the label before saving.';
+
+  @override
+  String get foodAiFill => 'Fill in the food';
+
+  @override
+  String get foodAiFilled => 'Food filled in';
+
+  @override
+  String get foodAiFilledHint => 'Check the values before saving';
+
+  @override
+  String get fastAdd => 'Add a past fast';
+
+  @override
+  String get fastAddTitle => 'Add a fast';
+
+  @override
+  String get fastEditTitle => 'Edit fast';
+
+  @override
+  String get fastStartRow => 'Start';
+
+  @override
+  String get fastEndRow => 'End';
+
+  @override
+  String get fastEndedAt => 'When did you end it?';
+
+  @override
+  String fastLasted(String time) {
+    return 'Lasted $time';
+  }
+
+  @override
+  String get fastErrFuture => 'The end can\'t be later than now';
+
+  @override
+  String get fastErrOrder => 'The end has to come after the start';
+
+  @override
+  String get fastErrShort => 'A fast lasts at least 10 minutes';
+
+  @override
+  String get fastErrOverlap => 'It overlaps another fast';
+
+  @override
+  String get fastSaved => 'Fast saved';
+
+  @override
+  String get fastAdjust => 'Adjust';
+
+  @override
+  String get keepCounting => 'Terus hitung';
+
+  @override
+  String get keepCountingHint => 'Berbunyi di waktumu dan terus jalan sampai kamu hentikan';
+
+  @override
+  String get holdOvertime => 'Waktu tambahan';
+
+  @override
+  String get pairSetting => 'Sepasang dumbel';
+
+  @override
+  String get pairSettingHint => 'Catat berat satu dumbel. Volume menghitung keduanya.';
+
+  @override
+  String get helpCommon => 'Pertanyaan umum';
+
+  @override
+  String get helpQuestions => 'Pertanyaan';
+
+  @override
+  String get helpNoResults => 'Tidak ada yang cocok. Coba kata lain';
+
+  @override
+  String get helpLbQ => 'Bisakah memakai lb untuk satu latihan saja?';
+
+  @override
+  String helpLbA(String option) {
+    return 'Bisa. Saat latihan, buka menu ⋯ latihan itu dan pilih “$option”.';
+  }
+
+  @override
+  String get helpSupersetQ => 'Bagaimana membuat superset?';
+
+  @override
+  String get helpSupersetA =>
+      'Di editor rutinitas, ketuk tautan di antara dua latihan untuk menggabungkannya.';
+
+  @override
+  String get helpRangeQ => 'Bagaimana mengatur rentang repetisi seperti 8-12?';
+
+  @override
+  String get helpRangeA => 'Di editor rutinitas, tekan lama repetisinya.';
+
+  @override
+  String get helpRestQ => 'Bisakah tiap latihan punya waktu istirahat sendiri?';
+
+  @override
+  String helpRestA(String settings, String rest, String section) {
+    return 'Bisa: buka latihan › $settings › $rest. Istirahat bawaanmu ada di Pengaturan › $section.';
+  }
+
+  @override
+  String get helpSidesQ => 'Bagaimana mencatat kiri dan kanan terpisah?';
+
+  @override
+  String helpSidesA(String settings, String sides) {
+    return 'Buka latihan › $settings › $sides.';
+  }
+
+  @override
+  String get helpPairQ => 'Dumbel: catat satu atau keduanya?';
+
+  @override
+  String helpPairA(String pair) {
+    return 'Satu. Aktifkan “$pair” di pengaturan latihan dan volume menghitung keduanya.';
+  }
+
+  @override
+  String get helpKeepQ => 'Bisakah set berwaktu berjalan melewati waktunya?';
+
+  @override
+  String helpKeepA(String keep) {
+    return 'Bisa: aktifkan “$keep” di pengaturan latihan. Berbunyi di waktumu dan terus menghitung sampai kamu hentikan.';
+  }
+
+  @override
+  String get helpDayOffQ => 'Bagaimana menandai hari istirahat, sakit, atau bepergian?';
+
+  @override
+  String get helpDayOffA =>
+      'Di Beranda, tekan lama hari itu di minggumu. Runtunan dan pengingat akan membiarkannya.';
+
+  @override
+  String get helpImportQ => 'Bisakah membawa latihanku dari Hevy, Strong, atau aplikasi lain?';
+
+  @override
+  String helpImportA(String section, String row) {
+    return 'Bisa: Pengaturan › $section › $row. Juga membaca FitNotes, Fitbod, JEFIT, StrongLifts, Liftosaur, dan Lyfta.';
+  }
+
+  @override
+  String get helpPhoneQ => 'Bagaimana memindahkan data ke ponsel baru?';
+
+  @override
+  String helpPhoneA(String section, String import) {
+    return 'Ekspor salinan di Pengaturan › $section dan buka di ponsel baru dengan “$import”.';
+  }
+
+  @override
+  String get helpSlowQ => 'Aplikasi terasa lambat di ponselku';
+
+  @override
+  String helpSlowA(String section, String perf, String lite) {
+    return 'Pengaturan › $section › $perf › $lite. Ini mematikan efek buram, bagian paling berat.';
+  }
+
+  @override
+  String get helpPlatesQ => 'Berapa piringan yang dipasang di barbel?';
+
+  @override
+  String helpPlatesA(String tool, String places) {
+    return 'Pakai “$tool” di Alat. Piringan dan barbel gym-mu diatur di “$places”.';
+  }
+
+  @override
+  String get helpRaceQ => 'Bagaimana membandingkan dengan latihan terakhirku?';
+
+  @override
+  String helpRaceA(String race) {
+    return 'Saat latihan, ketuk pil di atas: “$race”.';
+  }
+
+  @override
+  String get helpFastQ => 'Aku lupa mengakhiri puasaku';
+
+  @override
+  String helpFastA(String adjust) {
+    return 'Akhiri lalu ketuk “$adjust” di pemberitahuan, atau ketuk puasa itu di lembar puasa untuk mengubah jamnya.';
+  }
+
+  @override
+  String get helpGo => 'Tunjukkan';
+
+  @override
+  String get helpHomeOrderQ => 'Bisakah mengubah urutan Beranda?';
+
+  @override
+  String helpHomeOrderA(String section, String row) {
+    return 'Bisa: Pengaturan › $section › “$row”. Tahan dan seret bagiannya, atau matikan yang tidak kamu pakai.';
+  }
+
+  @override
+  String get helpCustomQ => 'Bisakah membuat latihan sendiri?';
+
+  @override
+  String helpCustomA(String button) {
+    return 'Bisa: di Latihan, ketuk “$button”. Kamu pilih nama, otot, dan alatnya, dan ia bekerja seperti yang lain.';
+  }
+
+  @override
+  String get helpWarmupQ => 'Bisakah aplikasi menambahkan set pemanasan untukku?';
+
+  @override
+  String helpWarmupA(String settings, String warm, String tool) {
+    return 'Bisa: buka latihan › $settings › “$warm”. Untuk menghitungnya sendiri, pakai “$tool” di Alat.';
+  }
+
+  @override
+  String get helpPassQ => 'Bisakah menyimpan kartu anggota gym di aplikasi?';
+
+  @override
+  String helpPassA(String row, String section) {
+    return 'Bisa: “$row” di Pengaturan › $section. Menampilkan barcode atau kode QR untuk dipindai di pintu.';
+  }
+
+  @override
+  String get helpStepsQ => 'Kenapa langkahku tidak muncul?';
+
+  @override
+  String helpStepsA(String row, String section) {
+    return 'Langkah dibaca dari Health Connect, yang ada di Android 14 ke atas. Di ponsel lebih lama tidak tersedia. Jika kamu punya, aktifkan “$row” di Pengaturan › $section.';
+  }
+
+  @override
+  String get helpNfcQ => 'Bisakah mulai latihan dengan menempelkan ponsel?';
+
+  @override
+  String helpNfcA(String row, String section) {
+    return 'Bisa, dengan stiker NFC: “$row” di Pengaturan › $section. Tempel di gym dan menempelkan ponsel membuka latihan hari ini.';
+  }
+
+  @override
+  String get helpCleanQ => 'Bagaimana membuat layar Nutrisi lebih bersih?';
+
+  @override
+  String helpCleanA(String button) {
+    return 'Di Nutrisi, ketuk tombol penggeser di atas (“$button”) dan matikan yang tidak kamu lacak.';
+  }
+
+  @override
+  String alsoWorksMuscles(String muscles) {
+    return 'Juga melatih $muscles';
+  }
+
+  @override
+  String get wearSyncAllow => 'Izinkan Bluetooth';
+
+  @override
+  String get wearSyncSearching => 'Mencari ponsel…';
+
+  @override
+  String get wearSyncNotFound => 'Ponsel tidak ditemukan';
+
+  @override
+  String get wearSyncBluetoothOff => 'Bluetooth mati';
+
+  @override
+  String get watchRow => 'Jam Wear OS';
+
+  @override
+  String get watchTitle => 'Jam Wear OS';
+
+  @override
+  String get watchSubtitle => 'Rutinitas di pergelangan, latihan kembali ke ponsel';
+
+  @override
+  String get watchPoint1 => 'Pasang GymMane di jam';
+
+  @override
+  String get watchPoint1Body => 'Aplikasinya sama dengan di ponsel. Ketuk untuk melihat panduan pemasangan.';
+
+  @override
+  String get watchPoint2 => 'Buka GymMane di keduanya';
+
+  @override
+  String get watchPoint2Body =>
+      'Keduanya sinkron sendiri lewat Bluetooth yang sudah menghubungkan ponsel dan jam. Tanpa internet.';
+
+  @override
+  String get watchPoint3 => 'Latihan dengan jam';
+
+  @override
+  String get watchPoint3Body => 'Yang kamu lakukan di jam sampai ke ponsel saat keduanya terbuka lagi.';
+
+  @override
+  String get watchUse => 'Sinkronkan dengan jam';
+
+  @override
+  String get watchUseHint => 'Hanya jika kamu punya jam. Meminta izin Bluetooth';
+
+  @override
+  String get watchTurnOnBluetooth => 'Nyalakan Bluetooth';
+
+  @override
+  String get watchSyncNow => 'Sinkronkan sekarang';
+
+  @override
+  String get watchSearching => 'Mencari jam…';
+
+  @override
+  String get watchSearchingHint => 'Buka GymMane di jam jika belum terbuka.';
+
+  @override
+  String get watchBluetoothOff => 'Bluetooth mati.';
+
+  @override
+  String get watchNotFound => 'Jam tidak ditemukan. Buka GymMane di jam lalu coba lagi.';
+
+  @override
+  String get watchNever => 'Belum disinkronkan.';
+
+  @override
+  String watchLast(String when) {
+    return 'Disinkronkan $when.';
+  }
+
+  @override
+  String watchLastWith(String name, String when) {
+    return 'Disinkronkan dengan $name $when.';
+  }
+
+  @override
+  String get watchTip => 'Beta: belum diuji di semua jam. Jika gagal, beri tahu kami di GitHub.';
+
+  @override
+  String get mineralsTracker => 'Iron and potassium';
+
+  @override
+  String get ironLabel => 'Iron';
+
+  @override
+  String get potassiumLabel => 'Potassium';
+
+  @override
+  String mineralsCoverage(int known, int total) {
+    return '$known of $total foods today have iron and potassium';
+  }
+
+  @override
+  String get mineralsHint =>
+      'Few foods in the list come with iron and potassium, so the total only counts the ones that do. Add them to your own foods or with the AI.';
+
+  @override
+  String get qsRow => 'Ubin Setelan cepat';
+
+  @override
+  String get qsRowHint => 'Latihan hari ini atau kartu gym, dari panel atas';
+
+  @override
+  String get qsTitle => 'Ubin Setelan cepat';
+
+  @override
+  String get qsSubtitle =>
+      'Tarik Setelan cepat ke bawah dan masuk dengan sekali ketuk, tanpa mencari aplikasinya';
+
+  @override
+  String get qsToday => 'Latihan hari ini';
+
+  @override
+  String get qsTodayHint => 'Seperti stiker NFC: membuka yang dijadwalkan hari ini';
+
+  @override
+  String get qsPass => 'Kartu gym';
+
+  @override
+  String qsPassHint(String name) {
+    return 'Membuka $name agar bisa dipindai di pintu masuk';
+  }
+
+  @override
+  String get qsPassNone => 'Tambahkan kartu gym dulu';
+
+  @override
+  String get qsRest => 'Hari istirahat';
+
+  @override
+  String get qsAdd => 'Tambah';
+
+  @override
+  String get qsAdded => 'Ditambahkan';
+
+  @override
+  String get qsManual =>
+      'Tarik Setelan cepat ke bawah, ketuk pensil, lalu seret ubin GymMane ke ubin milikmu.';
+
+  @override
+  String get qsPassUse => 'Buka dari Setelan cepat';
+
+  @override
+  String get qsPassUseHint => 'Ubin di Setelan cepat membuka kartu ini';
+
+  @override
+  String get measureAbdomen => 'Perut';
+
+  @override
+  String get bfNeckBelow => 'Leher (di bawah jakun)';
+
+  @override
+  String get bfAbdomen => 'Perut (setinggi pusar)';
+
+  @override
+  String get bfWaistNarrow => 'Pinggang (bagian tersempit)';
+
+  @override
+  String get bfHipWide => 'Pinggul (bagian terlebar)';
+
+  @override
+  String get measureBp => 'Tekanan darah';
+
+  @override
+  String get measureLeft => 'Kiri';
+
+  @override
+  String get measureRight => 'Kanan';
+
+  @override
+  String get measureLeftShort => 'Ki';
+
+  @override
+  String get measureRightShort => 'Ka';
+
+  @override
+  String get measureOneValue => 'Satu nilai';
+
+  @override
+  String get measureNoteHint => 'Catatan (opsional)';
+
+  @override
+  String get bpHigh => 'Sistolik';
+
+  @override
+  String get bpLow => 'Diastolik';
+
+  @override
+  String get bpPulse => 'Denyut';
+
+  @override
+  String get bpPulseAdd => '+ Denyut';
 }

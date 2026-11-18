@@ -30,6 +30,7 @@ class MainActivity : FlutterActivity() {
 
     override fun getFlutterShellArgs(): FlutterShellArgs {
         val args = super.getFlutterShellArgs()
+        GraphicsMode.starting(this)
         if (GraphicsMode.compat(this)) args.add(GraphicsMode.DISABLE_IMPELLER)
         return args
     }
@@ -43,6 +44,10 @@ class MainActivity : FlutterActivity() {
                 "state" -> result.success(
                     mapOf("compat" to GraphicsMode.compat(this), "detected" to GraphicsMode.detected(this)),
                 )
+                "ready" -> {
+                    GraphicsMode.ready(this)
+                    result.success(null)
+                }
                 "set" -> {
                     result.success(null)
                     val on = call.argument<Boolean>("compat") ?: false
@@ -170,8 +175,12 @@ class MainActivity : FlutterActivity() {
         HealthBridge.attach(this, MethodChannel(messenger, HealthBridge.CHANNEL))
         BackupBridge.attach(this, MethodChannel(messenger, BackupBridge.CHANNEL))
         SoundBridge.attach(this, MethodChannel(messenger, SoundBridge.CHANNEL))
+        AppIconBridge.attach(this, MethodChannel(messenger, AppIconBridge.CHANNEL))
+        NfcBridge.attach(this, MethodChannel(messenger, NfcBridge.CHANNEL))
         VoiceBridge.attach(this, MethodChannel(messenger, VoiceBridge.CHANNEL))
         WearSurfaces.attach(this, MethodChannel(messenger, WearSurfaces.CHANNEL))
+        WatchLinkBridge.attach(this, MethodChannel(messenger, WatchLinkBridge.CHANNEL))
+        QuickTiles.attach(this, MethodChannel(messenger, QuickTiles.CHANNEL))
     }
 
     private fun currentDisplay(): android.view.Display? =
@@ -268,6 +277,7 @@ class MainActivity : FlutterActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (HealthBridge.onPermissionResult(requestCode, grantResults)) return
+        if (WatchLinkBridge.onPermissionResult(requestCode, grantResults)) return
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
@@ -291,6 +301,8 @@ class MainActivity : FlutterActivity() {
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
         rotaryChannel = null
         openChannel = null
+        NfcBridge.detach(this)
+        WatchLinkBridge.detach()
         LiveNotifier.dart = null
         HealthBridge.channel = null
         if (isFinishing) LiveNotifier.cancel(this)
@@ -313,7 +325,18 @@ class MainActivity : FlutterActivity() {
         incomingChannel?.invokeMethod("incoming", text)
     }
 
+    override fun onResume() {
+        super.onResume()
+        NfcBridge.resume(this)
+    }
+
+    override fun onPause() {
+        NfcBridge.pause(this)
+        super.onPause()
+    }
+
     private fun takeOpen(intent: Intent?): String? {
+        if (NfcBridge.isToday(intent)) return "nfc/today"
         val route = intent?.getStringExtra(OPEN_EXTRA) ?: return null
         intent.removeExtra(OPEN_EXTRA)
         return route
@@ -321,6 +344,7 @@ class MainActivity : FlutterActivity() {
 
     private fun takeIncoming(intent: Intent?): String? {
         if (intent == null || intent.action == Intent.ACTION_VIEW_PERMISSION_USAGE) return null
+        if (intent.action == android.nfc.NfcAdapter.ACTION_NDEF_DISCOVERED) return null
         val text = when (intent.action) {
             Intent.ACTION_VIEW -> intent.data?.let { readText(it) }
             Intent.ACTION_SEND -> streamOf(intent)?.let { readText(it) }

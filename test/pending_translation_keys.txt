@@ -12,3 +12,9 @@ sidesReps
 progSchemeTitle
 groupMoveUp
 groupMoveDown
+routineExerciseNote
+importRoutineNotes
+routineNotesAdded
+reportChooseCsv
+reportWeighIns
+reportSessionDetails

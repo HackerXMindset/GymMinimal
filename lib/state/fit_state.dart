@@ -376,6 +376,7 @@ class FitState extends FitCore
     askCheckIn = data['checkIn'] as bool? ?? true;
     muscleTune = data['mTune'] as bool? ?? true;
     voiceCoach = data['voice'] as bool? ?? false;
+    nfcTag = data['nfc'] as bool? ?? false;
     final every = (data['deload'] as num?)?.toInt() ?? 0;
     deloadEvery = SettingsState.deloadChoices.contains(every) ? every : 0;
     deloadFrom = deloadEvery > 0 ? DateTime.tryParse((data['deloadFrom'] as String?) ?? '') ?? DateTime.now() : null;
@@ -484,6 +485,9 @@ class FitState extends FitCore
     collapsedGroups
       ..clear()
       ..addAll(((data['collapsedGroups'] as List?) ?? const []).whereType<String>());
+    groupNames
+      ..clear()
+      ..addAll(((data['groupNames'] as List?) ?? const []).whereType<String>().where((g) => g.trim().isNotEmpty));
     exerciseUnits.clear();
     ((data['exUnits'] as Map?) ?? const {}).forEach((k, v) {
       if (k is String && (v == 'kg' || v == 'lb')) exerciseUnits[k] = v as String;
@@ -507,6 +511,12 @@ class FitState extends FitCore
     eachSideOff
       ..clear()
       ..addAll(((data['eachSideOff'] as List?) ?? const []).cast<String>());
+    keepCounting
+      ..clear()
+      ..addAll(((data['keepCounting'] as List?) ?? const []).cast<String>());
+    pairOn
+      ..clear()
+      ..addAll(((data['pairOn'] as List?) ?? const []).cast<String>());
     assistedOn
       ..clear()
       ..addAll(((data['assisted'] as List?) ?? const []).cast<String>());
@@ -638,6 +648,7 @@ class FitState extends FitCore
         if (!askCheckIn) 'checkIn': false,
         if (!muscleTune) 'mTune': false,
         if (voiceCoach) 'voice': true,
+        if (nfcTag) 'nfc': true,
         if (deloadEvery > 0) 'deload': deloadEvery,
         if (deloadFrom != null) 'deloadFrom': deloadFrom!.toIso8601String(),
         if (lowEndAsked) 'lowEndAsked': true,
@@ -704,6 +715,7 @@ class FitState extends FitCore
         'place': activePlaceId,
         if (gymPasses.isNotEmpty) 'passes': gymPasses.map((p) => p.toJson()).toList(),
         if (lastPassId.isNotEmpty) 'lastPass': lastPassId,
+        if (quickPassId.isNotEmpty) 'quickPass': quickPassId,
         'checkins': checkins.toList(),
         if (daysOff.isNotEmpty) 'daysOff': daysOff,
         'routines': routines.map((r) => r.toJson()).toList(),
@@ -723,6 +735,7 @@ class FitState extends FitCore
         if (exerciseUnits.isNotEmpty) 'exUnits': exerciseUnits,
         if (exerciseDistance.isNotEmpty) 'exDist': exerciseDistance,
         if (collapsedGroups.isNotEmpty) 'collapsedGroups': collapsedGroups.toList(),
+        if (groupNames.isNotEmpty) 'groupNames': groupNames,
         'progress': progressStep,
         if (holdStep.isNotEmpty) 'holdStep': holdStep,
         if (progressRules.isNotEmpty)
@@ -732,6 +745,8 @@ class FitState extends FitCore
         'repsOnlyOff': repsOnlyOff.toList(),
         'eachSide': eachSide.toList(),
         'eachSideOff': eachSideOff.toList(),
+        if (keepCounting.isNotEmpty) 'keepCounting': keepCounting.toList(),
+        if (pairOn.isNotEmpty) 'pairOn': pairOn.toList(),
         if (assistedOn.isNotEmpty) 'assisted': assistedOn.toList(),
         if (assistedOff.isNotEmpty) 'assistedOff': assistedOff.toList(),
         'sessions': _stored('sessions', sessions, (s) => s.toJson(), parts: _sessionParts),
@@ -830,6 +845,7 @@ class FitState extends FitCore
     activePlaceId = '';
     gymPasses.clear();
     lastPassId = '';
+    quickPassId = '';
     checkins.clear();
     daysOff.clear();
     routines.clear();
@@ -849,12 +865,15 @@ class FitState extends FitCore
     repsOnlyOff.clear();
     eachSide.clear();
     eachSideOff.clear();
+    keepCounting.clear();
+    pairOn.clear();
     assistedOn.clear();
     assistedOff.clear();
     exerciseRest.clear();
     exerciseUnits.clear();
     exerciseDistance.clear();
     collapsedGroups.clear();
+    groupNames.clear();
     progressStep.clear();
     holdStep.clear();
     progressRules.clear();
@@ -1178,7 +1197,8 @@ class FitState extends FitCore
       '         "plan": [{"type": "warmup", "reps": 10, "weight": 30}]},\n'
       '        {"name": "Barbell Bent Over Row", "reps": 8, "superset": true,\n'
       '         "plan": [{"reps": 8, "weight": 50}, {"reps": 8, "weight": 50}, {"reps": 6, "weight": 45}]},\n'
-      '        {"name": "Dumbbell Biceps Curl", "sets": 3, "reps": 12}\n'
+      '        {"name": "Dumbbell Biceps Curl", "sets": 3, "reps": 12,\n'
+      '         "logging_note": "Log reps per arm and weight per dumbbell."}\n'
       '      ]\n'
       '    },\n'
       '    {\n'
@@ -1254,8 +1274,11 @@ class FitState extends FitCore
     return exerciseById(id);
   }
 
-  ({int routines, int added, List<String> missed, int owned}) previewPlan(List<PlanRoutine> plans) {
+  ({int routines, int added, List<String> missed, int owned, bool hasNewNotes}) previewPlan(
+    List<PlanRoutine> plans,
+  ) {
     var made = 0, added = 0, owned = 0;
+    var hasNewNotes = false;
     final missed = <String>[];
     for (final plan in plans) {
       var found = 0;
@@ -1267,11 +1290,20 @@ class FitState extends FitCore
           missed.add(item.name);
         }
       }
-      if (found > 0) made++;
-      if (found > 0 && ownsPlan(plan)) owned++;
+      if (found == 0) continue;
+      made++;
       added += found;
+      final existing = _matchingRoutine(plan);
+      if (existing == null) continue;
+      owned++;
+      hasNewNotes =
+          hasNewNotes ||
+          plan.items.any((item) {
+            final ex = _planExercise(item);
+            return ex != null && item.loggingNote.isNotEmpty && !existing.exerciseNotes.containsKey(ex.id);
+          });
     }
-    return (routines: made, added: added, missed: missed, owned: owned);
+    return (routines: made, added: added, missed: missed, owned: owned, hasNewNotes: hasNewNotes);
   }
 
   Routine? _ownedRoutine(PlanRoutine plan, List<String> ids) {
@@ -1279,17 +1311,19 @@ class FitState extends FitCore
     return routines.where((r) => _sameRoutine(r, name, ids) && r.group == plan.group).firstOrNull;
   }
 
-  bool ownsPlan(PlanRoutine plan) {
+  bool ownsPlan(PlanRoutine plan) => _matchingRoutine(plan) != null;
+
+  Routine? _matchingRoutine(PlanRoutine plan) {
     final ids = <String>[];
     for (final item in plan.items) {
       final ex = _planExercise(item);
       if (ex == null) {
-        if ((item.muscle ?? '').isNotEmpty) return false;
+        if ((item.muscle ?? '').isNotEmpty) return null;
         continue;
       }
       if (!ids.contains(ex.id)) ids.add(ex.id);
     }
-    return ids.isNotEmpty && _ownedRoutine(plan, ids) != null;
+    return ids.isEmpty ? null : _ownedRoutine(plan, ids);
   }
 
   bool _sameRoutine(Routine r, String name, List<String> ids) =>
@@ -1297,18 +1331,20 @@ class FitState extends FitCore
       r.exerciseIds.length == ids.length &&
       [for (var i = 0; i < ids.length; i++) r.exerciseIds[i] == ids[i]].every((x) => x);
 
-  ({int routines, int added, List<String> missed}) applyPlan(List<PlanRoutine> plans,
+  ({int routines, int added, List<String> missed, int notesAdded}) applyPlan(List<PlanRoutine> plans,
       {bool schedule = false, bool copies = false}) {
-    var made = 0, added = 0;
+    var made = 0, added = 0, notesAdded = 0;
     final missed = <String>[];
     for (final plan in plans) {
       final picked = <(Exercise, PlanItem)>[];
+      final incomingNotes = <String, String>{};
       for (final item in plan.items) {
         final ex = _planExercise(item, create: true);
         if (ex == null) {
           if (!missed.contains(item.name)) missed.add(item.name);
           continue;
         }
+        if (item.loggingNote.isNotEmpty) incomingNotes.putIfAbsent(ex.id, () => item.loggingNote);
         if (picked.any((p) => p.$1.id == ex.id)) continue;
         picked.add((ex, item));
       }
@@ -1339,18 +1375,24 @@ class FitState extends FitCore
         made++;
         added += picked.length;
       }
+      final notes = routineById(id)!.exerciseNotes;
+      for (final entry in incomingNotes.entries) {
+        if (notes.containsKey(entry.key)) continue;
+        notes[entry.key] = entry.value;
+        notesAdded++;
+      }
       if (schedule) {
         for (final d in plan.days) {
           weeklyPlan[d] = id;
         }
       }
     }
-    if (added > 0 || schedule) {
+    if (added > 0 || notesAdded > 0 || schedule) {
       persistNow();
       syncTrainReminder();
       notifyListeners();
     }
-    return (routines: made, added: added, missed: missed);
+    return (routines: made, added: added, missed: missed, notesAdded: notesAdded);
   }
 
   List<PlannedSet> _plannedFrom(PlanItem item) {
@@ -1397,6 +1439,7 @@ class FitState extends FitCore
                     'id': id,
                     'name': ex.name,
                     'sets': routineSets(r, id),
+                    'logging_note': ?r.exerciseNotes[id],
                     if (hasPlan(r, id))
                       'plan': [
                         for (final p in plannedSets(r, id))

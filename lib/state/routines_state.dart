@@ -125,6 +125,13 @@ mixin RoutinesState on FitCore, LibraryState {
     return last;
   }
 
+  int? daysSinceDone(String routineId) {
+    final last = lastDoneOf(routineId);
+    if (last == null) return null;
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day).difference(DateTime(last.year, last.month, last.day)).inDays;
+  }
+
   List<Routine> get activeRoutines => [for (final r in routines) if (!r.archived) r];
 
   List<Routine> get archivedRoutines => [for (final r in routines) if (r.archived) r];
@@ -132,6 +139,17 @@ mixin RoutinesState on FitCore, LibraryState {
   bool showArchivedRoutines = false;
 
   final Set<String> collapsedGroups = {};
+
+  final List<String> groupNames = [];
+
+  void _syncGroupNames() {
+    final order = routineGroups;
+    final rest = [for (final g in groupNames) if (!order.contains(g)) g];
+    groupNames
+      ..clear()
+      ..addAll(order)
+      ..addAll(rest);
+  }
 
   void toggleGroupCollapsed(String group) {
     if (!collapsedGroups.remove(group)) collapsedGroups.add(group);
@@ -145,6 +163,11 @@ mixin RoutinesState on FitCore, LibraryState {
     final to = from + by;
     if (from < 0 || to < 0 || to >= order.length) return;
     order.insert(to, order.removeAt(from));
+    final hidden = [for (final g in groupNames) if (!order.contains(g)) g];
+    groupNames
+      ..clear()
+      ..addAll(order)
+      ..addAll(hidden);
     final rank = {for (var i = 0; i < order.length; i++) order[i]: i};
     final grouped = [for (final r in routines) if (rank.containsKey(r.group)) r]
       ..sort((a, b) => rank[a.group]!.compareTo(rank[b.group]!));
@@ -541,6 +564,20 @@ mixin RoutinesState on FitCore, LibraryState {
     for (final r in activeRoutines) {
       if (r.group.isNotEmpty && !out.contains(r.group)) out.add(r.group);
     }
+    final used = {for (final r in routines) r.group};
+    for (var i = 0; i < groupNames.length; i++) {
+      final g = groupNames[i];
+      if (g.isEmpty || used.contains(g) || out.contains(g)) continue;
+      var at = 0;
+      for (var k = i - 1; k >= 0; k--) {
+        final p = out.indexOf(groupNames[k]);
+        if (p >= 0) {
+          at = p + 1;
+          break;
+        }
+      }
+      out.insert(at, g);
+    }
     return out;
   }
 
@@ -550,7 +587,9 @@ mixin RoutinesState on FitCore, LibraryState {
   void setRoutineGroup(String id, String group) {
     final r = _routine(id);
     if (r == null) return;
+    _syncGroupNames();
     r.group = group.trim();
+    if (r.group.isNotEmpty && !groupNames.contains(r.group)) groupNames.add(r.group);
     _persist();
     notifyListeners();
   }
@@ -575,6 +614,7 @@ mixin RoutinesState on FitCore, LibraryState {
     made.plan.addAll({for (final e in source.plan.entries) e.key: [...e.value]});
     made.rest.addAll(source.rest);
     made.alts.addAll({for (final e in source.alts.entries) e.key: [...e.value]});
+    made.exerciseNotes.addAll(source.exerciseNotes);
     made.group = source.group;
     made.color = source.color;
     _persist();
@@ -582,8 +622,30 @@ mixin RoutinesState on FitCore, LibraryState {
     return copy;
   }
 
+  void reorderRoutines(String group, int from, int to) {
+    final slots = [
+      for (var i = 0; i < routines.length; i++)
+        if (routines[i].group == group && !routines[i].archived) i,
+    ];
+    if (from < 0 || from >= slots.length || to < 0 || to >= slots.length || from == to) return;
+    final items = [for (final i in slots) routines[i]];
+    items.insert(to, items.removeAt(from));
+    for (var k = 0; k < slots.length; k++) {
+      routines[slots[k]] = items[k];
+    }
+    _persist();
+    notifyListeners();
+  }
+
   void renameGroup(String from, String to) {
     final name = to.trim();
+    _syncGroupNames();
+    final at = groupNames.indexOf(from);
+    if (name.isEmpty || groupNames.contains(name)) {
+      groupNames.remove(from);
+    } else if (at >= 0) {
+      groupNames[at] = name;
+    }
     for (final r in routines) {
       if (r.group == from) r.group = name;
     }
@@ -593,6 +655,8 @@ mixin RoutinesState on FitCore, LibraryState {
   }
 
   void deleteGroup(String group) {
+    _syncGroupNames();
+    groupNames.remove(group);
     for (final id in [for (final r in routinesInGroup(group)) r.id]) {
       _dropRoutine(id);
     }
@@ -601,6 +665,7 @@ mixin RoutinesState on FitCore, LibraryState {
   }
 
   void deleteRoutine(String id) {
+    _syncGroupNames();
     _dropRoutine(id);
     _persist();
     notifyListeners();
@@ -648,6 +713,7 @@ mixin RoutinesState on FitCore, LibraryState {
       r.rest.remove(exId);
       r.chained.remove(exId);
       r.alts.remove(exId);
+      r.exerciseNotes.remove(exId);
     } else {
       r.exerciseIds.add(exId);
     }
@@ -704,6 +770,7 @@ mixin RoutinesState on FitCore, LibraryState {
     if (plan != null) r.plan[to] = [for (final p in plan) PlannedSet(kind: p.kind)];
     final rest = r.rest.remove(from);
     if (rest != null) r.rest[to] = rest;
+    r.exerciseNotes.remove(from);
     if (r.chained.remove(from)) r.chained.add(to);
     final alts = r.alts.remove(from);
     if (alts != null) {
@@ -745,6 +812,7 @@ mixin RoutinesState on FitCore, LibraryState {
     final rest = r.rest[exId];
     final chained = r.chained.contains(exId);
     final alts = r.alts[exId];
+    final note = r.exerciseNotes[exId];
     toggleRoutineExercise(routineId, exId);
     return () {
       final back = _routine(routineId);
@@ -755,6 +823,7 @@ mixin RoutinesState on FitCore, LibraryState {
       if (rest != null) back.rest[exId] = rest;
       if (chained) back.chained.add(exId);
       if (alts != null) back.alts[exId] = alts;
+      if (note != null) back.exerciseNotes[exId] = note;
       _persist();
       notifyListeners();
     };
@@ -773,6 +842,22 @@ mixin RoutinesState on FitCore, LibraryState {
 
   int? routineRest(String? routineId, String exId) =>
       routineId == null ? null : _routine(routineId)?.rest[exId];
+
+  String? routineExerciseNote(String? routineId, String exId) =>
+      routineId == null ? null : _routine(routineId)?.exerciseNotes[exId];
+
+  void setRoutineExerciseNote(String routineId, String exId, String text) {
+    final r = _routine(routineId);
+    if (r == null || !r.exerciseIds.contains(exId)) return;
+    final note = text.trim();
+    if (note.isEmpty) {
+      r.exerciseNotes.remove(exId);
+    } else {
+      r.exerciseNotes[exId] = note;
+    }
+    _persist();
+    notifyListeners();
+  }
 
   void setRoutineRest(String routineId, String exId, int? seconds) {
     final r = _routine(routineId);

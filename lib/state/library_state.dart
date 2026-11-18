@@ -397,6 +397,7 @@ mixin LibraryState on FitCore {
     modeOverride.remove(id);
     for (final r in routines) {
       r.exerciseIds.remove(id);
+      r.exerciseNotes.remove(id);
     }
     favorites.remove(id);
     _persist();
@@ -508,6 +509,25 @@ mixin LibraryState on FitCore {
     eachSide.remove(id);
     eachSideOff.remove(id);
     if (on != _sidedByDefault.contains(id)) (on ? eachSide : eachSideOff).add(id);
+    _persist();
+    notifyListeners();
+  }
+
+  bool canPair(String id) =>
+      modeOf(id).isEmpty && !isRepsOnly(id) && exerciseById(id)?.equipment == 'Dumbbell';
+
+  bool isPaired(String id) => pairOn.contains(id);
+
+  void togglePaired(String id) {
+    if (!pairOn.remove(id)) pairOn.add(id);
+    _persist();
+    notifyListeners();
+  }
+
+  bool keepsCounting(String id) => runsClock(id) && keepCounting.contains(id);
+
+  void toggleKeepCounting(String id) {
+    if (!keepCounting.remove(id)) keepCounting.add(id);
     _persist();
     notifyListeners();
   }
