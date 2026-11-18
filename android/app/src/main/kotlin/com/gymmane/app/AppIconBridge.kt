@@ -8,10 +8,7 @@ import io.flutter.plugin.common.MethodChannel
 object AppIconBridge {
     const val CHANNEL = "gymmane/app_icon"
     private const val DEFAULT = "default"
-    private val NAMES = listOf(
-        DEFAULT, "light", "sand", "graphite", "sage", "night",
-        "material", "medal", "glass", "stopwatch", "marble",
-    )
+    private val NAMES = listOf(DEFAULT, "lambda", "dot", "ridge")
 
     fun attach(context: Context, channel: MethodChannel) {
         channel.setMethodCallHandler { call, result ->

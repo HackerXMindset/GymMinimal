@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="tile_label">GymMane</string>
+    <string name="tile_label">Apex</string>
     <string name="tile_week">this week</string>
     <string name="tile_start">Start</string>
     <string name="tile_continue">Continue</string>
