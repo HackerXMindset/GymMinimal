@@ -1,247 +1,115 @@
-<div align="center">
+# GymMinimal
 
-<img src="docs/screenshots/banner-en.png" alt="GymMane — Lift. Log it. Grow." width="860" />
+A minimal, offline gym tracker for Android. Few taps, a quiet screen, and
+stats that show you where you are stuck.
 
-<br/>
+GymMinimal is a fork of [GymMane](https://github.com/InlitX/GymMane) by InlitX,
+with a **Minimal mode** that turns the whole app into a smaller, calmer version
+of itself. Everything GymMane does is still there, and the original look is one
+switch away.
 
-<img src="docs/screenshots/icon.png" width="94" alt="GymMane" />
+- **Offline.** No account, no ads, no analytics, no internet permission.
+- **Minimal first.** As few taps as possible, small type, no clutter.
+- **Every addition has an on/off switch.** Turn off what you do not use.
+- **Stats you can see.** Raw numbers shown as charts, not lectures.
 
-# GymMane
+## What GymMinimal adds
 
-A free, offline gym log for Android.<br/>
-Tap the muscles you want to train, log your sets and watch your numbers go up.
+### Minimal mode
 
-<br/>
+On by default, with a switch in **Settings**. The Today page matches the
+HTML reference in [`docs/design`](docs/design).
 
-<p>
-  <img alt="Android 7.0+" src="https://img.shields.io/badge/Android-7.0%2B-3DDC84?style=flat&logo=android&logoColor=white" />
-  <img alt="License GPLv3" src="https://img.shields.io/badge/Code-GPLv3-C2410C?style=flat&logo=gnu&logoColor=white" />
-  <img alt="Art CC BY-SA 4.0" src="https://img.shields.io/badge/Art-CC%20BY--SA%204.0-8A6B41?style=flat&logo=creativecommons&logoColor=white" />
-  <a href="https://github.com/InlitX/GymMane/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/InlitX/GymMane?style=flat&color=D9A184&labelColor=181717&logo=github" /></a>
-  <a href="https://github.com/InlitX/GymMane/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/InlitX/GymMane/total?style=flat&color=D9A184&labelColor=181717&logo=github&label=downloads" /></a>
-</p>
+- **Today** with one hero card for the workout, no date header, and a **month
+  calendar**. Open any day to see its muscles and exercises, and add a workout
+  on a past day.
+- **Workout** exercises start collapsed. Choose between a **Table** view
+  (aligned columns, bands) and the **Cards** view in Settings.
+- **Keyboard-first number entry** for weight and reps, remembered between
+  sessions, with a small icon to switch back to the scroller.
+- **Exercises** open on a **Recent** chip. The exercise page is cleaner, with
+  How-to and Settings as popups and no Similar list.
+- **History** as a list or a table, with a month calendar on the list. Export a
+  single **Excel** file of an exercise's history.
+- **Bottom bar** with small icons, and your **wallpaper** shows through.
+- **Achievements** are off by default.
+- **Compact settings** on one page.
 
-<p>
-  <a href="https://trendshift.io/repositories/107197?utm_source=repository-badge&amp;utm_medium=badge&amp;utm_campaign=badge-repository-107197" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/repositories/107197" alt="InlitX%2FGymMane | Trendshift" width="250" height="55"/></a>
-  <br/>
-  <a href="https://ko-fi.com/inlitx"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support me on Ko-fi" height="34" /></a>
-</p>
+### Stats
 
-<a href="https://f-droid.org/packages/com.gymmane.app/"><img alt="Get it on F-Droid" src="docs/badges/get-it-on-fdroid.png" height="60" /></a>
-&nbsp;
-<a href="https://apt.izzysoft.de/fdroid/index/apk/com.gymmane.app?repo=main"><img alt="Get it on IzzyOnDroid" src="docs/badges/get-it-on-izzyondroid.png" height="60" /></a>
-&nbsp;
-<a href="https://www.openapk.net/gymmane/com.gymmane.app/"><img alt="Get it on OpenAPK" src="docs/badges/get-it-on-openapk.png" height="60" /></a>
-&nbsp;
-<a href="https://github.com/InlitX/GymMane/releases"><img alt="Get it on GitHub" src="docs/badges/get-it-on-github.png" height="60" /></a>
-&nbsp;
-<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22com.gymmane.app%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FInlitX%2FGymMane%22%2C%22author%22%3A%22InlitX%22%2C%22name%22%3A%22GymMane%22%2C%22preferredApkIndex%22%3A0%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Afalse%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22filterReleaseTitlesByRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22filterReleaseNotesByRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22verifyLatestTag%5C%22%3Afalse%2C%5C%22dontSortReleasesList%5C%22%3Afalse%2C%5C%22useLatestAssetDateAsReleaseDate%5C%22%3Afalse%2C%5C%22trackOnly%5C%22%3Afalse%2C%5C%22versionExtractionRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22matchGroupToUse%5C%22%3A%5C%22%5C%22%2C%5C%22versionDetection%5C%22%3Atrue%2C%5C%22releaseDateAsVersion%5C%22%3Afalse%2C%5C%22useVersionCodeAsOSVersion%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22invertAPKFilter%5C%22%3Afalse%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%2C%5C%22appName%5C%22%3A%5C%22%5C%22%2C%5C%22shizukuPretendToBeGooglePlay%5C%22%3Afalse%2C%5C%22allowInsecure%5C%22%3Afalse%2C%5C%22exemptFromBackgroundUpdates%5C%22%3Afalse%2C%5C%22skipUpdateNotifications%5C%22%3Afalse%2C%5C%22about%5C%22%3A%5C%22GymMane%20is%20an%20open%20source%20gym%20log%20for%20Android.%20Pick%20your%20muscles%20on%20a%20body%20map%2C%20log%20your%20sets%2C%20and%20watch%20your%20numbers%20grow.%20No%20accounts%2C%20no%20ads%2C%20no%20tracking%2C%20no%20internet%20permission.%5C%22%7D%22%2C%22overrideSource%22%3Anull%7D"><img alt="Get it on Obtainium" src="docs/badges/get-it-on-obtainium.png" height="60" /></a>
+- A **Stats** page built from cards you can switch on and off one by one
+  (**Settings › Stats cards**), grouped into sections.
+- **Per-exercise stats** shaped by the kind of exercise: strength level,
+  sets and frequency, records, volume, progression, and more. Nineteen cards in
+  all, each with its own switch.
+- **Minimal parity cards**: the same stats arranged for the Minimal screen.
+- **Rep max per exercise.** Change an exercise's 1RM to any rep max (8RM, for
+  example) in its settings, and the chart follows.
+- **Swipe through past weeks** on every card that shows one week. Drag left to
+  right for the previous week.
+- **Chart styles** you pick in Settings: classic, a **TradingView-style**
+  chart with a crosshair and tooltip, bars, or dots.
 
-<sub><b>English</b> · <a href="docs/readme/README.es.md">Español</a> · <a href="docs/readme/README.it.md">Italiano</a> · <a href="docs/readme/README.zh.md">简体中文</a></sub>
+### Garmin and heart rate (optional)
 
-<br/>
-<br/>
+Off until you turn on the **Garmin** switch.
 
-<img src="docs/screenshots/store/en/01-hero.jpg" width="196" alt="Lift. Log it. Grow." />
-<img src="docs/screenshots/store/en/02-train.jpg" width="196" alt="Tap the muscle, get the session" />
-<img src="docs/screenshots/store/en/03-rest.jpg" width="196" alt="Tick the set, rest rings itself" />
-<img src="docs/screenshots/store/en/04-progress.jpg" width="196" alt="Progress from your own sets" />
+- Reads Garmin data through **Health Connect**, and imports **.fit** files.
+- Heart rate, zones, sleep, readiness and hard minutes as cards, plus heart
+  rate laid over your sets.
+- Max heart rate is typed in or worked out for you.
 
-<img src="docs/screenshots/store/en/05-library.jpg" width="196" alt="500+ exercises with animations" />
-<img src="docs/screenshots/store/en/10-nutrition.jpg" width="196" alt="What you eat, at a glance" />
-<img src="docs/screenshots/store/en/06-privacy.jpg" width="196" alt="No account. No internet. No smoke." />
+### Food tracker in Minimal (optional)
 
-<details>
-<summary><sub><b>Plain screenshots</b>, every screen straight off the phone</sub></summary>
-<br/>
+A small tracker under the workout card on Today, with a switch. It reads the
+same food log and targets as the full Nutrition section (**Settings › Beta**).
 
-<img src="docs/screenshots/mock/01-home.png" width="215" alt="Today" />
-<img src="docs/screenshots/mock/03-train.png" width="215" alt="Body map" />
-<img src="docs/screenshots/mock/04-session.png" width="215" alt="Live session" />
-<img src="docs/screenshots/mock/02-progress.png" width="215" alt="Progress" />
+- A **Food strip** with bars against your targets, quick-add foods, and a
+  Water button.
+- A small **Food page** for the day's meals, with a link to the full Nutrition
+  section.
+- **Everything is a setting**: the numbers shown (calories, protein, carbs, fat,
+  water, fiber, sugar, sodium), targets (with a separate set for rest days),
+  your meals, the quick-add foods, and which cards show.
+- **Twelve food cards** on Stats, such as calories by week, macro split, days on
+  target, when you eat and water.
+- **Food next to training**: protein on lifting days against rest days, calories
+  next to bodyweight, and what eating before you lift does to your load.
 
-<sub><b>Today</b> &nbsp;·&nbsp; <b>Body map</b> &nbsp;·&nbsp; <b>Live session</b> &nbsp;·&nbsp; <b>Progress</b></sub>
+## Everything from GymMane
 
-<br/>
-<br/>
+GymMinimal is currently on top of **GymMane 2.4.0**. Body map sessions, rest
+timer, supersets, routines, progression and deload weeks, records and strength
+curves, 500+ exercises with animations, places, a training journal, twelve
+calculators, widgets, an NFC sticker, nutrition (beta), the Wear OS watch app,
+imports from Hevy, Strong, Lyfta, Liftosaur, JEFIT, StrongLifts, FitNotes and
+openGym, CSV and ZIP backups, Health Connect, and 22 languages. See the
+[GymMane README](https://github.com/InlitX/GymMane#readme) for the full list.
 
-<img src="docs/screenshots/mock/05-history.png" width="215" alt="History" />
-<img src="docs/screenshots/mock/06-library.png" width="215" alt="Library" />
-<img src="docs/screenshots/mock/07-routines.png" width="215" alt="Routines" />
-<img src="docs/screenshots/mock/08-settings.png" width="215" alt="Settings" />
+## Build
 
-<img src="docs/screenshots/mock/09-notes.png" width="215" alt="Journal" />
-<img src="docs/screenshots/mock/10-places.png" width="215" alt="Places" />
-<img src="docs/screenshots/mock/11-body.png" width="215" alt="Muscle timeline" />
-<img src="docs/screenshots/mock/12-profile.png" width="215" alt="Profile" />
+The signed ARM64 APK is built on GitHub Actions
+(`.github/workflows/build-minimal-apk.yml`, also runnable by hand from the
+**Actions** tab). To build it yourself:
 
-<sub><b>History</b> &nbsp;·&nbsp; <b>Library</b> &nbsp;·&nbsp; <b>Routines</b> &nbsp;·&nbsp; <b>Settings</b></sub>
-
-</details>
-
-</div>
-
-## What it does
-
-<table>
-<tr>
-<td width="50%" valign="top">
-
-### Training
-
-- Tap the muscles on a **body map** and get a session
-- Reps, weight and a **rest timer** with your own sound
-- Warm-up, drop, failure, rest-pause and cluster sets, with RPE or RIR
-- **Supersets** and **plates per side**
-- **Routines**, weekly plans and rotations, with days off that keep your streak
-- **Progression** per exercise, **deload weeks** and light sessions
-- A **voice** that guides your rest (beta)
-
-</td>
-<td width="50%" valign="top">
-
-### Progress
-
-- Volume, streaks, weekly goal and **records** for every rep range
-- **Strength curves** with estimated 1RM and strength per bodyweight
-- An **activity heatmap** and a muscle map of what you trained
-- **Your month, recapped**, as a story and a card to share
-- **Progress photos** on a timeline
-- Bodyweight, **ten body measurements**, steps, sleep and heart rate
-- Levels, **medals** and a sticker to share your workout
-
-</td>
-</tr>
-<tr>
-<td width="50%" valign="top">
-
-### Exercises and tools
-
-- **500+ exercises** with animations and instructions
-- Browse by muscle, equipment or level, or add **your own**
-- Use **your own photo, GIF or video** for any exercise
-- **Places**: tell it your kit and it only suggests what fits
-- A **training journal** with photos and video
-- Twelve **calculators**, five **widgets** and an **NFC sticker** that opens today's workout
-
-</td>
-<td width="50%" valign="top">
-
-### Your data
-
-- **CSV** export and a full **ZIP backup**
-- Import from **Hevy**, **Strong**, **Lyfta**, **Liftosaur**, **JEFIT**, **StrongLifts**, **FitNotes** or **openGym**
-- **Health Connect** in and out, and workouts to **Strava** as a `.fit` file
-- No account, no ads, no analytics, no **internet permission**
-- **22 languages**, light and dark, kg or lb
-- Delete everything in one tap
-
-</td>
-</tr>
-</table>
-
-## Nutrition (beta)
-
-Calories and macros against your goal, 500+ foods with photos, your own foods
-and dishes, water, supplements with dose and stock, meal plans and meal prep.
-**Ask any AI for a meal**, paste its answer and GymMane turns it into real
-food, with nothing sent from the app. No scanner and no online database. Don't
-need it? Turn it off in **Settings › Beta**.
-
-## Download
-
-Get it from F-Droid, IzzyOnDroid, OpenAPK, Obtainium or the
-[GitHub releases](https://github.com/InlitX/GymMane/releases/latest). Not sure
-which APK? Take `arm64-v8a`.
-
-| Platform | Status |
-|---|---|
-| Android 7.0+ | Supported |
-| Web, self-hosted | Supported, see [SELFHOST.md](SELFHOST.md) |
-| Wear OS 3+ | Beta, see [WEAR.md](WEAR.md) |
-| iOS 15+ | In progress |
-
-### Self-hosted
-
-The full app also runs in the browser from your own server, laid out for big
-screens, with your data in one folder on that machine:
-
-```sh
-curl -fsSLO https://raw.githubusercontent.com/InlitX/GymMane/main/compose.yaml
-docker compose up -d
+```bash
+flutter pub get
+flutter build apk --release --target-platform android-arm64
 ```
 
-No Docker? There are one-line installers for Linux, macOS, Windows and
-Proxmox VE, a template for Unraid and a compose file you can paste into
-Synology, QNAP, TrueNAS, CasaOS or Portainer. Everything, including syncing
-with the phone through Syncthing, is in [SELFHOST.md](SELFHOST.md).
+The release is signed with the key in `android/keystore`. Replace it with your
+own if you publish the app.
 
 ## Privacy
 
-GymMane doesn't have the internet permission, so your training never leaves
-your phone. The permissions it asks for are for the rest timer, its
-notification and the widgets.
+There is no internet permission, so your training and food never leave your
+phone. The permissions it asks for are for the rest timer, its notification and
+the widgets.
 
-## Contributing
+## License and credit
 
-Bug reports, ideas and pull requests are welcome. For anything big, open an
-issue first. Want to translate? Edit your language's file and send a pull
-request, [TRANSLATING.md](TRANSLATING.md) shows how.
-
-```bash
-git clone https://github.com/InlitX/GymMane.git
-cd GymMane
-flutter pub get
-flutter build apk --release
-```
-
-## Support
-
-GymMane is free and will stay that way. A star, a translation or a clear bug
-report helps a lot. If you want to buy me a coffee:
-
-<div align="center">
-
-<a href="https://ko-fi.com/inlitx"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support me on Ko-fi" height="38" /></a>
-
-<table align="center">
-  <tr>
-    <td align="center" width="130"><img src="docs/crypto/bitcoin.svg" width="22" alt="Bitcoin" /><br/><sub><b>Bitcoin</b></sub></td>
-    <td><code>bc1qm0r4pg8nknnjh3a7n2t63ckafhsz8jdd6qer29</code></td>
-  </tr>
-  <tr>
-    <td align="center" width="130"><img src="docs/crypto/ethereum.svg" width="22" alt="Ethereum" /><br/><sub><b>Ethereum</b></sub></td>
-    <td><code>0x34b7A5552132cBca150Ae29c1E632faA49430e1a</code></td>
-  </tr>
-  <tr>
-    <td align="center" width="130"><img src="docs/crypto/solana.svg" width="22" alt="Solana" /><br/><sub><b>Solana</b></sub></td>
-    <td><code>DC8dNEUNJhWdtBHBZAn4FTheVC3W4PtkGhbazvtk17Jo</code></td>
-  </tr>
-  <tr>
-    <td align="center" width="130"><img src="docs/crypto/monero.svg" width="22" alt="Monero" /><br/><sub><b>Monero</b></sub></td>
-    <td><code>44SECMEf3rfV228kpy3Gs48wLmLXnq231gAMG7ULYoCWBWLYLHdwYV7YFkhMk31DR5P7SRAyRPyhkYaehtgEoajASz7qubq</code></td>
-  </tr>
-</table>
-
-</div>
-
-## License
-
-The code is [GPL-3.0](LICENSE), with one [additional term](ADDITIONAL_TERMS.md)
-under its section 7(b): works based on GymMane must credit it as "Based on
-GymMane by InlitX". The exercise art comes from
-[Workout Guide](https://github.com/bryllim/workout-guide) by Bryl Lim and from
-[Everkinetic](https://github.com/everkinetic/data), the drawings Workout Guide
-builds on, and is
-[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). The fonts use
-the SIL Open Font License. [CREDITS.md](CREDITS.md) has the details.
-
-## Star history
-
-<a href="https://www.star-history.com/?repos=inlitx%2Fgymmane&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=inlitx/gymmane&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=inlitx/gymmane&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=inlitx/gymmane&type=date&legend=top-left" />
- </picture>
-</a>
+Based on GymMane by InlitX. The code is [GPL-3.0](LICENSE), with one
+[additional term](ADDITIONAL_TERMS.md) under its section 7(b): works based on
+GymMane must credit it as "Based on GymMane by InlitX". The exercise art is
+[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) and the fonts
+use the SIL Open Font License. [CREDITS.md](CREDITS.md) has the details.
