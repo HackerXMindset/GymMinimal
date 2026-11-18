@@ -43,7 +43,7 @@ class _GymManeAppState extends State<GymManeApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'GymMane',
+        title: 'Apex',
         debugShowCheckedModeBanner: false,
         scrollBehavior: kIsWeb ? const _WebScroll() : null,
         theme: AppTheme.light,

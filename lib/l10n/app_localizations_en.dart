@@ -3548,7 +3548,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appIcon => 'App icon';
 
   @override
-  String get appIconHint => 'How GymMane looks on your home screen';
+  String get appIconHint => 'How Apex looks on your home screen';
 
   @override
   String get appIconColors => 'Colors';

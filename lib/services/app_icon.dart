@@ -18,17 +18,10 @@ class AppIcon {
   static const _channel = MethodChannel('gymmane/app_icon');
 
   static const styles = [
-    AppIconStyle('default', false),
-    AppIconStyle('light', false),
-    AppIconStyle('sand', false),
-    AppIconStyle('graphite', false),
-    AppIconStyle('sage', false),
-    AppIconStyle('night', false),
-    AppIconStyle('material', true),
-    AppIconStyle('medal', true),
-    AppIconStyle('glass', true),
-    AppIconStyle('stopwatch', true),
-    AppIconStyle('marble', true),
+    AppIconStyle('default', true),
+    AppIconStyle('lambda', true),
+    AppIconStyle('dot', true),
+    AppIconStyle('ridge', true),
   ];
 
   static final current = ValueNotifier<String>('default');

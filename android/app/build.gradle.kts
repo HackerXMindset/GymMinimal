@@ -22,7 +22,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.gymmane.app"
+        applicationId = "com.hackerxmindset.apex"
         minSdk = 24
         targetSdk = 36
         versionCode = flutter.versionCode

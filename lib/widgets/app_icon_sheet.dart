@@ -10,17 +10,10 @@ import 'glass.dart';
 import 'ui_kit.dart';
 
 String appIconName(String id) => switch (id) {
-      'light' => t.appIconLight,
-      'sand' => t.appIconSand,
-      'graphite' => t.appIconGraphite,
-      'sage' => t.appIconSage,
-      'night' => t.appIconNight,
-      'material' => t.appIconMaterial,
-      'medal' => t.appIconMedal,
-      'glass' => t.appIconGlass,
-      'stopwatch' => t.appIconStopwatch,
-      'marble' => t.appIconMarble,
-      _ => t.appIconDefault,
+      'lambda' => 'Lambda',
+      'dot' => 'Dot',
+      'ridge' => 'Ridge',
+      _ => 'Barbell',
     };
 
 void showAppIconSheet(BuildContext context) {
@@ -75,9 +68,7 @@ class _AppIconSheet extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _Group(label: t.appIconColors, styles: [for (final s in AppIcon.styles) if (!s.design) s], current: current),
-                    const SizedBox(height: 22),
-                    _Group(label: t.appIconDesigns, styles: [for (final s in AppIcon.styles) if (s.design) s], current: current),
+                    _Group(label: t.appIconDesigns, styles: AppIcon.styles, current: current),
                     const SizedBox(height: 16),
                     Text(t.appIconNote,
                         textAlign: TextAlign.center,
